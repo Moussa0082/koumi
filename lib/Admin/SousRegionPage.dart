@@ -44,9 +44,8 @@ class _SousRegionPageState extends State<SousRegionPage> {
   void initState() {
     // continents = widget.continent;
     // _liste = getSousRegionListe();
-    _continentList =
-        http.get(Uri.parse('$apiOnlineUrl/continent/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
+    _continentList = http.get(Uri.parse('$apiOnlineUrl/continent/read'));
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
     _searchController = TextEditingController();
 
     super.initState();
@@ -73,7 +72,8 @@ class _SousRegionPageState extends State<SousRegionPage> {
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: const Text(
             "Sous regions",
-            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20),
+            style: TextStyle(
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           actions: [
             PopupMenuButton<String>(
@@ -93,8 +93,8 @@ class _SousRegionPageState extends State<SousRegionPage> {
                           overflow: TextOverflow.ellipsis),
                     ),
                     onTap: () async {
-                        Navigator.of(context).pop();
-                      _showDialog();
+                      Navigator.of(context).pop();
+                      _showBottomSheet();
                     },
                   ),
                 ),
@@ -400,7 +400,8 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                               String>>[
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
-                                                            leading: e.statutSousRegion ==
+                                                            leading:
+                                                                e.statutSousRegion ==
                                                                         false
                                                                     ? Icon(
                                                                         Icons
@@ -414,7 +415,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                         color: Colors
                                                                             .orange[400],
                                                                       ),
-                                                            title:  Text(
+                                                            title: Text(
                                                               e.statutSousRegion ==
                                                                       false
                                                                   ? "Activer"
@@ -433,45 +434,45 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                             ),
                                                             onTap: () async {
                                                               e.statutSousRegion ==
-                                                                        false
-                                                                    ?
-                                                              await SousRegionService()
-                                                                  .activerSousRegion(e
-                                                                      .idSousRegion!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<SousRegionService>(context, listen: false).applyChange(),
-                                                                            // setState(() {
-                                                                            //   _liste = SousRegionService().fetchSousRegionByContinent(continents.idContinent!);
-                                                                            // }),
-                                                                            Navigator.of(context).pop(),
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Activer avec succèss "),
-                                                                                  ],
+                                                                      false
+                                                                  ? await SousRegionService()
+                                                                      .activerSousRegion(e
+                                                                          .idSousRegion!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<SousRegionService>(context, listen: false).applyChange(),
+                                                                                // setState(() {
+                                                                                //   _liste = SousRegionService().fetchSousRegionByContinent(continents.idContinent!);
+                                                                                // }),
+                                                                                Navigator.of(context).pop(),
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Activer avec succèss "),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 2),
+                                                                                  ),
+                                                                                )
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
                                                                                 ),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ),
-                                                                            )
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          }) :  await SousRegionService()
+                                                                                Navigator.of(context).pop(),
+                                                                              })
+                                                                  : await SousRegionService()
                                                                       .desactiverSousRegion(e
                                                                           .idSousRegion!)
                                                                       .then(
@@ -533,32 +534,11 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                               ),
                                                             ),
                                                             onTap: () async {
-                                                              // Ouvrir la boîte de dialogue de modification
-                                                              var updatedSousRegion =
-                                                                  await showDialog(
-                                                                context:
-                                                                    context,
-                                                                builder: (BuildContext
-                                                                        context) =>
-                                                                    AlertDialog(
-                                                                  backgroundColor:
-                                                                      Colors
-                                                                          .white,
-                                                                  content: updateSousRegions(
-                                                                      sousRegion:
-                                                                          e),
-                                                                ),
-                                                              );
-
-                                                              // Si les détails sont modifiés, appliquer les changements
-                                                              if (updatedSousRegion !=
-                                                                  null) {
-                                                                Provider.of<SousRegionService>(
-                                                                        context,
-                                                                        listen:
-                                                                            false)
-                                                                    .applyChange();
-                                                              }
+                                                                Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                              bottomUpdatesheet(
+                                                                  context, e);
                                                             },
                                                           ),
                                                         ),
@@ -624,99 +604,112 @@ class _SousRegionPageState extends State<SousRegionPage> {
         ));
   }
 
-  void _showDialog() {
-    showDialog(
+  Future<dynamic> bottomUpdatesheet(
+      BuildContext context, SousRegion? sousRegion) async {
+    return await showModalBottomSheet<int>(
       context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ListTile(
-                title: Text(
-                  "Ajouter une sous-région",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 18,
-                  ),
-                  textAlign: TextAlign.center,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
-                trailing: IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: Icon(
-                    Icons.close,
-                    color: Colors.red,
-                    size: 24,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
                   ),
-                ),
+                ],
               ),
-              SizedBox(height: 16),
-              Form(
-                key: formkey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextFormField(
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Veuillez remplir ce champ";
-                        }
-                        return null;
-                      },
-                      controller: libelleController,
-                      decoration: InputDecoration(
-                        labelText: "Nom de la sous-région",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Consumer<ContinentService>(
-                      builder: (context, conService, child) {
-                        return FutureBuilder(
-                          future: _continentList,
-                          builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return  DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Chargement...',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              );
-                            }
-                            
-                            if (snapshot.hasData) {
-                              // final reponse = json.decode(snapshot.data.body);
-                              dynamic jsonString =
-                                  utf8.decode(snapshot.data.bodyBytes);
-                              dynamic reponse = json.decode(jsonString);
-                              if (reponse is List) {
-                                final continentList = reponse
-                                    .map((e) => Continent.fromMap(e))
-                                    .where((con) => con.statutContinent == true)
-                                    .toList();
+              child: updateSousRegions(sousRegion: sousRegion!)),
+        );
+      },
+    );
+  }
 
-                                if (continentList.isEmpty) {
+  void _showBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Ajouter une sous-région",
+                        maxLines: 2,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 18,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("Fermer",
+                            style: TextStyle(color: Colors.red, fontSize: 18)),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Form(
+                    key: formkey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir ce champ";
+                            }
+                            return null;
+                          },
+                          controller: libelleController,
+                          decoration: InputDecoration(
+                            labelText: "Nom de la sous-région",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                        Consumer<ContinentService>(
+                          builder: (context, conService, child) {
+                            return FutureBuilder(
+                              future: _continentList,
+                              builder: (_, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
                                   return DropdownButtonFormField(
                                     items: [],
                                     onChanged: null,
                                     decoration: InputDecoration(
-                                      labelText: 'Aucun continent trouvé',
+                                      labelText: 'Chargement...',
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
@@ -724,116 +717,144 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                   );
                                 }
 
-                                return DropdownButtonFormField<String>(
-                                  isExpanded: true,
-                                  items: continentList
-                                      .map(
-                                        (e) => DropdownMenuItem(
-                                          value: e.idContinent,
-                                          child: Text(e.nomContinent),
+                                if (snapshot.hasData) {
+                                  // final reponse = json.decode(snapshot.data.body);
+                                  dynamic jsonString =
+                                      utf8.decode(snapshot.data.bodyBytes);
+                                  dynamic reponse = json.decode(jsonString);
+                                  if (reponse is List) {
+                                    final continentList = reponse
+                                        .map((e) => Continent.fromMap(e))
+                                        .where((con) =>
+                                            con.statutContinent == true)
+                                        .toList();
+
+                                    if (continentList.isEmpty) {
+                                      return DropdownButtonFormField(
+                                        items: [],
+                                        onChanged: null,
+                                        decoration: InputDecoration(
+                                          labelText: 'Aucun continent trouvé',
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
                                         ),
-                                      )
-                                      .toList(),
-                                  value: continentValue,
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      continentValue = newValue;
-                                      if (newValue != null) {
-                                        continents = continentList.firstWhere(
-                                            (element) =>
-                                                element.idContinent ==
-                                                newValue);
-                                        debugPrint(
-                                            "con select ${continents.idContinent.toString()}");
-                                        // typeSelected = true;
-                                      }
-                                    });
-                                  },
+                                      );
+                                    }
+
+                                    return DropdownButtonFormField<String>(
+                                      isExpanded: true,
+                                      items: continentList
+                                          .map(
+                                            (e) => DropdownMenuItem(
+                                              value: e.idContinent,
+                                              child: Text(e.nomContinent),
+                                            ),
+                                          )
+                                          .toList(),
+                                      value: continentValue,
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          continentValue = newValue;
+                                          if (newValue != null) {
+                                            continents = continentList
+                                                .firstWhere((element) =>
+                                                    element.idContinent ==
+                                                    newValue);
+                                            debugPrint(
+                                                "con select ${continents.idContinent.toString()}");
+                                            // typeSelected = true;
+                                          }
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: 'Sélectionner un continent',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Sélectionner un continent',
+                                    labelText: 'Aucun continent trouvé',
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
                                 );
-                              }
-                            }
-                            return DropdownButtonFormField(
-                              items: [],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                labelText: 'Aucun continent trouvé',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
+                              },
                             );
                           },
-                        );
-                      },
+                        ),
+                        SizedBox(height: 20),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final String libelle = libelleController.text;
+                            if (formkey.currentState!.validate()) {
+                              try {
+                                await SousRegionService()
+                                    .addSousRegion(
+                                        nomSousRegion: libelle,
+                                        continent: continents)
+                                    .then((value) => {
+                                          Provider.of<SousRegionService>(
+                                                  context,
+                                                  listen: false)
+                                              .applyChange(),
+                                          libelleController.clear(),
+                                          setState(() {
+                                            continents == null;
+                                          }),
+                                          Navigator.of(context).pop()
+                                        });
+                              } catch (e) {
+                                final String errorMessage = e.toString();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Row(
+                                      children: [
+                                        Text("Une erreur s'est produit"),
+                                      ],
+                                    ),
+                                    duration: Duration(seconds: 5),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green, // Orange color code
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            minimumSize: const Size(290, 45),
+                          ),
+                          icon: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            "Ajouter",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        )
+                      ],
                     ),
-                    SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        final String libelle = libelleController.text;
-                        if (formkey.currentState!.validate()) {
-                          try {
-                            await SousRegionService()
-                                .addSousRegion(
-                                    nomSousRegion: libelle,
-                                    continent: continents)
-                                .then((value) => {
-                                      Provider.of<SousRegionService>(context,
-                                              listen: false)
-                                          .applyChange(),
-                                      libelleController.clear(),
-                                      setState(() {
-                                        continents == null;
-                                      }),
-                                      Navigator.of(context).pop()
-                                    });
-                          } catch (e) {
-                            final String errorMessage = e.toString();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Row(
-                                  children: [
-                                    Text("Une erreur s'est produit"),
-                                  ],
-                                ),
-                                duration: Duration(seconds: 5),
-                              ),
-                            );
-                          }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green, // Orange color code
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        minimumSize: const Size(290, 45),
-                      ),
-                      icon: const Icon(
-                        Icons.add,
-                        color: Colors.white,
-                      ),
-                      label: const Text(
-                        "Ajouter",
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-      ),
+            ));
+      },
     );
   }
 

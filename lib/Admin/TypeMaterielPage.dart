@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:koumi_app/Admin/ListeMaterielByType.dart';
+import 'package:koumi_app/Admin/UpdateTypeMateriel.dart';
 import 'package:koumi_app/models/Materiels.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/service/MaterielService.dart';
@@ -28,110 +27,6 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
   final formkey = GlobalKey<FormState>();
   TextEditingController nomController = TextEditingController();
   TextEditingController descController = TextEditingController();
-
-  String? detectedC;
-  String? detectedCountryCode;
-  String? detectedCountry;
-
-  void getLocationNew() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        await Geolocator.openLocationSettings();
-        return Future.error('Location services are disabled.');
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          return Future.error('Location permissions are denied');
-        }
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        return Future.error('Location permissions are permanently denied.');
-      }
-
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-
-      Placemark placemark = placemarks.first;
-      setState(() {
-        detectedCountryCode = placemark.isoCountryCode!;
-      });
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  var latitude = 'Getting Latitude..'.obs;
-  var longitude = 'Getting Longitude..'.obs;
-  var address = 'Getting Address..'.obs;
-  late StreamSubscription<Position> streamSubscription;
-
-  getLocation() async {
-    bool serviceEnabled;
-
-    LocationPermission permission;
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      await Geolocator.openLocationSettings();
-      return Future.error('Location services are disabled.');
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    streamSubscription =
-        Geolocator.getPositionStream().listen((Position position) {
-      latitude.value = 'Latitude : ${position.latitude}';
-      longitude.value = 'Longitude : ${position.longitude}';
-      getAddressFromLatLang(position);
-    });
-  }
-
-  Future<void> getAddressFromLatLang(Position position) async {
-    List<Placemark> placemark =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark place = placemark[0];
-    debugPrint("Address ISO: $detectedC");
-    address.value =
-        'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
-    setState(() {
-      detectedC = place.isoCountryCode;
-      detectedCountryCode = place.isoCountryCode!;
-      detectedCountry = place.country!;
-    });
-
-    debugPrint(
-        "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
-  }
 
   @override
   void initState() {
@@ -159,12 +54,11 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            'Materiel',
+            'Type Matériel',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold,fontSize:20),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           actions: [
-           
             PopupMenuButton<String>(
               padding: EdgeInsets.zero,
               itemBuilder: (context) {
@@ -176,7 +70,7 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                         color: Colors.green,
                       ),
                       title: const Text(
-                        "Type matériel ",
+                        "Ajouter Type matériel ",
                         style: TextStyle(
                           color: Colors.green,
                           fontSize: 18,
@@ -185,7 +79,7 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                       ),
                       onTap: () async {
                         Navigator.of(context).pop();
-                        _showDialog();
+                        _showBottomSheet();
                       },
                     ),
                   ),
@@ -219,7 +113,7 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                           setState(() {});
                         },
                         decoration: InputDecoration(
-                          hintText: 'Rechercher',
+                          hintText: 'Rechercher...',
                           border: InputBorder.none,
                           hintStyle: TextStyle(
                               color: Colors
@@ -275,7 +169,7 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                                       onTap: () {
                                         Get.to(ListeMaterielByType(
                                           typeMateriel: e,
-                                          detectedCountry: detectedCountryCode,
+                                          
                                         ));
                                       },
                                       child: Container(
@@ -570,27 +464,11 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                                                             ),
                                                           ),
                                                           onTap: () {
-                                                            showDialog(
-                                                                context:
-                                                                    context,
-                                                                builder: (BuildContext
-                                                                        context) =>
-                                                                    AlertDialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(16),
-                                                                      ),
-                                                                      // content: UpdateTypeVehicule(
-                                                                      //     typeVoiture:
-                                                                      //         e)
-                                                                    ));
                                                             Navigator.of(
                                                                     context)
                                                                 .pop();
+                                                            bottomUpdatesheet(
+                                                                context, e);
                                                           },
                                                         ),
                                                       ),
@@ -671,163 +549,197 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
     );
   }
 
-  void _showDialog() {
-    showDialog(
+  Future<dynamic> bottomUpdatesheet(
+      BuildContext context, TypeMateriel? typeMateriel) async {
+    return await showModalBottomSheet<int>(
       context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    "Ajouter un type matériel ",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.visible,
-                  ),
-                  trailing: IconButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      icon: Icon(
-                        Icons.close,
-                        color: Colors.red,
-                        size: 30,
-                      )),
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
-                const SizedBox(height: 5),
-                Form(
-                  key: formkey,
-                  child: Column(
-                    children: [
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: nomController,
-                        decoration: InputDecoration(
-                          hintText: "Nom type matériel",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: descController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Description",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final String nom = nomController.text;
-                          final String description = descController.text;
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: UpdateTypeMateriel(typeMateriel: typeMateriel!)),
+        );
+      },
+    );
+  }
 
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await TypeMaterielService()
-                                  .addTypeMateriel(
-                                      nom: nom, description: description)
-                                  .then((value) => {
-                                        Provider.of<TypeMaterielService>(
-                                                context,
-                                                listen: false)
-                                            .applyChange(),
-                                        nomController.clear(),
-                                        descController.clear(),
-                                        Navigator.of(context).pop()
-                                      })
-                                  .catchError((onError) => {
-                                        print(onError.toString()),
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Row(
-                                              children: [
-                                                Text(
-                                                    "Ce type de matériel existe déjà"),
-                                              ],
-                                            ),
-                                            duration: Duration(seconds: 5),
-                                          ),
-                                        )
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              print(errorMessage);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("Une erreur s'est produit"),
-                                    ],
-                                  ),
-                                  duration: const Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                          // }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // Orange color code
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          minimumSize: const Size(290, 45),
+  void _showBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Ajouter un type matériel ",
+                        maxLines: 2,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 18,
                         ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Ajouter",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                        textAlign: TextAlign.center,
                       ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("Fermer",
+                            style: TextStyle(color: Colors.red, fontSize: 18)),
+                      )
                     ],
                   ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
+                  const SizedBox(height: 5),
+                  Form(
+                    key: formkey,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir les champs";
+                            }
+                            return null;
+                          },
+                          controller: nomController,
+                          decoration: InputDecoration(
+                            hintText: "Nom type matériel",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir les champs";
+                            }
+                            return null;
+                          },
+                          controller: descController,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                            labelText: "Description",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final String nom = nomController.text;
+                            final String description = descController.text;
+
+                            if (formkey.currentState!.validate()) {
+                              try {
+                                await TypeMaterielService()
+                                    .addTypeMateriel(
+                                        nom: nom, description: description)
+                                    .then((value) => {
+                                          Provider.of<TypeMaterielService>(
+                                                  context,
+                                                  listen: false)
+                                              .applyChange(),
+                                          nomController.clear(),
+                                          descController.clear(),
+                                          Navigator.of(context).pop()
+                                        })
+                                    .catchError((onError) => {
+                                          print(onError.toString()),
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Row(
+                                                children: [
+                                                  Text(
+                                                      "Ce type de matériel existe déjà"),
+                                                ],
+                                              ),
+                                              duration: Duration(seconds: 5),
+                                            ),
+                                          )
+                                        });
+                              } catch (e) {
+                                final String errorMessage = e.toString();
+                                print(errorMessage);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Row(
+                                      children: [
+                                        Text("Une erreur s'est produit"),
+                                      ],
+                                    ),
+                                    duration: const Duration(seconds: 5),
+                                  ),
+                                );
+                              }
+                            }
+                            // }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green, // Orange color code
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            minimumSize: const Size(290, 45),
+                          ),
+                          icon: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            "Ajouter",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ));
+      },
     );
   }
 }

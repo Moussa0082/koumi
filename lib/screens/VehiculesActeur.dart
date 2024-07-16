@@ -11,7 +11,9 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddVehicule.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
+import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:provider/provider.dart';
+import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 import 'package:shimmer/shimmer.dart';
 
 class VehiculeActeur extends StatefulWidget {
@@ -224,50 +226,38 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                       return <Widget>[
                         SliverToBoxAdapter(
                             child: Column(children: [
-                          const SizedBox(height: 10),
-                          Padding(
+                        Padding(
                             padding: const EdgeInsets.all(10.0),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: Colors
-                                    .blueGrey[50], // Couleur d'arrière-plan
-                                borderRadius: BorderRadius.circular(25),
+                            child: SearchFieldAutoComplete<String>(
+                              controller: _searchController,
+                              placeholder: 'Rechercher...',
+                              placeholderStyle:
+                                  TextStyle(fontStyle: FontStyle.italic),
+                              suggestions: AutoComplet.getTransportVehicles,
+                              suggestionsDecoration: SuggestionDecoration(
+                                marginSuggestions: const EdgeInsets.all(8.0),
+                                color: const Color.fromARGB(255, 236, 234, 234),
+                                borderRadius: BorderRadius.circular(16.0),
                               ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.search,
-                                      color: Colors.blueGrey[400],
-                                      size:
-                                          28), // Utiliser une icône de recherche plus grande
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _searchController,
-                                      onChanged: (value) {
-                                        setState(() {});
-                                      },
-                                      decoration: InputDecoration(
-                                        hintText: 'Rechercher',
-                                        border: InputBorder.none,
-                                        hintStyle: TextStyle(
-                                            color: Colors.blueGrey[400]),
-                                      ),
-                                    ),
+                              onSuggestionSelected: (selectedItem) {
+                                _searchController.text = selectedItem.searchKey;
+                                // setState(() {});
+                              },
+                              onChanged: (value) {
+                                setState(() {});
+                              },
+                              suggestionItemBuilder:
+                                  (context, searchFieldItem) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    searchFieldItem.searchKey,
+                                    style: TextStyle(color: Colors.black),
                                   ),
-                                  // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
-                                  IconButton(
-                                    icon: Icon(Icons.clear),
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      setState(() {});
-                                    },
-                                  ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
                           ),
-                          const SizedBox(height: 10),
                         ])),
                       ];
                     },

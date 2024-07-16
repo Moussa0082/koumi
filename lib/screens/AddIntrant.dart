@@ -16,8 +16,8 @@ import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:provider/provider.dart';
 
 class AddIntrant extends StatefulWidget {
-  String? detectedCountry;
-  AddIntrant({super.key, this.detectedCountry});
+ 
+  AddIntrant({super.key});
 
   @override
   State<AddIntrant> createState() => _AddIntrantState();
@@ -378,50 +378,74 @@ class _AddIntrantState extends State<AddIntrant> {
                         ),
                       ),
                     ),
-                    Padding(
+                     Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 20),
-                      child: Autocomplete<String>(
-                        optionsBuilder: (TextEditingValue textEditingValue) {
-                          if (textEditingValue.text.isEmpty) {
-                            return const Iterable<String>.empty();
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir les champs";
                           }
-                          return AutoComplet.getAgriculturalInputs()
-                              .where((String option) {
-                            return option
-                                .toLowerCase()
-                                .contains(textEditingValue.text.toLowerCase());
-                          });
+                          return null;
                         },
-                        onSelected: (String selection) {
-                          _nomController.text = selection;
-                           print("nom : ${_nomController.text}");
-                        },
-                        fieldViewBuilder: (BuildContext context,
-                            TextEditingController fieldTextEditingController,
-                            FocusNode fieldFocusNode,
-                            VoidCallback onFieldSubmitted) {
-                          return TextFormField(
-                            controller: fieldTextEditingController,
-                            focusNode: fieldFocusNode,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Veuillez remplir le champs";
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              hintText: "Nom intrant",
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          );
-                        },
+                        controller: _nomController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          hintText: "Nom intrant",
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                       ),
                     ),
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(
+                    //       vertical: 10, horizontal: 20),
+                    //   child:  TypeAheadField<String>(
+                    //     // direction: settings.direction.value,
+                    //     controller: TextEditingController(),
+                    //     builder: (context, controller, focusNode) => TextField(
+                    //       controller: _nomController,
+                    //       focusNode: focusNode,
+                    //       autofocus: false,
+                    //       style: DefaultTextStyle.of(context)
+                    //           .style
+                    //           .copyWith(fontStyle: FontStyle.italic),
+                    //       decoration: InputDecoration(
+                    //         hintText: 'Nom produit',
+                    //         border: InputBorder.none,
+                    //         hintStyle: TextStyle(color: Colors.blueGrey[400]),
+                    //       ),
+                    //     ),
+
+                    //     itemBuilder: (context, suggestion) {
+                    //       return ListTile(
+                    //         title: Text(suggestion),
+                    //       );
+                    //     },
+                    //     onSelected: (suggestion) {
+                    //       _nomController.text = suggestion;
+                    //       print('Selected vehicle: $suggestion');
+                    //     },
+                    //     // suggestionsCallback: (pattern) {
+                    //     //   return AutoComplet.getAgriculturalInputs()
+                    //     //       .where((country) => country
+                    //     //           .toLowerCase()
+                    //     //           .contains(pattern.toLowerCase()))
+                    //     //       .toList();
+                    //     // },
+                    //     suggestionsCallback: (pattern) {
+                    //       return AutoComplet.getAgriculturalInputs()
+                    //           .where((String option) {
+                    //         return option
+                    //             .toLowerCase()
+                    //             .contains(_nomController.text.toLowerCase());
+                    //       }).toList();
+                    //     },
+                    //   ),
+                    // ),
                     SizedBox(
                       height: 10,
                     ),

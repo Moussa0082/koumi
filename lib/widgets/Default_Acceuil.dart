@@ -320,7 +320,7 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        IntrantScreen(detectedCountry: detectedCountry!)));
+                        IntrantScreen(detectedCountry: detectedCountry)));
           } else if (index == 14) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const MesCommande()));
@@ -329,73 +329,66 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        SemenceAndPlant(detectedCountry: detectedCountry)));
+                        SemenceAndPlant()));
           } else if (index == 12) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ProduitPhytosanitaire(
-                        detectedCountry: detectedCountry)));
+                    builder: (context) => ProduitPhytosanitaire()));
           } else if (index == 11) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        EngraisAndApport(detectedCountry: detectedCountry)));
+                        EngraisAndApport()));
           } else if (index == 10) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        FruitAndLegumes(detectedCountry: detectedCountry)));
+                        FruitAndLegumes()));
           } else if (index == 9) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        ProductsScreen(detectedCountry: detectedCountry!)));
+                        ProductsScreen()));
           } else if (index == 8) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        ProduitTransforme(detectedCountry: detectedCountry)));
+                        ProduitTransforme()));
           } else if (index == 7) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        ProduitElevage(detectedCountry: detectedCountry)));
+                        ProduitElevage()));
           } else if (index == 6) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        StoreScreen(detectedCountry: detectedCountry!)));
+                        StoreScreen()));
           } else if (index == 5) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => ComplementAlimentaire(
-                        detectedCountry: detectedCountry)));
+                        )));
           } else if (index == 4) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        LocationMateriel(detectedCountry: detectedCountry!)));
+                         l.Location()));
           } else if (index == 3) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        Transport(detectedCountry: detectedCountry!)));
-          } else if (index == 3) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        Transport(detectedCountry: detectedCountry)));
+                        Transport()));
           } else if (index == 2) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => WeatherScreen()));

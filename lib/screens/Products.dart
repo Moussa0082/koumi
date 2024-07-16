@@ -18,14 +18,16 @@ import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/screens/MyProduct.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/widgets/AutoComptet.dart';
+import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:provider/provider.dart';
+import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductsScreen extends StatefulWidget {
-  String? id, nom;
-  String? detectedCountry;
-  ProductsScreen({super.key, this.id, this.nom, this.detectedCountry});
+  ProductsScreen({
+    super.key,
+  });
 
   @override
   State<ProductsScreen> createState() => _ProductsScreenState();
@@ -37,6 +39,7 @@ const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
 
 class _ProductsScreenState extends State<ProductsScreen> {
   late Acteur acteur = Acteur();
+  String? detectedCountry;
   late List<TypeActeur> typeActeurData = [];
   late String type;
   bool isSearchMode = true;
@@ -82,15 +85,15 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Future<List<Stock>> getAllStock() async {
     if (selectedCat != null) {
       stockListe = await StockService().fetchStockByCategorie(
-          selectedCat!.idCategorieProduit!, widget.detectedCountry!);
+          selectedCat!.idCategorieProduit!, detectedCountry!);
     }
 
     return stockListe;
   }
 
   Future<List<Stock>> getAllStocks() async {
-    stockListe = await StockService().fetchStock(
-        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+    stockListe = await StockService()
+        .fetchStock(detectedCountry != null ? detectedCountry! : "Mali");
     return stockListe;
   }
 
@@ -106,8 +109,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           page++;
         });
       debugPrint("yes - fetch all stocks by pays");
-      fetchStock(
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+      fetchStock(detectedCountry != null ? detectedCountry! : "Mali")
           .then((value) {
         setState(() {
           // Rafraîchir les données ici
@@ -115,8 +117,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
         });
       });
     }
-    //  fetchStock(widget.detectedCountry != null
-    //               ? widget.detectedCountry!
+    //  fetchStock(detectedCountry != null
+    //               ? detectedCountry!
     //               : "Mali")
     //           .then((value) {
     //         setState(() {
@@ -142,8 +144,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           page++;
         });
 
-      fetchStockByCategorie(
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+      fetchStockByCategorie(detectedCountry != null ? detectedCountry! : "Mali")
           .then((value) {
         setState(() {
           // Rafraîchir les données ici
@@ -273,6 +274,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController1.addListener(_scrollListener1);
     });
+    detectedCountry =
+        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
     verify();
     _searchController = TextEditingController();
     _catList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
@@ -445,65 +448,34 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   ),
                 ),
                 if (isSearchMode)
-                   Padding(
+                 Padding(
                     padding: const EdgeInsets.all(10.0),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.blueGrey[50],
-                        borderRadius: BorderRadius.circular(25),
+                    child: SearchFieldAutoComplete<String>(
+                      controller: _searchController,
+                      placeholder: 'Rechercher...',
+                      placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
+                      suggestions: AutoComplet.getAgriculturalProducts,
+                      suggestionsDecoration: SuggestionDecoration(
+                        marginSuggestions: const EdgeInsets.all(8.0),
+                        color: const Color.fromARGB(255, 236, 234, 234),
+                        borderRadius: BorderRadius.circular(16.0),
                       ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.search, color: Colors.blueGrey[400]),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Autocomplete<String>(
-                              optionsBuilder:
-                                  (TextEditingValue textEditingValue) {
-                                if (textEditingValue.text.isEmpty) {
-                                  return const Iterable<String>.empty();
-                                }
-                                return AutoComplet.getSuggestions()
-                                    .where((String option) {
-                                  return option.toLowerCase().contains(
-                                      textEditingValue.text.toLowerCase());
-                                });
-                              },
-                              onSelected: (String selection) {
-                                _searchController.text = selection;
-                                setState(() {});
-                              },
-                              fieldViewBuilder: (BuildContext context,
-                                  TextEditingController
-                                      fieldTextEditingController,
-                                  FocusNode fieldFocusNode,
-                                  VoidCallback onFieldSubmitted) {
-                                return TextField(
-                                  controller: fieldTextEditingController,
-                                  focusNode: fieldFocusNode,
-                                  onChanged: (value) {
-                                    setState(() {});
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Rechercher',
-                                    border: InputBorder.none,
-                                    hintStyle:
-                                        TextStyle(color: Colors.blueGrey[400]),
-                                  ),
-                                );
-                              },
-                            ),
+                      onSuggestionSelected: (selectedItem) {
+                        _searchController.text = selectedItem.searchKey;
+                        // setState(() {});
+                      },
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      suggestionItemBuilder: (context, searchFieldItem) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            searchFieldItem.searchKey,
+                            style: TextStyle(color: Colors.black),
                           ),
-                          IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {});
-                            },
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   ),
                 if (!isSearchMode)
@@ -560,15 +532,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   ? setState(() {
                       stockListeFuture1 = StockService().fetchStockByCategorie(
                           selectedCat!.idCategorieProduit!,
-                          widget.detectedCountry != null
-                              ? widget.detectedCountry!
-                              : "Mali");
+                          detectedCountry != null ? detectedCountry! : "Mali");
                     })
                   : setState(() {
                       stockListeFuture = StockService().fetchStock(
-                          widget.detectedCountry != null
-                              ? widget.detectedCountry!
-                              : "Mali");
+                          detectedCountry != null ? detectedCountry! : "Mali");
                     });
             },
             child: selectedCat == null
@@ -1238,7 +1206,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
- 
   DropdownButtonFormField<String> buildDropdown(
       List<CategorieProduit> typeList) {
     return DropdownButtonFormField<String>(
@@ -1262,7 +1229,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           page = 0;
           hasMore = true;
           fetchStockByCategorie(
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali",
+              detectedCountry != null ? detectedCountry! : "Mali",
               refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {

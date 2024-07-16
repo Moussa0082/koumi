@@ -8,11 +8,13 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/ListeVehiculeByType.dart';
 import 'package:koumi_app/service/TypeVoitureService.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
+import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:provider/provider.dart';
+import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 
 class TypeVehicule extends StatefulWidget {
   String? detectedCountry;
-   TypeVehicule({super.key, this.detectedCountry});
+  TypeVehicule({super.key, this.detectedCountry});
 
   @override
   State<TypeVehicule> createState() => _TypeVehiculeState();
@@ -61,7 +63,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
           title: Text(
             'Type de véhicule',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold,fontSize:20),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           actions: [
             PopupMenuButton<String>(
@@ -84,11 +86,10 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                       ),
                       onTap: () async {
                         Navigator.of(context).pop();
-                        _showDialog();
+                        _showBottomSheet();
                       },
                     ),
                   ),
-                 
                 ];
               },
             )
@@ -96,39 +97,34 @@ class _TypeVehiculeState extends State<TypeVehicule> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(10.0),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                  borderRadius: BorderRadius.circular(25),
+              child: SearchFieldAutoComplete<String>(
+                controller: _searchController,
+                placeholder: 'Rechercher...',
+                placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
+                suggestions: AutoComplet.getTransportVehicles,
+                suggestionsDecoration: SuggestionDecoration(
+                  marginSuggestions: const EdgeInsets.all(8.0),
+                  color: const Color.fromARGB(255, 236, 234, 234),
+                  borderRadius: BorderRadius.circular(16.0),
                 ),
-                child: Row(
-                  children: [
-                    Icon(Icons.search,
-                        color: Colors.blueGrey[400]), // Couleur de l'icône
-                    SizedBox(
-                        width:
-                            10), // Espacement entre l'icône et le champ de recherche
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (value) {
-                          setState(() {});
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Rechercher',
-                          border: InputBorder.none,
-                          hintStyle: TextStyle(
-                              color: Colors
-                                  .blueGrey[400]), // Couleur du texte d'aide
-                        ),
-                      ),
+                onSuggestionSelected: (selectedItem) {
+                  _searchController.text = selectedItem.searchKey;
+                  // setState(() {});
+                },
+                onChanged: (value) {
+                  setState(() {});
+                },
+                suggestionItemBuilder: (context, searchFieldItem) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      searchFieldItem.searchKey,
+                      style: TextStyle(color: Colors.black),
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 10),
@@ -170,7 +166,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     ListeVehiculeByType(
-                                                        typeVoitures: e,detectedCountry:widget.detectedCountry, )));
+                                                        typeVoitures: e)));
                                       },
                                       child: Container(
                                         width:
@@ -338,22 +334,21 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                     PopupMenuItem<String>(
                                                       child: ListTile(
                                                         leading: e.statutType ==
-                                                                    false
-                                                                ? Icon(
-                                                                    Icons.check,
-                                                                    color: Colors
-                                                                        .green,
-                                                                  )
-                                                                : Icon(
-                                                                    Icons
-                                                                        .disabled_visible,
-                                                                    color: Colors
-                                                                            .orange[
-                                                                        400],
-                                                                  ),
-                                                        title:  Text(
-                                                          e.statutType ==
-                                                                  false
+                                                                false
+                                                            ? Icon(
+                                                                Icons.check,
+                                                                color: Colors
+                                                                    .green,
+                                                              )
+                                                            : Icon(
+                                                                Icons
+                                                                    .disabled_visible,
+                                                                color: Colors
+                                                                        .orange[
+                                                                    400],
+                                                              ),
+                                                        title: Text(
+                                                          e.statutType == false
                                                               ? "Activer"
                                                               : "Desactiver",
                                                           style: TextStyle(
@@ -367,83 +362,65 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                           e.statutType == false
-                                                          ? 
-                                                          await TypeVoitureService()
-                                                              .activerType(e
-                                                                  .idTypeVoiture!)
-                                                              .then((value) => {
-                                                                    Provider.of<TypeVoitureService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
-                                                                        .showSnackBar(
-                                                                      const SnackBar(
-                                                                        content:
-                                                                            Row(
-                                                                          children: [
-                                                                            Text("Activer avec succèss "),
-                                                                          ],
-                                                                        ),
-                                                                        duration:
-                                                                            Duration(seconds: 2),
-                                                                      ),
-                                                                    )
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Une erreur s'est produit : $onError"),
-                                                                              ],
+                                                          e.statutType == false
+                                                              ? await TypeVoitureService()
+                                                                  .activerType(e
+                                                                      .idTypeVoiture!)
+                                                                  .then(
+                                                                      (value) =>
+                                                                          {
+                                                                            Provider.of<TypeVoitureService>(context, listen: false).applyChange(),
+                                                                            Navigator.of(context).pop(),
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Activer avec succèss "),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 2),
+                                                                              ),
+                                                                            )
+                                                                          })
+                                                                  .catchError(
+                                                                      (onError) =>
+                                                                          {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Une erreur s'est produit : $onError"),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: const Duration(seconds: 5),
+                                                                              ),
                                                                             ),
-                                                                            duration:
-                                                                                const Duration(seconds: 5),
-                                                                          ),
-                                                                        ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
-                                                                      }) :  await TypeVoitureService()
-                                                              .desactiverType(e
-                                                                  .idTypeVoiture!)
-                                                              .then((value) => {
-                                                                    Provider.of<TypeVoitureService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Une erreur s'est produit : $onError"),
-                                                                              ],
+                                                                            Navigator.of(context).pop(),
+                                                                          })
+                                                              : await TypeVoitureService()
+                                                                  .desactiverType(e
+                                                                      .idTypeVoiture!)
+                                                                  .then(
+                                                                      (value) =>
+                                                                          {
+                                                                            Provider.of<TypeVoitureService>(context, listen: false).applyChange(),
+                                                                            Navigator.of(context).pop(),
+                                                                          })
+                                                                  .catchError(
+                                                                      (onError) =>
+                                                                          {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Une erreur s'est produit : $onError"),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: const Duration(seconds: 5),
+                                                                              ),
                                                                             ),
-                                                                            duration:
-                                                                                const Duration(seconds: 5),
-                                                                          ),
-                                                                        ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
-                                                                      });
+                                                                            Navigator.of(context).pop(),
+                                                                          });
 
                                                           ScaffoldMessenger.of(
                                                                   context)
@@ -479,24 +456,10 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                           ),
                                                         ),
                                                         onTap: () {
-                                                          showDialog(
-                                                              context: context,
-                                                              builder: (BuildContext
-                                                                      context) =>
-                                                                  AlertDialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(16),
-                                                                      ),
-                                                                      content: UpdateTypeVehicule(
-                                                                          typeVoiture:
-                                                                              e)));
                                                           Navigator.of(context)
                                                               .pop();
+                                                          bottomUpdatesheet(
+                                                              context, e);
                                                         },
                                                       ),
                                                     ),
@@ -568,6 +531,35 @@ class _TypeVehiculeState extends State<TypeVehicule> {
     );
   }
 
+  Future<dynamic> bottomUpdatesheet(
+      BuildContext context, TypeVoiture? typeVoiture) async {
+    return await showModalBottomSheet<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: UpdateTypeVehicule(typeVoiture: typeVoiture!)),
+        );
+      },
+    );
+  }
+
   Widget _buildEtat(bool isState) {
     return Container(
       width: 15,
@@ -579,195 +571,200 @@ class _TypeVehiculeState extends State<TypeVehicule> {
     );
   }
 
-  void _showDialog() {
-    showDialog(
+  void _showBottomSheet() {
+    showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    "Ajouter un type de véhicule ",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.visible,
-                  ),
-                  trailing: IconButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      icon: Icon(
-                        Icons.close,
-                        color: Colors.red,
-                        size: 30,
-                      )),
-                ),
-                const SizedBox(height: 5),
-                Form(
-                  key: formkey,
-                  child: Column(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const SizedBox(
-                        height: 10,
+                      Text(
+                        "Ajouter un type de véhicule",
+                        maxLines: 2,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 18,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
                         },
-                        controller: nomController,
-                        decoration: InputDecoration(
-                          hintText: "Nom type vehicule",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: nombreSiegesController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        decoration: InputDecoration(
-                          hintText: "nombre siège facultatif",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: descController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Description",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final String nom = nomController.text;
-                          final String siege = nombreSiegesController.text;
-                          final String description = descController.text;
-                          // if (formkey.currentState != null &&
-                          //     formkey.currentState!.validate()) {
-                          // Votre code ici
-
-                          print(nom);
-                          print(siege);
-                          print(description);
-                          try {
-                            await TypeVoitureService()
-                                .addTypeVoiture(
-                                    nom: nom,
-                                    nombreSieges: siege,
-                                    description: description,
-                                    acteur: acteur)
-                                .then((value) => {
-                                      Provider.of<TypeVoitureService>(context,
-                                              listen: false)
-                                          .applyChange(),
-                                      nomController.clear(),
-                                      descController.clear(),
-                                      nombreSiegesController.clear(),
-                                      Navigator.of(context).pop()
-                                    })
-                                .catchError((onError) => {
-                                      print(onError.toString()),
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Row(
-                                            children: [
-                                              Text(
-                                                  "Ce type de véhicule existe déjà"),
-                                            ],
-                                          ),
-                                          duration: Duration(seconds: 5),
-                                        ),
-                                      )
-                                    });
-                          } catch (e) {
-                            final String errorMessage = e.toString();
-                            print(errorMessage);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Row(
-                                  children: [
-                                    Text(
-                                        "Une erreur s'est produit : $errorMessage"),
-                                  ],
-                                ),
-                                duration: const Duration(seconds: 5),
-                              ),
-                            );
-                          }
-                          // }
-                          // }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // Orange color code
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          minimumSize: const Size(290, 45),
-                        ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Ajouter",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
+                        child: Text("Fermer",
+                            style: TextStyle(color: Colors.red, fontSize: 18)),
+                      )
                     ],
                   ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
+                  const SizedBox(height: 5),
+                  Form(
+                    key: formkey,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir les champs";
+                            }
+                            return null;
+                          },
+                          controller: nomController,
+                          decoration: InputDecoration(
+                            hintText: "Nom type vehicule",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir les champs";
+                            }
+                            return null;
+                          },
+                          controller: nombreSiegesController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          decoration: InputDecoration(
+                            hintText: "nombre siège facultatif",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir les champs";
+                            }
+                            return null;
+                          },
+                          controller: descController,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                            labelText: "Description",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final String nom = nomController.text;
+                            final String siege = nombreSiegesController.text;
+                            final String description = descController.text;
+                            // if (formkey.currentState != null &&
+                            //     formkey.currentState!.validate()) {
+                            // Votre code ici
+
+                            print(nom);
+                            print(siege);
+                            print(description);
+                            try {
+                              await TypeVoitureService()
+                                  .addTypeVoiture(
+                                      nom: nom,
+                                      nombreSieges: siege,
+                                      description: description,
+                                      acteur: acteur)
+                                  .then((value) => {
+                                        Provider.of<TypeVoitureService>(context,
+                                                listen: false)
+                                            .applyChange(),
+                                        nomController.clear(),
+                                        descController.clear(),
+                                        nombreSiegesController.clear(),
+                                        Navigator.of(context).pop()
+                                      })
+                                  .catchError((onError) => {
+                                        print(onError.toString()),
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Row(
+                                              children: [
+                                                Text(
+                                                    "Ce type de véhicule existe déjà"),
+                                              ],
+                                            ),
+                                            duration: Duration(seconds: 5),
+                                          ),
+                                        )
+                                      });
+                            } catch (e) {
+                              final String errorMessage = e.toString();
+                              print(errorMessage);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text(
+                                          "Une erreur s'est produit : $errorMessage"),
+                                    ],
+                                  ),
+                                  duration: const Duration(seconds: 5),
+                                ),
+                              );
+                            }
+                            // }
+                            // }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green, // Orange color code
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            minimumSize: const Size(290, 45),
+                          ),
+                          icon: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            "Ajouter",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ));
+      },
     );
   }
 }

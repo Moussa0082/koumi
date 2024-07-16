@@ -14,8 +14,8 @@ import 'package:provider/provider.dart';
 
 class ListeMaterielByType extends StatefulWidget {
   final TypeMateriel? typeMateriel;
-  String? detectedCountry;
-  ListeMaterielByType({super.key, this.typeMateriel, this.detectedCountry});
+  
+  ListeMaterielByType({super.key, this.typeMateriel});
 
   @override
   State<ListeMaterielByType> createState() => _ListeMaterielByTypeState();

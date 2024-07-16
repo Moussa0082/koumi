@@ -731,12 +731,11 @@ class _CategoriPageState extends State<CategoriPage> {
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop();
-                                                                   
-                                                                        bottomUpdatesheet(
-                                                                            context,
-                                                                            e);
 
-                                                                   
+                                                                    bottomUpdatesheet(
+                                                                        context,
+                                                                        e);
+
                                                                     Provider.of<CategorieService>(
                                                                             context,
                                                                             listen:

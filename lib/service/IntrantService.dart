@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-
+ 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -125,7 +127,42 @@ class IntrantService extends ChangeNotifier {
   }
 
   
- 
+  Future<void> updateQuantiteIntrant({
+  required String id,
+  required double quantite,
+}) async {
+  
+  try {
+    final response = await http.put(
+      Uri.parse('$baseUrl/$id/quantite?quantite=$quantite'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final donneesResponse = json.decode(response.body);
+      debugPrint('Intrant  service update: ${donneesResponse.toString()}');
+      // return Stock.fromJson(json.decode(response.body));
+      // applyChange();
+    } else {
+      Get.snackbar(
+        "Erreur",
+        "Une erreur s'est produite, veuillez réessayer ultérieurement",
+        duration: Duration(seconds: 3),
+      );
+      throw Exception(
+        'Impossible de mettre à jour la quantité : ${quantite} et code : ${response.statusCode}',
+      );
+    }
+  } catch (e) {
+    Get.snackbar(
+      "Erreur",
+      "Une erreur s'est produite, veuillez réessayer ultérieurement",
+      duration: Duration(seconds: 3),
+    );
+    debugPrint('Erreur lors de la mise à jour de la quantité: $e');
+    throw Exception('Erreur lors de la mise à jour de la quantité: $e');
+  }
+  }
 
 
    Future<List<Intrant>> fetchIntrant({bool refresh = false }) async {

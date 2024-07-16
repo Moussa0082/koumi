@@ -78,7 +78,7 @@ class _UnitePageState extends State<UnitePage> {
                     ),
                     onTap: () async {
                       Navigator.of(context).pop();
-                      _showDialog();
+                      _showBottomSheet();
                     },
                   ),
                 ),
@@ -344,25 +344,11 @@ class _UnitePageState extends State<UnitePage> {
                                                             ),
                                                           ),
                                                           onTap: () {
-                                                            showDialog(
-                                                                context:
-                                                                    context,
-                                                                builder: (BuildContext
-                                                                        context) =>
-                                                                    AlertDialog(
-                                                                        backgroundColor:
-                                                                            Colors
-                                                                                .white,
-                                                                        shape:
-                                                                            RoundedRectangleBorder(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(16),
-                                                                        ),
-                                                                        content:
-                                                                            UpdateUnite(unite: e)));
                                                             Navigator.of(
                                                                     context)
                                                                 .pop();
+                                                            bottomUpdatesheet(
+                                                                context, e);
                                                           },
                                                         ),
                                                       ),
@@ -430,6 +416,34 @@ class _UnitePageState extends State<UnitePage> {
     );
   }
 
+  Future<dynamic> bottomUpdatesheet(BuildContext context, Unite? unite) async {
+    return await showModalBottomSheet<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: UpdateUnite(unite: unite!)),
+        );
+      },
+    );
+  }
+
   Widget _buildEtat(bool isState) {
     return Container(
       width: 15,
@@ -441,168 +455,173 @@ class _UnitePageState extends State<UnitePage> {
     );
   }
 
-  void _showDialog() {
-    showDialog(
+  void _showBottomSheet() {
+    showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    "Ajouter une unité ",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.visible,
-                  ),
-                  trailing: IconButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      icon: Icon(
-                        Icons.close,
-                        color: Colors.red,
-                        size: 30,
-                      )),
-                ),
-                const SizedBox(height: 5),
-                Form(
-                  key: formkey,
-                  child: Column(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const SizedBox(
-                        height: 10,
+                      Text(
+                        "Ajouter une unité ",
+                        maxLines: 2,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 18,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
                         },
-                        controller: libelleController,
-                        decoration: InputDecoration(
-                          hintText: "Nom unité",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: sigleController,
-                        decoration: InputDecoration(
-                          hintText: "Sigle unité",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: descController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Description",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          final String sigle = sigleController.text;
-                          final String description = descController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await UniteService()
-                                  .addUnite(
-                                      nomUnite: libelle,
-                                      sigleUnite: sigle,
-                                      description: description,
-                                      acteur: acteur)
-                                  .then((value) => {
-                                        Provider.of<UniteService>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        libelleController.clear(),
-                                        descController.clear(),
-                                        sigleController.clear(),
-                                        Navigator.of(context).pop()
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text(
-                                          "Une erreur s'est produit : $errorMessage"),
-                                    ],
-                                  ),
-                                  duration: const Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // Orange color code
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          minimumSize: const Size(290, 45),
-                        ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Ajouter",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
+                        child: Text("Fermer",
+                            style: TextStyle(color: Colors.red, fontSize: 18)),
+                      )
                     ],
                   ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
+                  const SizedBox(height: 5),
+                  Form(
+                    key: formkey,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir les champs";
+                            }
+                            return null;
+                          },
+                          controller: libelleController,
+                          decoration: InputDecoration(
+                            hintText: "Nom unité",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir les champs";
+                            }
+                            return null;
+                          },
+                          controller: sigleController,
+                          decoration: InputDecoration(
+                            hintText: "Sigle unité",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir les champs";
+                            }
+                            return null;
+                          },
+                          controller: descController,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                            labelText: "Description",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final String libelle = libelleController.text;
+                            final String sigle = sigleController.text;
+                            final String description = descController.text;
+                            if (formkey.currentState!.validate()) {
+                              try {
+                                await UniteService()
+                                    .addUnite(
+                                        nomUnite: libelle,
+                                        sigleUnite: sigle,
+                                        description: description,
+                                        acteur: acteur)
+                                    .then((value) => {
+                                          Provider.of<UniteService>(context,
+                                                  listen: false)
+                                              .applyChange(),
+                                          libelleController.clear(),
+                                          descController.clear(),
+                                          sigleController.clear(),
+                                          Navigator.of(context).pop()
+                                        });
+                              } catch (e) {
+                                final String errorMessage = e.toString();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Row(
+                                      children: [
+                                        Text(
+                                            "Une erreur s'est produit : $errorMessage"),
+                                      ],
+                                    ),
+                                    duration: const Duration(seconds: 5),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green, // Orange color code
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            minimumSize: const Size(290, 45),
+                          ),
+                          icon: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            "Ajouter",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ));
+      },
     );
   }
 }

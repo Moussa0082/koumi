@@ -27,9 +27,8 @@ class _updateSousRegionsState extends State<updateSousRegions> {
     libelleController.text = widget.sousRegion.nomSousRegion;
     continents = widget.sousRegion.continent;
     continentValue = widget.sousRegion.continent.idContinent;
-    _continentList =
-        http.get(Uri.parse('$apiOnlineUrl/continent/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
+    _continentList = http.get(Uri.parse('$apiOnlineUrl/continent/read'));
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
     super.initState();
   }
 
@@ -53,26 +52,27 @@ class _updateSousRegionsState extends State<updateSousRegions> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ListTile(
-            title: Text(
-              "Modification",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                fontSize: 18,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Modification",
+                maxLines: 2,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  fontSize: 18,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            trailing: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: Icon(
-                Icons.close,
-                color: Colors.red,
-                size: 24,
-              ),
-            ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("Fermer",
+                    style: TextStyle(color: Colors.red, fontSize: 18)),
+              )
+            ],
           ),
           SizedBox(height: 16),
           Form(
@@ -101,17 +101,17 @@ class _updateSousRegionsState extends State<updateSousRegions> {
                   builder: (_, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Chargement ...',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
+                        items: [],
+                        onChanged: null,
+                        decoration: InputDecoration(
+                          labelText: 'Chargement ...',
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
                     }
                     if (snapshot.hasError) {
                       return Text("${snapshot.error}");

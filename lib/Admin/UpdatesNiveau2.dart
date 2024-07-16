@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
@@ -8,10 +9,8 @@ import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/Niveau2Service.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 
 class UpdatesNiveau2 extends StatefulWidget {
   final Niveau2Pays niveau2pays;
@@ -48,11 +47,8 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
     // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
     //     .parametreList!;
     // para = paraList[0];
-    _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
-    // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
-    _niveauList =
-        http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
     niveau = widget.niveau2pays;
     libelleController.text = niveau.nomN2;
     descriptionController.text = niveau.descriptionN2;
@@ -60,6 +56,10 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
     n1Value = niveau.niveau1Pays.idNiveau1Pays;
     paysValue = niveau.niveau1Pays.pays!.idPays;
     pays = niveau.niveau1Pays.pays!;
+    _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
+    // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
+    _niveauList = http.get(Uri.parse(
+        '$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByIdPays/${pays.idPays!}'));
   }
 
   @override
@@ -71,28 +71,29 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ListTile(
-              title: Text(
-                "Modification",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontSize: 18,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Modification",
+                  maxLines: 2,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontSize: 18,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              trailing: IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                icon: Icon(
-                  Icons.close,
-                  color: Colors.red,
-                  size: 24,
-                ),
-              ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Fermer",
+                      style: TextStyle(color: Colors.red, fontSize: 18)),
+                )
+              ],
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 10),
             Form(
               key: formkey,
               child: Column(
@@ -119,35 +120,34 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                     builder: (_, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Chargement ...',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
+                          items: [],
+                          onChanged: null,
+                          decoration: InputDecoration(
+                            labelText: 'Chargement ...',
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
                       }
-                      if (snapshot.hasError) {
-                        return Text("${snapshot.error}");
-                      }
+
                       if (snapshot.hasData) {
-                        final reponse = json.decode((snapshot.data.body)) as List;
+                        final reponse =
+                            json.decode((snapshot.data.body)) as List;
                         final paysList = reponse
                             .map((e) => Pays.fromMap(e))
                             .where((con) => con.statutPays == true)
                             .toList();
-        
+
                         if (paysList.isEmpty) {
                           return Text(
                             'Aucun donné disponible',
                             style: TextStyle(overflow: TextOverflow.ellipsis),
                           );
                         }
-        
+
                         return DropdownButtonFormField<String>(
                           isExpanded: true,
                           items: paysList
@@ -161,12 +161,13 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                           value: paysValue,
                           onChanged: (newValue) {
                             setState(() {
+                              n1Value = null;
                               paysValue = newValue;
                               if (newValue != null) {
                                 pays = paysList.firstWhere(
                                     (element) => element.idPays == newValue);
-        
-                                // typeSelected = true;
+                                _niveauList = http.get(Uri.parse(
+                                    '$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByIdPays/${newValue}'));
                               }
                             });
                           },
@@ -190,33 +191,34 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                     builder: (_, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Chargement ...',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
+                          items: [],
+                          onChanged: null,
+                          decoration: InputDecoration(
+                            labelText: 'Chargement ...',
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
                       }
-                      
+
                       if (snapshot.hasData) {
-                        final reponse = json.decode((snapshot.data.body)) as List;
+                        final reponse =
+                            json.decode((snapshot.data.body)) as List;
                         final niveauList = reponse
                             .map((e) => Niveau1Pays.fromMap(e))
                             .where((con) => con.statutN1 == true)
                             .toList();
-        
+
                         if (niveauList.isEmpty) {
                           return Text(
                             'Aucun donné disponible',
                             style: TextStyle(overflow: TextOverflow.ellipsis),
                           );
                         }
-        
+
                         return DropdownButtonFormField<String>(
                           isExpanded: true,
                           items: niveauList
@@ -230,7 +232,7 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                           value: n1Value,
                           onChanged: (newValue) {
                             setState(() {
-                              paysValue = newValue;
+                              n1Value = newValue;
                               if (newValue != null) {
                                 niveau1 = niveauList.firstWhere((element) =>
                                     element.idNiveau1Pays == newValue);
@@ -241,8 +243,7 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                             });
                           },
                           decoration: InputDecoration(
-                            labelText:
-                                'Sélectionner un niveau 1',
+                            labelText: 'Sélectionner un niveau 1',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),

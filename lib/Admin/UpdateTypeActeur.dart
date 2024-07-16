@@ -33,32 +33,29 @@ class _UpdateTypeActeurState extends State<UpdateTypeActeur> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ListTile(
-            leading: Image.asset(
-              "assets/images/type.png",
-              width: 80,
-              height: 80,
-            ),
-            title: Text(
-              "Modification",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                fontSize: 18,
+           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Modification",
+                maxLines: 2,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  fontSize: 18,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-            ),
-            trailing: IconButton(
+              TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                icon: Icon(
-                  Icons.close,
-                  color: Colors.red,
-                  size: 30,
-                )),
+                child: Text("Fermer",
+                    style: TextStyle(color: Colors.red, fontSize: 18)),
+              )
+            ],
           ),
+         
           const SizedBox(height: 10),
           Form(
             key: formkey,

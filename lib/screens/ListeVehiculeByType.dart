@@ -11,16 +11,18 @@ import 'package:koumi_app/screens/AddVehiculeTransport.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/AutoComptet.dart';
+import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ListeVehiculeByType extends StatefulWidget {
   final TypeVoiture typeVoitures;
-  String? detectedCountry;
+ 
   ListeVehiculeByType(
-      {super.key, required this.typeVoitures, this.detectedCountry});
+      {super.key, required this.typeVoitures});
 
   @override
   State<ListeVehiculeByType> createState() => _ListeVehiculeByTypeState();
@@ -42,10 +44,10 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
   bool isLoading = false;
   int size = 4;
   bool hasMore = true;
-
+  String? detectedCountry;
   Future<List<Vehicule>> getListe(String id) async {
     final response = await VehiculeService()
-        .fetchVehiculeByTypeVoitureWithPagination(id, widget.detectedCountry!);
+        .fetchVehiculeByTypeVoitureWithPagination(id, detectedCountry!);
     return response;
   }
 
@@ -61,7 +63,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
         page++;
       });
       fetchVehiculeByTypeVoitureWithPagination(
-              typeVoiture.idTypeVoiture!, widget.detectedCountry!)
+              typeVoiture.idTypeVoiture!, detectedCountry!)
           .then((value) {
         setState(() {
           // Rafraîchir les données ici
@@ -133,6 +135,8 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
 
   @override
   void initState() {
+    detectedCountry =
+        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
@@ -231,69 +235,79 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
               return <Widget>[
                 SliverToBoxAdapter(
                     child: Column(children: [
-                  const SizedBox(height: 10),
-                  Padding(
+                       Padding(
                     padding: const EdgeInsets.all(10.0),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.blueGrey[50],
-                        borderRadius: BorderRadius.circular(25),
+                    child: SearchFieldAutoComplete<String>(
+                      controller: _searchController,
+                      placeholder: 'Rechercher...',
+                      placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
+                      suggestions: AutoComplet.getTransportVehicles,
+                      suggestionsDecoration: SuggestionDecoration(
+                        marginSuggestions: const EdgeInsets.all(8.0),
+                        color: const Color.fromARGB(255, 236, 234, 234),
+                        borderRadius: BorderRadius.circular(16.0),
                       ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.search, color: Colors.blueGrey[400]),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Autocomplete<String>(
-                              optionsBuilder:
-                                  (TextEditingValue textEditingValue) {
-                                if (textEditingValue.text.isEmpty) {
-                                  return const Iterable<String>.empty();
-                                }
-                                return AutoComplet.getTransportVehicles()
-                                    .where((String option) {
-                                  return option.toLowerCase().contains(
-                                      textEditingValue.text.toLowerCase());
-                                });
-                              },
-                              onSelected: (String selection) {
-                                _searchController.text = selection;
-                                setState(() {});
-                              },
-                              fieldViewBuilder: (BuildContext context,
-                                  TextEditingController
-                                      fieldTextEditingController,
-                                  FocusNode fieldFocusNode,
-                                  VoidCallback onFieldSubmitted) {
-                                return TextField(
-                                  controller: fieldTextEditingController,
-                                  focusNode: fieldFocusNode,
-                                  onChanged: (value) {
-                                    setState(() {});
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Rechercher',
-                                    border: InputBorder.none,
-                                    hintStyle:
-                                        TextStyle(color: Colors.blueGrey[400]),
-                                  ),
-                                );
-                              },
-                            ),
+                      onSuggestionSelected: (selectedItem) {
+                        _searchController.text = selectedItem.searchKey;
+                        // setState(() {});
+                      },
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      suggestionItemBuilder: (context, searchFieldItem) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            searchFieldItem.searchKey,
+                            style: TextStyle(color: Colors.black),
                           ),
-                          IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {});
-                            },
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  // const SizedBox(height: 10),
+                  //  Padding(
+                  //   padding: const EdgeInsets.all(10.0),
+                  //   child: Container(
+                  //     padding: EdgeInsets.symmetric(horizontal: 10),
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                  //       borderRadius: BorderRadius.circular(25),
+                  //     ),
+                  //     child: Row(
+                  //       children: [
+                  //         Icon(Icons.search,
+                  //             color: Colors.blueGrey[400],
+                  //             size:
+                  //                 28), // Utiliser une icône de recherche plus grande
+                  //         SizedBox(width: 10),
+                  //         Expanded(
+                  //           child: TextField(
+                  //             controller: _searchController,
+                  //             onChanged: (value) {
+                  //               setState(() {});
+                  //             },
+                  //             decoration: InputDecoration(
+                  //               hintText: 'Rechercher...',
+                  //               border: InputBorder.none,
+                  //               hintStyle:
+                  //                   TextStyle(color: Colors.blueGrey[400]),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //         // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                  //         IconButton(
+                  //           icon: Icon(Icons.clear),
+                  //           onPressed: () {
+                  //             _searchController.clear();
+                  //             setState(() {});
+                  //           },
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 10),
                 ])),
               ];
             },
@@ -304,7 +318,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                   // Rafraîchir les données ici
                   futureListe = VehiculeService()
                       .fetchVehiculeByTypeVoitureWithPagination(
-                          typeVoiture.idTypeVoiture!, widget.detectedCountry!);
+                          typeVoiture.idTypeVoiture!, detectedCountry!);
                 });
               },
               child: SingleChildScrollView(

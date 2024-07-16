@@ -69,7 +69,7 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                           color: Colors.green,
                         ),
                         title: const Text(
-                          "Type acteur ",
+                          "Ajouter un Type acteur ",
                           style: TextStyle(
                             color: Colors.green,
                             fontSize: 18,
@@ -78,7 +78,7 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                         ),
                         onTap: () async {
                           Navigator.of(context).pop();
-                          _showDialog();
+                          _showBottomSheet();
                         },
                       ),
                     ),
@@ -513,30 +513,11 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                                                                 ),
                                                               ),
                                                               onTap: () {
-                                                                showDialog(
-                                                                    context:
-                                                                        context,
-                                                                    builder: (BuildContext
-                                                                            context) =>
-                                                                        AlertDialog(
-                                                                            backgroundColor: Colors
-                                                                                .white,
-                                                                            shape:
-                                                                                RoundedRectangleBorder(
-                                                                              borderRadius: BorderRadius.circular(16),
-                                                                            ),
-                                                                            content:
-                                                                                UpdateTypeActeur(typeActeur: e)));
                                                                 Navigator.of(
                                                                         context)
                                                                     .pop();
-                                                                // setState(() {
-                                                                //   setState(() {
-                                                                //     listFuture =
-                                                                //         DepenseService()
-                                                                //             .fetchParametre();
-                                                                //   });
-                                                                // });
+                                                                bottomUpdatesheet(
+                                                                    context, e);
                                                               },
                                                             ),
                                                           ),
@@ -606,6 +587,35 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
         ));
   }
 
+  Future<dynamic> bottomUpdatesheet(
+      BuildContext context, TypeActeur? typeActeur) async {
+    return await showModalBottomSheet<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: UpdateTypeActeur(typeActeur: typeActeur!)),
+        );
+      },
+    );
+  }
+
   Widget _getIconForType(String libelle) {
     switch (libelle.toLowerCase()) {
       case 'producteur':
@@ -645,162 +655,163 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
     }
   }
 
-  void _showDialog() {
-    showDialog(
+  void _showBottomSheet() {
+    showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: Image.asset(
-                    "assets/images/type.png",
-                    width: 80,
-                    height: 80,
-                  ),
-                  title: Text(
-                    "Ajouter un type d'acteur",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: IconButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      icon: Icon(
-                        Icons.close,
-                        color: Colors.red,
-                        size: 30,
-                      )),
-                ),
-                // const SizedBox(height: 10),
-                Form(
-                  key: formkey,
-                  child: Column(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Text(
-                        'Libellé',
+                      Text(
+                        "Ajouter un type d'acteur",
+                        maxLines: 2,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 22,
+                          color: Colors.black,
+                          fontSize: 18,
                         ),
+                        textAlign: TextAlign.center,
                       ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
                         },
-                        controller: libelleController,
-                        decoration: InputDecoration(
-                          hintText: "Libellé",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                        child: Text("Fermer",
+                            style: TextStyle(color: Colors.red, fontSize: 18)),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Form(
+                    key: formkey,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text(
+                          'Libellé',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        'Description',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
-                        ),
-                      ),
-                      TextFormField(
+                        TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return "Veuillez remplir les champs";
                             }
                             return null;
                           },
-                          controller: descriptionController,
-                          maxLines: null,
+                          controller: libelleController,
                           decoration: InputDecoration(
-                            labelText: "Description",
+                            hintText: "Libellé",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
-                          )),
-                      const SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          final String desc = descriptionController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await TypeActeurService()
-                                  .addTypeActeur(
-                                      libelle: libelle,
-                                      descriptionTypeActeur: desc)
-                                  .then((value) => {
-                                        Provider.of<TypeActeurService>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        libelleController.clear(),
-                                        descriptionController.clear(),
-                                        Navigator.of(context).pop()
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text(
-                                          "Une erreur s'est produit : $errorMessage"),
-                                    ],
-                                  ),
-                                  duration: const Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
                           ),
-                          minimumSize: const Size(290, 45),
                         ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Ajouter",
+                        const SizedBox(height: 10),
+                        const Text(
+                          'Description',
                           style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
+                        TextFormField(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Veuillez remplir les champs";
+                              }
+                              return null;
+                            },
+                            controller: descriptionController,
+                            maxLines: null,
+                            decoration: InputDecoration(
+                              labelText: "Description",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            )),
+                        const SizedBox(height: 20),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final String libelle = libelleController.text;
+                            final String desc = descriptionController.text;
+                            if (formkey.currentState!.validate()) {
+                              try {
+                                await TypeActeurService()
+                                    .addTypeActeur(
+                                        libelle: libelle,
+                                        descriptionTypeActeur: desc)
+                                    .then((value) => {
+                                          Provider.of<TypeActeurService>(
+                                                  context,
+                                                  listen: false)
+                                              .applyChange(),
+                                          libelleController.clear(),
+                                          descriptionController.clear(),
+                                          Navigator.of(context).pop()
+                                        });
+                              } catch (e) {
+                                final String errorMessage = e.toString();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Row(
+                                      children: [
+                                        Text(
+                                            "Une erreur s'est produit : $errorMessage"),
+                                      ],
+                                    ),
+                                    duration: const Duration(seconds: 5),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            minimumSize: const Size(290, 45),
+                          ),
+                          icon: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            "Ajouter",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ));
+      },
     );
   }
 

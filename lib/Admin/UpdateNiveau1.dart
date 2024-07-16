@@ -8,7 +8,6 @@ import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/Niveau1Service.dart';
 import 'package:provider/provider.dart';
 
@@ -36,36 +35,6 @@ class _UpdatesNiveau1State extends State<UpdatesNiveau1> {
   late Future _paysList;
   late Pays pays;
 
-  bool isLoadingLibelle = true;
-    String? libelleNiveau1Pays;
- 
-  Future<String> getLibelleNiveau1PaysByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load libelle niveau1Pays');
-    }
- }
-
-     Future<void> fetchPaysDataByActor() async {
-    try {
-      String libelle1 = await getLibelleNiveau1PaysByActor(acteur.idActeur!);
-
-      setState(() { 
-        libelleNiveau1Pays = libelle1;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
-      print('Error: $e');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -74,7 +43,7 @@ class _UpdatesNiveau1State extends State<UpdatesNiveau1> {
     // para = paraList[0];
     _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
     // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
-    fetchPaysDataByActor();
+    // fetchPaysDataByActor();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     niveau = widget.niveau1pays;
     libelleController.text = niveau.nomN1!;
@@ -92,29 +61,29 @@ class _UpdatesNiveau1State extends State<UpdatesNiveau1> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ListTile(
-              title: Text(
-                "Modification",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  overflow: TextOverflow.ellipsis,
-                  fontSize: 18,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Modification",
+                  maxLines: 2,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontSize: 18,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              trailing: IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                icon: Icon(
-                  Icons.close,
-                  color: Colors.red,
-                  size: 24,
-                ),
-              ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Fermer",
+                      style: TextStyle(color: Colors.red, fontSize: 18)),
+                )
+              ],
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 10),
             Form(
               key: formkey,
               child: Column(
@@ -129,7 +98,7 @@ class _UpdatesNiveau1State extends State<UpdatesNiveau1> {
                     },
                     controller: libelleController,
                     decoration: InputDecoration(
-                      labelText: "Nom du ${libelleNiveau1Pays}",
+                      labelText: "nom niveau 1",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -140,36 +109,35 @@ class _UpdatesNiveau1State extends State<UpdatesNiveau1> {
                     future: _paysList,
                     builder: (_, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                       return DropdownButtonFormField(
-                              items: [],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                labelText: 'Chargement ...',
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
+                        return DropdownButtonFormField(
+                          items: [],
+                          onChanged: null,
+                          decoration: InputDecoration(
+                            labelText: 'Chargement ...',
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
                       }
-                      if (snapshot.hasError) {
-                        return Text("${snapshot.error}");
-                      }
+
                       if (snapshot.hasData) {
-                        final reponse = json.decode((snapshot.data.body)) as List;
+                        final reponse =
+                            json.decode((snapshot.data.body)) as List;
                         final paysList = reponse
                             .map((e) => Pays.fromMap(e))
                             .where((con) => con.statutPays == true)
                             .toList();
-        
+
                         if (paysList.isEmpty) {
                           return Text(
                             'Aucun donné disponible',
                             style: TextStyle(overflow: TextOverflow.ellipsis),
                           );
                         }
-        
+
                         return DropdownButtonFormField<String>(
                           isExpanded: true,
                           items: paysList
@@ -187,7 +155,7 @@ class _UpdatesNiveau1State extends State<UpdatesNiveau1> {
                               if (newValue != null) {
                                 pays = paysList.firstWhere(
                                     (element) => element.idPays == newValue);
-        
+
                                 // typeSelected = true;
                               }
                             });

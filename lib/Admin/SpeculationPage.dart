@@ -497,46 +497,21 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                                           Navigator.of(context)
                                                               .pop();
                                                           // var updatedSousRegion =
-                                                          bottomUpdatesheet(
-                                                              context, e);
-                                                          //     await showDialog(
-                                                          //   context:
-                                                          //       context,
-                                                          //   builder: (BuildContext
-                                                          //           context) =>
-                                                          //       AlertDialog(
-                                                          //           backgroundColor:
-                                                          //               Colors
-                                                          //                   .white,
-                                                          //           shape:
-                                                          //               RoundedRectangleBorder(
-                                                          //             borderRadius:
-                                                          //                 BorderRadius.circular(16),
-                                                          //           ),
-                                                          //           content:
-                                                          //               UpdatesSpeculation(
-                                                          //             speculation:
-                                                          //                 e,
-                                                          //           )),
-                                                          // );
-                                                          Provider.of<SpeculationService>(
-                                                                  context,
-                                                                  listen: false)
-                                                              .applyChange();
-                                                          setState(() {
-                                                            _liste =
-                                                                getCatListe();
-                                                          });
-                                                          // if (updatedSousRegion !=
-                                                          //     null) {
 
-                                                          //   // setState(() {
-                                                          //   //   _liste = SpeculationService()
-                                                          //   //       .fetchCategorieByFiliere(
-                                                          //   //           filiere
-                                                          //   //               .idFiliere!);
-                                                          //   // });
-                                                          // }
+                                                          await bottomUpdatesheet(
+                                                                  context, e)
+                                                              .then((value) {
+                                                            Provider.of<SpeculationService>(
+                                                                    context,
+                                                                    listen:
+                                                                        false)
+                                                                .applyChange();
+                                                            setState(() {
+                                                              _liste =
+                                                                  getCatListe();
+                                                            });
+                                                            // Navigator.of(context).pop();
+                                                          });
                                                         },
                                                       ),
                                                     ),
@@ -763,8 +738,9 @@ class _SpeculationPageState extends State<SpeculationPage> {
     );
   }
 
-  void bottomUpdatesheet(BuildContext context, Speculation? speculation) {
-    showModalBottomSheet(
+  Future<dynamic> bottomUpdatesheet(
+      BuildContext context, Speculation? speculation) async {
+    return await showModalBottomSheet<int>(
       context: context,
       builder: (BuildContext context) {
         return SingleChildScrollView(

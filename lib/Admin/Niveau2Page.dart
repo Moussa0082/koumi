@@ -13,7 +13,6 @@ import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/Niveau1Service.dart';
 import 'package:koumi_app/service/Niveau2Service.dart';
 import 'package:koumi_app/service/Niveau3Service.dart';
@@ -35,17 +34,10 @@ class _Niveau2PageState extends State<Niveau2Page> {
   late Acteur acteur;
   List<Niveau2Pays> niveauList = [];
   List<Niveau3Pays> niveau3List = [];
-  final formkey = GlobalKey<FormState>();
-  TextEditingController libelleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  late Future<List<Niveau2Pays>> _liste;
+
+  // late Future<List<Niveau2Pays>> _liste;
   List<ParametreGeneraux> paraList = [];
-  late Niveau1Pays niveau1;
-  late Pays pays;
-  String? paysValue;
-  late Future _paysList;
-  String? n1Value;
-  late Future _niveauList;
+
   late TextEditingController _searchController;
 
   Future<List<Niveau2Pays>> getNiveauListe(String id) async {
@@ -53,112 +45,12 @@ class _Niveau2PageState extends State<Niveau2Page> {
     return response;
   }
 
-  bool isLoadingLibelle = true;
-  String? libelleNiveau2Pays;
-
-  Future<String> getLibelleNiveau2PaysByActor(String id) async {
-    final response = await http
-        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau2Pays/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response
-          .body; // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load libelle niveau2Pays');
-    }
-  }
-
-  Future<void> fetchPaysDataByActor() async {
-    try {
-      String libelle2 = await getLibelleNiveau2PaysByActor(acteur.idActeur!);
-
-      setState(() {
-        libelleNiveau2Pays = libelle2;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-      });
-      print('Error: $e');
-    }
-  }
-
-  String? libelleNiveau1Pays;
-  bool isLoadingLibelle1 = true;
-  Future<String> getlibelleNiveau1PaysByActor(String id) async {
-    final response = await http
-        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response
-          .body; // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load libelle niveau2Pays');
-    }
-  }
-
-  Future<void> fetchPaysData1ByActor() async {
-    try {
-      String libelle2 = await getlibelleNiveau1PaysByActor(acteur.idActeur!);
-
-      setState(() {
-        libelleNiveau1Pays = libelle2;
-        isLoadingLibelle1 = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle1 = false;
-      });
-      print('Error: $e');
-    }
-  }
-String? libelleNiveau3Pays;
-    bool isLoadingLibelle3 = true;
-    
-   Future<String> getlibelleNiveau3PaysByActor(String id) async {
-    final response = await http
-        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response
-          .body; // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load libelle niveau2Pays');
-    }
-  }
-
-  Future<void> fetchPaysData3ByActor() async {
-    try {
-      String libelle2 = await getlibelleNiveau3PaysByActor(acteur.idActeur!);
-
-      setState(() {
-        libelleNiveau3Pays = libelle2;
-        isLoadingLibelle3 = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle3 = false;
-      });
-      print('Error: $e');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
-    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-    //     .parametreList!;
+
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    // para = paraList[0];
-    //         acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
-    _niveauList = http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
-    fetchPaysDataByActor();
   }
 
   @override
@@ -182,8 +74,8 @@ String? libelleNiveau3Pays;
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
           "Niveau 2",
-          style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20),
+          style: const TextStyle(
+              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         actions: [
           PopupMenuButton<String>(
@@ -204,7 +96,7 @@ String? libelleNiveau3Pays;
                   ),
                   onTap: () async {
                     Navigator.of(context).pop();
-                    _showDialog();
+                    bottomAddsheet(context);
                   },
                 ),
               ),
@@ -265,8 +157,7 @@ String? libelleNiveau3Pays;
                   if (!snapshot.hasData) {
                     return Padding(
                       padding: EdgeInsets.all(10),
-                      child: Center(
-                          child: Text("Aucun niveau 2 trouvé")),
+                      child: Center(child: Text("Aucun niveau 2 trouvé")),
                     );
                   } else {
                     niveauList = snapshot.data!;
@@ -356,7 +247,7 @@ String? libelleNiveau3Pays;
                                                                 .spaceBetween,
                                                         children: [
                                                           Text(
-                                                              "Nombres ${libelleNiveau3Pays} :",
+                                                              "Nombres niveau 3 :",
                                                               style: TextStyle(
                                                                 color: Colors
                                                                     .black87,
@@ -393,7 +284,7 @@ String? libelleNiveau3Pays;
                                                                 .spaceBetween,
                                                         children: [
                                                           Text(
-                                                              "Nombres ${libelleNiveau3Pays} :",
+                                                              "Nombres niveau 3 :",
                                                               style: TextStyle(
                                                                 color: Colors
                                                                     .black87,
@@ -572,41 +463,10 @@ String? libelleNiveau3Pays;
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                          // Ouvrir la boîte de dialogue de modification
-                                                          var updatedSousRegion =
-                                                              await showDialog(
-                                                            context: context,
-                                                            builder: (BuildContext
-                                                                    context) =>
-                                                                AlertDialog(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    shape:
-                                                                        RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              16),
-                                                                    ),
-                                                                    content: UpdatesNiveau2(
-                                                                        niveau2pays:
-                                                                            e)),
-                                                          );
-
-                                                          // Si les détails sont modifiés, appliquer les changements
-                                                          if (updatedSousRegion !=
-                                                              null) {
-                                                            Provider.of<Niveau2Service>(
-                                                                    context,
-                                                                    listen:
-                                                                        false)
-                                                                .applyChange();
-                                                            setState(() {
-                                                              _liste =
-                                                                  updatedSousRegion;
-                                                            });
-                                                            // Mettre à jour la liste des sous-régions
-                                                          }
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                          bottomUpdatesheet(
+                                                              context, e);
                                                         },
                                                       ),
                                                     ),
@@ -676,256 +536,60 @@ String? libelleNiveau3Pays;
     );
   }
 
-  void _showDialog() {
-    showDialog(
+  Future<dynamic> bottomUpdatesheet(
+      BuildContext context, Niveau2Pays? niveau2pays) async {
+    return await showModalBottomSheet<int>(
       context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ListTile(
-                  title: Text(
-                    "Ajouter un niveau 2",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  trailing: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.red,
-                      size: 24,
-                    ),
-                  ),
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
-                SizedBox(height: 16),
-                Form(
-                  key: formkey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: libelleController,
-                        decoration: InputDecoration(
-                          labelText: "Nom du niveau 2",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      Consumer<Niveau1Service>(
-                        builder: (context, niveauService, child) {
-                          return FutureBuilder(
-                            future: _niveauList,
-                            builder: (_, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Chargement...',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              if (snapshot.hasData) {
-                                dynamic jsonString =
-                                    utf8.decode(snapshot.data.bodyBytes);
-                                dynamic reponse = json.decode(jsonString);
-
-                                // final reponse = json.decode(snapshot.data.body);
-                                if (reponse is List) {
-                                  final niveauList = reponse
-                                      .map((e) => Niveau1Pays.fromMap(e))
-                                      .where((con) => con.statutN1 == true)
-                                      .toList();
-
-                                  if (niveauList.isEmpty) {
-                                    return DropdownButtonFormField(
-                                      items: [],
-                                      onChanged: null,
-                                      decoration: InputDecoration(
-                                        labelText:
-                                            'Aucun ${libelleNiveau1Pays} trouvé',
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                    );
-                                  }
-
-                                  return DropdownButtonFormField<String>(
-                                    isExpanded: true,
-                                    items: niveauList
-                                        .map(
-                                          (e) => DropdownMenuItem(
-                                            value: e.idNiveau1Pays,
-                                            child: Text(e.nomN1 ?? ''),
-                                          ),
-                                        )
-                                        .toList(),
-                                    value: n1Value,
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        n1Value = newValue;
-                                        if (newValue != null) {
-                                          niveau1 = niveauList.firstWhere(
-                                              (element) =>
-                                                  element.idNiveau1Pays ==
-                                                  newValue);
-                                          debugPrint(
-                                              "niveau select :${niveau1.toString()}");
-                                          // typeSelected = true;
-                                        }
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                      labelText:
-                                          'Sélectionner un ${libelleNiveau1Pays}',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
-                                }
-                              }
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText:
-                                      'Aucun ${libelleNiveau1Pays} trouvé',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: descriptionController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Description",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          final String description = descriptionController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await Niveau2Service()
-                                  .addNiveau2Pays(
-                                    nomN2: libelle,
-                                    descriptionN2: description,
-                                    niveau1Pays: niveau1,
-                                  )
-                                  .then((value) => {
-                                        Provider.of<Niveau2Service>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        Navigator.of(context).pop(),
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Row(
-                                              children: [
-                                                Text(
-                                                    "niveau 2 ajouté avec success"),
-                                              ],
-                                            ),
-                                            duration: Duration(seconds: 5),
-                                          ),
-                                        ),
-                                        libelleController.clear(),
-                                        descriptionController.clear(),
-                                        setState(() {
-                                          niveau1 == null;
-                                        }),
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("niveau 2 existe déjà"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // Orange color code
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          minimumSize: const Size(290, 45),
-                        ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Ajouter",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      )
-                    ],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
                   ),
+                ],
+              ),
+              child: UpdatesNiveau2(niveau2pays: niveau2pays!)),
+        );
+      },
+    );
+  }
+
+  Future<dynamic> bottomAddsheet(BuildContext context) async {
+    return await showModalBottomSheet<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: addNiveau2()),
+        );
+      },
     );
   }
 
@@ -936,6 +600,382 @@ String? libelleNiveau3Pays;
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         color: isState ? Colors.green : Colors.red,
+      ),
+    );
+  }
+}
+
+class addNiveau2 extends StatefulWidget {
+  const addNiveau2({super.key});
+
+  @override
+  State<addNiveau2> createState() => _addNiveau2State();
+}
+
+class _addNiveau2State extends State<addNiveau2> {
+  final formkey = GlobalKey<FormState>();
+  TextEditingController libelleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
+  late Pays pays;
+  String? paysValue;
+  late Future _paysList;
+  String? n1Value;
+  late Future _niveauList;
+  String? id = '';
+  late Niveau1Pays niveau1;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
+
+    _niveauList = http.get(
+        Uri.parse('$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByIdPays/${id!}'));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Ajouter un niveau 2",
+                  maxLines: 2,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontSize: 18,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Fermer",
+                      style: TextStyle(color: Colors.red, fontSize: 18)),
+                )
+              ],
+            ),
+            SizedBox(height: 16),
+            Form(
+              key: formkey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez remplir ce champ";
+                      }
+                      return null;
+                    },
+                    controller: libelleController,
+                    decoration: InputDecoration(
+                      labelText: "Nom du niveau 2",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  FutureBuilder(
+                    future: _paysList,
+                    builder: (_, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return DropdownButtonFormField(
+                          items: [],
+                          onChanged: null,
+                          decoration: InputDecoration(
+                            labelText: 'Chargement ...',
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasData) {
+                        dynamic jsonString =
+                            utf8.decode(snapshot.data.bodyBytes);
+                        dynamic responseData = json.decode(jsonString);
+                        if(responseData is List){
+                          final reponse = responseData;
+                           final paysList = reponse
+                              .map((e) => Pays.fromMap(e))
+                              .where((con) => con.statutPays == true)
+                              .toList();
+
+                         if (paysList.isEmpty) {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun pays trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                              return DropdownButtonFormField<String>(
+                            isExpanded: true,
+                            items: paysList
+                                .map(
+                                  (e) => DropdownMenuItem(
+                                    value: e.idPays,
+                                    child: Text(e.nomPays!),
+                                  ),
+                                )
+                                .toList(),
+                            value: paysValue,
+                            onChanged: (newValue) {
+                              setState(() {
+                                n1Value = null;
+                                paysValue = newValue;
+                                if (newValue != null) {
+                                  pays = paysList.firstWhere(
+                                      (element) => element.idPays == newValue);
+                                  _niveauList = http.get(Uri.parse(
+                                      '$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByIdPays/${newValue}'));
+                                }
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Sélectionner un pays',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        }
+                       else {
+                          return DropdownButtonFormField(
+                            items: [],
+                            onChanged: null,
+                            decoration: InputDecoration(
+                              labelText: 'Aucun pays trouvé',
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    return DropdownButtonFormField(
+                        items: [],
+                        onChanged: null,
+                        decoration: InputDecoration(
+                          labelText: 'Aucun pays trouvé',
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  FutureBuilder(
+                    future: _niveauList,
+                    builder: (_, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return DropdownButtonFormField(
+                          items: [],
+                          onChanged: null,
+                          decoration: InputDecoration(
+                            labelText: 'Chargement ...',
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasData) {
+                        dynamic jsonString =
+                            utf8.decode(snapshot.data.bodyBytes);
+                        dynamic responseData = json.decode(jsonString);
+
+                          if(responseData is List){
+                              final reponse = responseData;
+                              final niveauList = reponse
+                              .map((e) => Niveau1Pays.fromMap(e))
+                              .where((con) => con.statutN1 == true)
+                              .toList();
+
+                          if (niveauList.isEmpty) {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucun niveau 1 trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+                               return DropdownButtonFormField<String>(
+                            isExpanded: true,
+                            items: niveauList
+                                .map(
+                                  (e) => DropdownMenuItem(
+                                    value: e.idNiveau1Pays,
+                                    child: Text(e.nomN1!),
+                                  ),
+                                )
+                                .toList(),
+                            value: n1Value,
+                            onChanged: (newValue) {
+                              setState(() {
+                                n1Value = newValue;
+                                if (newValue != null) {
+                                  niveau1 = niveauList.firstWhere((element) =>
+                                      element.idNiveau1Pays == newValue);
+                                  debugPrint(
+                                      "niveau select :${niveau1.toString()}");
+                                  // typeSelected = true;
+                                }
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Sélectionner un niveau 1',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        }
+                          }
+
+                          return DropdownButtonFormField(
+                        items: [],
+                        onChanged: null,
+                        decoration: InputDecoration(
+                          labelText: 'Aucun niveau 1 trouvé',
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+                        
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez remplir ce champ";
+                      }
+                      return null;
+                    },
+                    controller: descriptionController,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      labelText: "Description",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      final String libelle = libelleController.text;
+                      final String description = descriptionController.text;
+                      if (formkey.currentState!.validate()) {
+                        try {
+                          await Niveau2Service()
+                              .addNiveau2Pays(
+                                nomN2: libelle,
+                                descriptionN2: description,
+                                niveau1Pays: niveau1,
+                              )
+                              .then((value) => {
+                                    Provider.of<Niveau2Service>(context,
+                                            listen: false)
+                                        .applyChange(),
+                                    Navigator.of(context).pop(),
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Row(
+                                          children: [
+                                            Text(
+                                                "niveau 2 ajouté avec success"),
+                                          ],
+                                        ),
+                                        duration: Duration(seconds: 5),
+                                      ),
+                                    ),
+                                    libelleController.clear(),
+                                    descriptionController.clear(),
+                                    setState(() {
+                                      niveau1 == null;
+                                    }),
+                                  });
+                        } catch (e) {
+                          final String errorMessage = e.toString();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  Text("niveau 2 existe déjà"),
+                                ],
+                              ),
+                              duration: Duration(seconds: 5),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green, // Orange color code
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      minimumSize: const Size(290, 45),
+                    ),
+                    icon: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      "Ajouter",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

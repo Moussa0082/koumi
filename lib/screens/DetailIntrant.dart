@@ -148,27 +148,11 @@ class _DetailIntrantState extends State<DetailIntrant> {
     }
   }
 
-  // void verifyParam() {
-  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-  //       .parametreList!;
-
-  //   if (paraList.isNotEmpty) {
-  //     para = paraList[0];
-  //   } else {
-  //     // Gérer le cas où la liste est null ou vide, par exemple :
-  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-  //   }
-  // }
-
   @override
   void initState() {
     super.initState();
     verify();
-    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-    //     .parametreList!;
-    // para = paraList[0];
-    // fetchPaysDataByActor();
-    // verifyParam();
+
     intrants = widget.intrant;
     rates = fetchConvert(intrants);
     print("rates ${rates.toString()}");
@@ -404,22 +388,23 @@ class _DetailIntrantState extends State<DetailIntrant> {
                       )
                     : IconButton(
                         onPressed: () {
-                          Navigator.of(context).pop();
+                          Navigator.pop(context, true);
                         },
                         icon: const Icon(Icons.arrow_back_ios,
-                            color: d_colorGreen),
-                      ),
+                            color: d_colorGreen)),
                 title: _isEditing
                     ? Text(
                         'Modification',
                         style: const TextStyle(
-                            color: d_colorGreen, fontWeight: FontWeight.bold,
+                            color: d_colorGreen,
+                            fontWeight: FontWeight.bold,
                             fontSize: 20),
                       )
                     : Text(
                         'Détail intrant',
                         style: const TextStyle(
-                            color: d_colorGreen, fontWeight: FontWeight.bold,
+                            color: d_colorGreen,
+                            fontWeight: FontWeight.bold,
                             fontSize: 20),
                       ),
                 actions: acteur.idActeur == intrants.acteur!.idActeur

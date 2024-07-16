@@ -1,16 +1,9 @@
-import 'dart:async';
-
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:koumi_app/api/firebase_api.dart';
-import 'package:koumi_app/firebase_options.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
-import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/AlerteService.dart';
@@ -44,18 +37,14 @@ import 'package:koumi_app/service/UniteService.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
+import 'package:koumi_app/widgets/CustomErrorWidget.dart';
 import 'package:koumi_app/widgets/DetectorPays.dart';
-import 'package:koumi_app/widgets/connection_verify.dart';
-import 'package:koumi_app/widgets/notification_controller.dart';
-import 'package:koumi_app/controller/dependency_injection.dart';
 import 'package:provider/provider.dart';
 
-
 void main() async {
-  
   // awai       t AwesomeNotifications().initial ize(
   //    'resource://@drawable/launcher_icon',
-  
+
   //   [
   //   Not
   //       channelGroupKey: "basic_channel_group",
@@ -93,6 +82,11 @@ void main() async {
   //       allowWhileIdle: true
   //     )
   //   );
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.dumpErrorToConsole(details);
+    runApp(ErrorWidgetClass(details));
+  };
+
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => CountryProvider()),
     ChangeNotifierProvider(create: (_) => DetectorPays()),
@@ -134,7 +128,7 @@ void main() async {
     ChangeNotifierProvider(create: (context) => FormeService()),
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
   ], child: MyApp()));
-    // DependencyInjection.init();
+  // DependencyInjection.init();
   // Get.put(ConnectionVerify(), permanent: true);
 }
 
@@ -172,11 +166,23 @@ class _MyAppState extends State<MyApp> {
       ),
       // navigatorKey: navigatorKey,
       routes: {
-        '/BottomNavigationPage': (context) =>  BottomNavigationPage(),
-        // '/notificationPage':(context) =>  NotificationPage(),
+        '/BottomNavigationPage': (context) => BottomNavigationPage(),
       },
-      //  home:  ItemScreen(),
-      home: const SplashScreen(), 
+      home: const SplashScreen(),
+    );
+  }
+}
+
+class ErrorWidgetClass extends StatelessWidget {
+  final FlutterErrorDetails errorDetails;
+  ErrorWidgetClass(this.errorDetails);
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: CustomErrorWidget(
+        errorMessage: errorDetails.exceptionAsString(),
+      ),
     );
   }
 }

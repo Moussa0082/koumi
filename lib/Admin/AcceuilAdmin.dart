@@ -288,43 +288,43 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          ProduitTransforme(detectedCountry: detectedCountry)));
+                          ProduitTransforme()));
             } else if (index == 19) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          ProduitElevage(detectedCountry: detectedCountry)));
+                          ProduitElevage()));
             } else if (index == 18) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => ComplementAlimentaire(
-                          detectedCountry: detectedCountry)));
+                         )));
             } else if (index == 17) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          EngraisAndApport(detectedCountry: detectedCountry)));
+                          EngraisAndApport()));
             } else if (index == 16) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          FruitAndLegumes(detectedCountry: detectedCountry)));
+                          FruitAndLegumes()));
             } else if (index == 15) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => ProduitPhytosanitaire(
-                          detectedCountry: detectedCountry)));
+                          )));
             } else if (index == 14) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          SemenceAndPlant(detectedCountry: detectedCountry)));
+                          SemenceAndPlant()));
             } else if (index == 13) {
               Navigator.push(
                   context,
@@ -350,7 +350,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        ProductsScreen(detectedCountry: detectedCountry!),
+                        ProductsScreen(),
                   ));
             } else if (index == 8) {
               Navigator.push(
@@ -363,13 +363,13 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          LocationMateriel(detectedCountry: detectedCountry!)));
+                          l.Location()));
             } else if (index == 6) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          Transport(detectedCountry: detectedCountry!)));
+                          Transport()));
             } else if (index == 5) {
               Navigator.push(
                   context,
@@ -380,7 +380,6 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => StoreScreen(
-                            detectedCountry: detectedCountry!,
                           )));
             } else if (index == 3) {
               Navigator.push(context,
@@ -395,7 +394,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          IntrantScreen(detectedCountry: detectedCountry!)));
+                          IntrantScreen(detectedCountry: detectedCountry)));
             }
           },
           borderRadius: BorderRadius.circular(10),

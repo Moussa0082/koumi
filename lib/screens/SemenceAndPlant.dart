@@ -15,14 +15,16 @@ import 'package:koumi_app/screens/AddIntrant.dart';
 import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/widgets/AutoComptet.dart';
+import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:provider/provider.dart';
+import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SemenceAndPlant extends StatefulWidget {
-  String? detectedCountry;
 
-  SemenceAndPlant({super.key, this.detectedCountry});
+
+  SemenceAndPlant({super.key});
 
   @override
   State<SemenceAndPlant> createState() => _SemenceAndPlantState();
@@ -37,7 +39,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
   late TextEditingController _searchController;
   ScrollController scrollableController = ScrollController();
   int size = sized;
-
+  String? detectedCountry;
   bool isExist = false;
   late Acteur acteur = Acteur();
   String? email = "";
@@ -70,7 +72,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
       });
 
       fetchIntrantByCategorie(
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+              detectedCountry != null ? detectedCountry! : "Mali")
           .then((value) {
         setState(() {
           debugPrint("page inc all $page");
@@ -155,7 +157,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
         });
 
       fetchIntrantByCategorieAndFiliere(
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+              detectedCountry != null ? detectedCountry! : "Mali")
           .then((value) {
         setState(() {
           // Rafraîchir les données ici
@@ -245,7 +247,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
  Future<List<Intrant>> getAllIntrant() async {
     if (selectedCat != null) {
       intrantListe = await IntrantService().fetchIntrantByCategorieAndFilieres(
-          selectedCat!.idCategorieProduit!, libelle, widget.detectedCountry!);
+          selectedCat!.idCategorieProduit!, libelle, detectedCountry!);
     }
 
     return intrantListe;
@@ -261,12 +263,14 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController1.addListener(_scrollListener1);
     });
+    detectedCountry =
+        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
     verify();
     _typeList = http.get(Uri.parse(
         '$apiOnlineUrl/Categorie/allCategorieByLibelleFiliere/$libelle'));
     intrantListeFuture1 = getAllIntrant();
     intrantListeFuture = fetchIntrantByCategorie(
-        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+        detectedCountry != null ? detectedCountry! : "Mali");
   }
 
   Future<void> _getResultFromNextScreen1(BuildContext context) async {
@@ -277,7 +281,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
       print("Rafraichissement en cours");
       setState(() {
         intrantListeFuture = IntrantService().fetchIntrantByPays(
-            widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+            detectedCountry != null ? detectedCountry! : "Mali");
       });
     }
   }
@@ -315,8 +319,8 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                     IconButton(
                         onPressed: () {
                           intrantListeFuture = fetchIntrantByCategorie(
-                              widget.detectedCountry != null
-                                  ? widget.detectedCountry!
+                              detectedCountry != null
+                                  ? detectedCountry!
                                   : "Mali");
                         },
                         icon: const Icon(Icons.refresh, color: d_colorGreen)),
@@ -334,8 +338,8 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                         IconButton(
                             onPressed: () {
                               intrantListeFuture = fetchIntrantByCategorie(
-                                  widget.detectedCountry != null
-                                      ? widget.detectedCountry!
+                                  detectedCountry != null
+                                      ? detectedCountry!
                                       : "Mali");
                             },
                             icon:
@@ -392,8 +396,8 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                         IconButton(
                             onPressed: () {
                               intrantListeFuture = fetchIntrantByCategorie(
-                                  widget.detectedCountry != null
-                                      ? widget.detectedCountry!
+                                  detectedCountry != null
+                                      ? detectedCountry!
                                       : "Mali");
                             },
                             icon:
@@ -432,64 +436,33 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                       if (isSearchMode)
                           Padding(
                           padding: const EdgeInsets.all(10.0),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.blueGrey[50],
-                              borderRadius: BorderRadius.circular(25),
+                          child: SearchFieldAutoComplete<String>(
+                            controller: _searchController,
+                            placeholder: 'Rechercher...',
+                            placeholderStyle:
+                                TextStyle(fontStyle: FontStyle.italic),
+                            suggestions: AutoComplet.getAgriculturalInputs,
+                            suggestionsDecoration: SuggestionDecoration(
+                              marginSuggestions: const EdgeInsets.all(8.0),
+                              color: const Color.fromARGB(255, 236, 234, 234),
+                              borderRadius: BorderRadius.circular(16.0),
                             ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.search, color: Colors.blueGrey[400]),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: Autocomplete<String>(
-                                    optionsBuilder:
-                                        (TextEditingValue textEditingValue) {
-                                      if (textEditingValue.text.isEmpty) {
-                                        return const Iterable<String>.empty();
-                                      }
-                                      return AutoComplet.getAgriculturalInputs()
-                                          .where((String option) {
-                                        return option.toLowerCase().contains(
-                                            textEditingValue.text
-                                                .toLowerCase());
-                                      });
-                                    },
-                                    onSelected: (String selection) {
-                                      _searchController.text = selection;
-                                      setState(() {});
-                                    },
-                                    fieldViewBuilder: (BuildContext context,
-                                        TextEditingController
-                                            fieldTextEditingController,
-                                        FocusNode fieldFocusNode,
-                                        VoidCallback onFieldSubmitted) {
-                                      return TextField(
-                                        controller: fieldTextEditingController,
-                                        focusNode: fieldFocusNode,
-                                        onChanged: (value) {
-                                          setState(() {});
-                                        },
-                                        decoration: InputDecoration(
-                                          hintText: 'Rechercher',
-                                          border: InputBorder.none,
-                                          hintStyle: TextStyle(
-                                              color: Colors.blueGrey[400]),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                            onSuggestionSelected: (selectedItem) {
+                              _searchController.text = selectedItem.searchKey;
+                              // setState(() {});
+                            },
+                            onChanged: (value) {
+                              setState(() {});
+                            },
+                            suggestionItemBuilder: (context, searchFieldItem) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  searchFieldItem.searchKey,
+                                  style: TextStyle(color: Colors.black),
                                 ),
-                                IconButton(
-                                  icon: Icon(Icons.clear),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    setState(() {});
-                                  },
-                                ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
                         ),
                       if (!isSearchMode)
@@ -549,12 +522,12 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                                   .fetchIntrantByCategorieAndFilieres(
                                       selectedCat!.idCategorieProduit!,
                                       libelle,
-                                      widget.detectedCountry!);
+                                      detectedCountry!);
                             })
                           : setState(() {
                               intrantListeFuture = fetchIntrantByCategorie(
-                                  widget.detectedCountry != null
-                                      ? widget.detectedCountry!
+                                  detectedCountry != null
+                                      ? detectedCountry!
                                       : "Mali");
                             });
                     },
@@ -1104,8 +1077,8 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
 
           page = 0;
           hasMore = true;
-          fetchIntrantByCategorieAndFiliere(widget.detectedCountry != null
-              ? widget.detectedCountry!
+          fetchIntrantByCategorieAndFiliere(detectedCountry != null
+              ? detectedCountry!
               : "Mali",refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {

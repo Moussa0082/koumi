@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -15,13 +16,14 @@ import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/MyStores.dart';
 import 'package:koumi_app/screens/ProductsByStores.dart';
 import 'package:koumi_app/service/MagasinService.dart';
+import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:provider/provider.dart';
+import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class StoreScreen extends StatefulWidget {
-  String? detectedCountry;
-  StoreScreen({super.key, this.detectedCountry});
+  StoreScreen({super.key});
 
   @override
   State<StoreScreen> createState() => _StoreScreenState();
@@ -37,17 +39,20 @@ class _StoreScreenState extends State<StoreScreen> {
   late Pays pays;
   String? paysValue;
   late Future _paysList;
-
+  String? detectedCountry;
   List<Magasin> magasinListe = [];
+  List<Magasin> magasinList = [];
   late Future<List<Magasin>> magasinListeFuture;
   late Future<List<Magasin>> magasinListeFuture1;
   Niveau1Pays? selectedNiveau1Pays;
   late TextEditingController _searchController;
   String? typeValue;
   late Future _niveau1PaysList;
+  late Future<List<Magasin>> _magasinList;
   bool isExist = false;
   String? email = "";
   bool isSearchMode = true;
+  final FocusNode _focusNode = FocusNode();
 
   ScrollController scrollableController = ScrollController();
   ScrollController scrollableController1 = ScrollController();
@@ -64,15 +69,18 @@ class _StoreScreenState extends State<StoreScreen> {
           .fetchMagasinByNiveau1PaysWithPagination(
               selectedNiveau1Pays!.idNiveau1Pays!);
     } else {
-      magasinListe =
-          await MagasinService().fetchAllMagasin();
+      magasinListe = await MagasinService().fetchAllMagasin();
     }
 
     return magasinListe;
   }
 
-  Future<List<Magasin>> fetchMagasin(
-      {bool refresh = false}) async {
+  Future<List<Magasin>> getAllMagasinBySearch() async {
+    magasinList = await MagasinService().fetchSearchItems();
+    return magasinList;
+  }
+
+  Future<List<Magasin>> fetchMagasin({bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -245,40 +253,60 @@ class _StoreScreenState extends State<StoreScreen> {
 
   @override
   void initState() {
-    // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    // typeActeurData = acteur.typeActeur!;
-    // // selectedType == null;
-    // type = typeActeurData.map((data) => data.libelle).join(', ');
     super.initState();
+   
+    detectedCountry =
+        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
     verify();
-    // magasinListeFuture = getAllMagasin();
     _searchController = TextEditingController();
     _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
+    // _magasinListe = http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagagin'));
+    _magasinList = getAllMagasinBySearch();
     _niveau1PaysList = http.get(
         Uri.parse('$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByIdPays/${id}'));
-    // _niveau1PaysList =
-    //     http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
     magasinListeFuture = magasinListeFuture1 = getAllMagasins();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //write or call your logic
-      //code will run when widget rendering complete
       scrollableController.addListener(_scrollListener);
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //write or call your logic
-      //code will run when widget rendering complete
       scrollableController1.addListener(_scrollListener1);
     });
   }
 
   @override
   void dispose() {
-    // Disposez le TextEditingController lorsque vous n'en avez plus besoin
     scrollableController.dispose();
     scrollableController1.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _getResultFromNextScreen1(BuildContext context) async {
+    final result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MyStoresScreen()));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        magasinListeFuture = MagasinService().fetchAllMagasin();
+      });
+    }
+  }
+
+  Future<void> _getResultFromNextScreen2(BuildContext context) async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddMagasinScreen(
+                  isEditable: false,
+                )));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        magasinListeFuture = MagasinService().fetchAllMagasin();
+      });
+    }
   }
 
   @override
@@ -300,14 +328,14 @@ class _StoreScreenState extends State<StoreScreen> {
           ),
           actions: !isExist
               ? [
-                IconButton(
+                  IconButton(
                       onPressed: () {
                         magasinListeFuture = MagasinService().fetchAllMagasin();
                       },
                       icon: const Icon(Icons.refresh, color: d_colorGreen)),
-              ]
+                ]
               : [
-                 IconButton(
+                  IconButton(
                       onPressed: () {
                         magasinListeFuture = MagasinService().fetchAllMagasin();
                       },
@@ -343,14 +371,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                   ),
                                   onTap: () async {
                                     Navigator.of(context).pop();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => AddMagasinScreen(
-                                          isEditable: false,
-                                        ),
-                                      ),
-                                    );
+                                    _getResultFromNextScreen2(context);
                                   },
                                 ),
                               ),
@@ -369,49 +390,45 @@ class _StoreScreenState extends State<StoreScreen> {
                                   ),
                                   onTap: () async {
                                     Navigator.of(context).pop();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => MyStoresScreen(),
-                                      ),
-                                    );
+                                    _getResultFromNextScreen1(context);
                                   },
                                 ),
                               ),
                             ];
                           },
                         )
-                      : PopupMenuButton<String>(
-                          padding: EdgeInsets.zero,
-                          itemBuilder: (context) {
-                            return <PopupMenuEntry<String>>[
-                              PopupMenuItem<String>(
-                                child: ListTile(
-                                  leading: const Icon(
-                                    Icons.remove_red_eye,
-                                    color: Colors.green,
-                                  ),
-                                  title: const Text(
-                                    "Mes boutiques",
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  onTap: () async {
-                                    Navigator.of(context).pop();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => MyStoresScreen(),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ];
-                          },
-                        ),
+                      : Container()
+                  // PopupMenuButton<String>(
+                  //     padding: EdgeInsets.zero,
+                  //     itemBuilder: (context) {
+                  //       return <PopupMenuEntry<String>>[
+                  //         PopupMenuItem<String>(
+                  //           child: ListTile(
+                  //             leading: const Icon(
+                  //               Icons.remove_red_eye,
+                  //               color: Colors.green,
+                  //             ),
+                  //             title: const Text(
+                  //               "Mes boutiques",
+                  //               style: TextStyle(
+                  //                 color: Colors.green,
+                  //                 fontWeight: FontWeight.bold,
+                  //               ),
+                  //             ),
+                  //             onTap: () async {
+                  //               Navigator.of(context).pop();
+                  //               Navigator.push(
+                  //                 context,
+                  //                 MaterialPageRoute(
+                  //                   builder: (context) => MyStoresScreen(),
+                  //                 ),
+                  //               );
+                  //             },
+                  //           ),
+                  //         ),
+                  //       ];
+                  //     },
+                  //   ),
                 ],
         ),
         body: Container(
@@ -422,8 +439,6 @@ class _StoreScreenState extends State<StoreScreen> {
                     SliverToBoxAdapter(
                         child: Column(children: [
                       const SizedBox(height: 10),
-
-                     
                       Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: ToggleButtons(
@@ -448,34 +463,88 @@ class _StoreScreenState extends State<StoreScreen> {
                         ),
                       ),
                       if (isSearchMode)
+                        // Padding(
+                        //   padding: const EdgeInsets.all(10.0),
+                        //   child: Container(
+                        //     padding: EdgeInsets.symmetric(horizontal: 10),
+                        //     decoration: BoxDecoration(
+                        //       color: Colors.blueGrey[50],
+                        //       borderRadius: BorderRadius.circular(25),
+                        //     ),
+                        //     child: Row(
+                        //       children: [
+                        //         Icon(Icons.search, color: Colors.blueGrey[400]),
+                        //         SizedBox(width: 10),
+                        //         Expanded(
+                        //           child: TextField(
+                        //             controller: _searchController,
+                        //             onChanged: (value) {
+                        //               setState(() {});
+                        //             },
+                        //             decoration: InputDecoration(
+                        //               hintText: 'Rechercher',
+                        //               border: InputBorder.none,
+                        //               hintStyle: TextStyle(
+                        //                   color: Colors.blueGrey[400]),
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
                         Padding(
                           padding: const EdgeInsets.all(10.0),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.blueGrey[50],
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.search, color: Colors.blueGrey[400]),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: TextField(
-                                    controller: _searchController,
-                                    onChanged: (value) {
-                                      setState(() {});
-                                    },
-                                    decoration: InputDecoration(
-                                      hintText: 'Rechercher',
-                                      border: InputBorder.none,
-                                      hintStyle: TextStyle(
-                                          color: Colors.blueGrey[400]),
-                                    ),
+                          child: FutureBuilder<List<Magasin>>(
+                            future: _magasinList,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return SearchFieldAutoComplete<String>(
+                                  placeholder: 'Rechercher...',
+                                  focusNode: _focusNode,
+                                  suggestions: [],
+                                );
+                              } else {
+                                return SearchFieldAutoComplete<String>(
+                                  controller: _searchController,
+                                  focusNode: _focusNode,
+                                  placeholder: 'Rechercher...',
+                                  suggestions: snapshot.data!
+                                      .map((item) =>
+                                          SearchFieldAutoCompleteItem<String>(
+                                            searchKey: item.nomMagasin!,
+                                            value: item.nomMagasin!,
+                                          ))
+                                      .toList(),
+                                  suggestionsDecoration: SuggestionDecoration(
+                                    marginSuggestions:
+                                        const EdgeInsets.all(8.0),
+                                    color: const Color.fromARGB(
+                                        255, 236, 234, 234),
+                                    borderRadius: BorderRadius.circular(16.0),
                                   ),
-                                ),
-                              ],
-                            ),
+                                  onSuggestionSelected: (selectedItem) {
+                                    _searchController.text =
+                                        selectedItem.searchKey;
+                                    setState(() {});
+                                  },
+                                  onChanged: (value) {
+                                    setState(() {});
+                                  },
+                                  suggestionItemBuilder:
+                                      (context, searchFieldItem) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        searchFieldItem.searchKey,
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }
+                            },
                           ),
                         ),
                       if (!isSearchMode)
@@ -632,7 +701,6 @@ class _StoreScreenState extends State<StoreScreen> {
                           ],
                         ),
                       const SizedBox(height: 10),
-                    
                     ])),
                   ];
                 },
@@ -650,8 +718,8 @@ class _StoreScreenState extends State<StoreScreen> {
                                       selectedNiveau1Pays!.idNiveau1Pays!);
                             })
                           : setState(() {
-                              magasinListeFuture = MagasinService()
-                                  .fetchAllMagasin();
+                              magasinListeFuture =
+                                  MagasinService().fetchAllMagasin();
                             });
                     },
                     child: selectedNiveau1Pays == null
@@ -671,7 +739,8 @@ class _StoreScreenState extends State<StoreScreen> {
                                       return const Padding(
                                         padding: EdgeInsets.all(10),
                                         child: Center(
-                                            child: Text("Aucun magasin trouvé")),
+                                            child:
+                                                Text("Aucun magasin trouvé")),
                                       );
                                     } else {
                                       magasinListe = snapshot.data!;
@@ -685,9 +754,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                         return nomCat.contains(searchText);
                                       }).toList();
 
-                                      return filteredSearch
-                                              
-                                              .isEmpty
+                                      return filteredSearch.isEmpty
                                           ? SingleChildScrollView(
                                               child: Padding(
                                                 padding: EdgeInsets.all(10),
@@ -726,7 +793,6 @@ class _StoreScreenState extends State<StoreScreen> {
                                               ),
                                               itemCount:
                                                   filteredSearch.length + 1,
-                                             
                                               itemBuilder: (context, index) {
                                                 if (index <
                                                     filteredSearch.length) {
@@ -796,9 +862,10 @@ class _StoreScreenState extends State<StoreScreen> {
                                                           // SizedBox(height: 8),
                                                           ListTile(
                                                             title: Text(
-                                                              filteredSearch[index]
+                                                              filteredSearch[
+                                                                      index]
                                                                   .nomMagasin!,
-                                                                  maxLines:2,
+                                                              maxLines: 2,
                                                               style: TextStyle(
                                                                 fontSize: 17,
                                                                 fontWeight:
@@ -807,7 +874,6 @@ class _StoreScreenState extends State<StoreScreen> {
                                                                 color: Colors
                                                                     .black87,
                                                               ),
-                                                              
                                                               overflow:
                                                                   TextOverflow
                                                                       .ellipsis,
@@ -829,10 +895,11 @@ class _StoreScreenState extends State<StoreScreen> {
                                                               ),
                                                             ),
                                                           ),
-                                                         
+
                                                           _buildItem(
-                                                             filteredSearch[
-                                                                  index].contactMagasin!)
+                                                              filteredSearch[
+                                                                      index]
+                                                                  .contactMagasin!)
                                                           //     Padding(
                                                           //         padding: const EdgeInsets.symmetric(
                                                           //             horizontal: 8.0),

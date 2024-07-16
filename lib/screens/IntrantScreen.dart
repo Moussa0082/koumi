@@ -5,9 +5,6 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -15,13 +12,13 @@ import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/screens/AddIntrant.dart';
 import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/screens/ListeIntrantByActeur.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:provider/provider.dart';
+import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -61,154 +58,6 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
   bool isLoadingLibelle = true;
 
-  String? countryName;
-  String? countryCode;
-
-  String? detectedC = '';
-  String? isoCountryCode = '';
-  String? country = '';
-  String? detectedCountryCode = '';
-  String? detectedCountry = '';
-  CountryProvider? countryProvider;
-
-  void getLocationNew() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        await Geolocator.openLocationSettings();
-        return Future.error('Location services are disabled.');
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          return Future.error('Location permissions are denied');
-        }
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        return Future.error('Location permissions are permanently denied.');
-      }
-
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-
-      Placemark placemark = placemarks.first;
-      setState(() {
-        detectedCountryCode = placemark.isoCountryCode!;
-      });
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  var latitude = 'Getting Latitude..'.obs;
-  var longitude = 'Getting Longitude..'.obs;
-  var address = 'Getting Address..'.obs;
-  late StreamSubscription<Position> streamSubscription;
-
-  getLocation() async {
-    bool serviceEnabled;
-
-    LocationPermission permission;
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      await Geolocator.openLocationSettings();
-      return Future.error('Location services are disabled.');
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    streamSubscription =
-        Geolocator.getPositionStream().listen((Position position) {
-      latitude.value = 'Latitude : ${position.latitude}';
-      longitude.value = 'Longitude : ${position.longitude}';
-      getAddressFromLatLang(position);
-    });
-  }
-
-  Future<void> getAddressFromLatLang(Position position) async {
-    List<Placemark> placemark =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark place = placemark[0];
-    debugPrint("Address ISO: $detectedC");
-    address.value =
-        'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
-    if (mounted)
-      setState(() {
-        detectedC = place.isoCountryCode;
-        detectedCountryCode = place.isoCountryCode!;
-        detectedCountry = place.country!;
-      });
-
-    debugPrint(
-        "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
-  }
-
-  Future<void> _loadCountryData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      countryName = prefs.getString('countryName');
-      countryCode = prefs.getString('countryCode');
-    });
-  }
-
-  // String? monnaie;
-
-//   Future<String> getMonnaieByActor(String id) async {
-//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
-
-//     if (response.statusCode == 200) {
-//       print("libelle : ${response.body}");
-//       return response.body;  // Return the body directly since it's a plain string
-//     } else {
-//       throw Exception('Failed to load monnaie');
-//     }
-// }
-
-//  Future<void> fetchPaysDataByActor() async {
-//     try {
-//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
-
-//       setState(() {
-//         monnaie = monnaies;
-//         isLoadingLibelle = false;
-//       });
-//     } catch (e) {
-//       setState(() {
-//         isLoadingLibelle = false;
-//         });
-//       print('Error: $e');
-//     }
-//   }
-
   void _scrollListener() {
     if (scrollableController.position.pixels >=
             scrollableController.position.maxScrollExtent - 200 &&
@@ -222,7 +71,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
         });
       debugPrint("yes - fetch all by pays intrants");
       isExist
-          ? fetchIntrantByPays(detectedCountry!)
+          ? fetchIntrantByPays(
+              widget.detectedCountry != null ? widget.detectedCountry! : "mali")
           : fetchIntrantByPays(acteur.niveau3PaysActeur!);
     }
     debugPrint("no");
@@ -243,7 +93,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
       isExist
           ? fetchIntrantByCategorie(
-              detectedCountry!, selectedType!.idCategorieProduit!)
+              widget.detectedCountry!, selectedType!.idCategorieProduit!)
           : fetchIntrantByCategorie(
               acteur.niveau3PaysActeur!, selectedType!.idCategorieProduit!);
     }
@@ -384,7 +234,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
     } else {
       setState(() {
         isExist = false;
-        intrantListeFuture = IntrantService().fetchIntrantByPays(countryName!);
+        intrantListeFuture = IntrantService().fetchIntrantByPays(
+            widget.detectedCountry! != null ? widget.detectedCountry! : "mali");
       });
     }
   }
@@ -393,7 +244,10 @@ class _IntrantScreenState extends State<IntrantScreen> {
     if (selectedType != null) {
       isExist
           ? intrantListe = await IntrantService().fetchIntrantByCategorie(
-              selectedType!.idCategorieProduit!, countryName!)
+              selectedType!.idCategorieProduit!,
+              widget.detectedCountry! != null
+                  ? widget.detectedCountry!
+                  : "mali")
           : intrantListe = await IntrantService().fetchIntrantByCategorie(
               selectedType!.idCategorieProduit!, acteur.niveau3PaysActeur!);
     }
@@ -405,8 +259,10 @@ class _IntrantScreenState extends State<IntrantScreen> {
   void initState() {
     super.initState();
     verify();
-    _loadCountryData();
-    getLocation();
+    // widget.detectedCountry! =
+    //     Provider.of<DetectorPays>(context, listen: false).widget.detectedCountry!!;
+    // _loadCountryData();
+    // getLocation();
     _searchController = TextEditingController();
     _typeList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -422,8 +278,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
     isExist == true
         ? intrantListeFuture =
             IntrantService().fetchIntrantByPays(acteur.niveau3PaysActeur!)
-        : intrantListeFuture =
-            IntrantService().fetchIntrantByPays(detectedCountry!);
+        : intrantListeFuture = IntrantService().fetchIntrantByPays(
+            widget.detectedCountry != null ? widget.detectedCountry! : "mali");
 
     intrantListeFuture1 = getAllIntrant();
     // final countryProvider = Provider.of<CountryProvider>(context , listen: false);
@@ -447,7 +303,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
     intrantListeFuture1 = getAllIntrant();
     // final countryProvider = Provider.of<CountryProvider>(context , listen: false);
 
-    debugPrint("pays ${widget.detectedCountry!}");
+    debugPrint("pays ${widget.detectedCountry != null ? widget.detectedCountry : "mali"}");
   }
 
   Future<void> _getResultFromNextScreen1(BuildContext context) async {
@@ -476,6 +332,24 @@ class _IntrantScreenState extends State<IntrantScreen> {
     }
   }
 
+  Future<void> _getResultFromNextScreen3(
+      BuildContext context, Intrant? intrant) async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => DetailIntrant(
+                  intrant: intrant!,
+                )));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        intrantListeFuture = IntrantService().fetchIntrantByPays(
+            widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      });
+    }
+  }
+
   @override
   void dispose() {
     _searchController
@@ -485,6 +359,13 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
     super.dispose();
   }
+
+  String? _searchingWithQuery;
+
+  // The most recent options received from the API.
+  late Iterable<String> _lastOptions = <String>[];
+
+  // Searches the options, but injects a fake "network" delay.
 
   @override
   Widget build(BuildContext context) {
@@ -522,7 +403,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             onPressed: () {
                               intrantListeFuture = IntrantService()
                                   .fetchIntrantByPays(
-                                      widget.detectedCountry != null
+                                      widget.detectedCountry! != null
                                           ? widget.detectedCountry!
                                           : "Mali");
                             },
@@ -581,7 +462,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             onPressed: () {
                               intrantListeFuture = IntrantService()
                                   .fetchIntrantByPays(
-                                      widget.detectedCountry != null
+                                      widget.detectedCountry! != null
                                           ? widget.detectedCountry!
                                           : "Mali");
                             },
@@ -619,69 +500,37 @@ class _IntrantScreenState extends State<IntrantScreen> {
                         ),
                       ),
                       if (isSearchMode)
-                       
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey[50],
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.search, color: Colors.blueGrey[400]),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: Autocomplete<String>(
-                                  optionsBuilder:
-                                      (TextEditingValue textEditingValue) {
-                                    if (textEditingValue.text.isEmpty) {
-                                      return const Iterable<String>.empty();
-                                    }
-                                    return AutoComplet.getAgriculturalInputs()
-                                        .where((String option) {
-                                      return option.toLowerCase().contains(
-                                          textEditingValue.text.toLowerCase());
-                                    });
-                                  },
-                                  onSelected: (String selection) {
-                                    _searchController.text = selection;
-                                    setState(() {});
-                                  },
-                                  fieldViewBuilder: (BuildContext context,
-                                      TextEditingController
-                                          fieldTextEditingController,
-                                      FocusNode fieldFocusNode,
-                                      VoidCallback onFieldSubmitted) {
-                                    return TextField(
-                                      controller: fieldTextEditingController,
-                                      focusNode: fieldFocusNode,
-                                      onChanged: (value) {
-                                        setState(() {});
-                                      },
-                                      decoration: InputDecoration(
-                                        hintText: 'Rechercher',
-                                        border: InputBorder.none,
-                                        hintStyle: TextStyle(
-                                            color: Colors.blueGrey[400]),
-                                      ),
-                                    );
-                                  },
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: SearchFieldAutoComplete<String>(
+                            controller: _searchController,
+                            placeholder: 'Rechercher...',
+                            placeholderStyle:
+                                TextStyle(fontStyle: FontStyle.italic),
+                            suggestions: AutoComplet.getAgriculturalInputs,
+                            suggestionsDecoration: SuggestionDecoration(
+                              marginSuggestions: const EdgeInsets.all(8.0),
+                              color: const Color.fromARGB(255, 236, 234, 234),
+                              borderRadius: BorderRadius.circular(16.0),
+                            ),
+                            onSuggestionSelected: (selectedItem) {
+                              _searchController.text = selectedItem.searchKey;
+                              // setState(() {});
+                            },
+                            onChanged: (value) {
+                              setState(() {});
+                            },
+                            suggestionItemBuilder: (context, searchFieldItem) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  searchFieldItem.searchKey,
+                                  style: TextStyle(color: Colors.black),
                                 ),
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.clear),
-                                onPressed: () {
-                                 
-                                  _searchController.clear();
-                                  setState(() {});
-                                },
-                              ),
-                            ],
+                              );
+                            },
                           ),
                         ),
-                      ),
                       if (!isSearchMode)
                         Padding(
                           padding: const EdgeInsets.symmetric(
@@ -738,7 +587,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
                           ? setState(() {
                               isExist
                                   ? intrantListeFuture = IntrantService()
-                                      .fetchIntrantByPays(detectedCountry!)
+                                      .fetchIntrantByPays(
+                                          widget.detectedCountry!)
                                   : intrantListeFuture = IntrantService()
                                       .fetchIntrantByPays(
                                           acteur.niveau3PaysActeur!);
@@ -748,7 +598,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                   ? intrantListeFuture1 = IntrantService()
                                       .fetchIntrantByCategorie(
                                           selectedType!.idCategorieProduit!,
-                                          detectedCountry!)
+                                          widget.detectedCountry!)
                                   : intrantListeFuture1 = IntrantService()
                                       .fetchIntrantByCategorie(
                                           selectedType!.idCategorieProduit!,
@@ -832,16 +682,20 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                     filteredSearch.length) {
                                                   return GestureDetector(
                                                     onTap: () {
-                                                      Navigator.push(
+                                                      // Navigator.push(
+                                                      //   context,
+                                                      //   MaterialPageRoute(
+                                                      //     builder: (context) =>
+                                                      //         DetailIntrant(
+                                                      //       intrant:
+                                                      //           filteredSearch[
+                                                      //               index],
+                                                      //     ),
+                                                      //   ),
+                                                      // );
+                                                      _getResultFromNextScreen3(
                                                         context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              DetailIntrant(
-                                                            intrant:
-                                                                filteredSearch[
-                                                                    index],
-                                                          ),
-                                                        ),
+                                                        filteredSearch[index],
                                                       );
                                                     },
                                                     child: Card(
@@ -1084,14 +938,19 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                           .elementAt(index);
                                                       return GestureDetector(
                                                         onTap: () {
-                                                          Navigator.push(
+                                                          // Navigator.push(
+                                                          //   context,
+                                                          //   MaterialPageRoute(
+                                                          //     builder: (context) =>
+                                                          //         DetailIntrant(
+                                                          //       intrant: e,
+                                                          //     ),
+                                                          //   ),
+                                                          // );
+                                                          _getResultFromNextScreen3(
                                                             context,
-                                                            MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  DetailIntrant(
-                                                                intrant: e,
-                                                              ),
-                                                            ),
+                                                            filteredSearch[
+                                                                index],
                                                           );
                                                         },
                                                         child: Card(
@@ -1228,6 +1087,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
                           )))));
   }
 
+  
+
   Widget _buildShimmerEffect() {
     return Center(
       child: GridView.builder(
@@ -1321,7 +1182,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
           hasMore = true;
           isExist
               ? fetchIntrantByCategorie(
-                  selectedType!.idCategorieProduit!, detectedCountry!,
+                  selectedType!.idCategorieProduit!, widget.detectedCountry!,
                   refresh: true)
               : fetchIntrantByCategorie(
                   selectedType!.idCategorieProduit!, acteur.niveau3PaysActeur!,

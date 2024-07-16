@@ -436,7 +436,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
           toolbarHeight: 100,
           leading: IconButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.pop(context, true);
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
@@ -667,7 +667,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                         child: Align(
                             alignment: Alignment.topLeft,
                             child: Text(
-                              "Localité Magasin *",
+                              "Adresse Magasin *",
                               style: TextStyle(
                                   fontSize: 15, fontWeight: FontWeight.bold),
                             )),
@@ -680,7 +680,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          hintText: "Exemple : Bamako , Kayes , Segou",
+                          hintText: "Adresse du magasin",
                         ),
                         keyboardType: TextInputType.text,
                         validator: (val) {

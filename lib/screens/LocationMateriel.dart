@@ -15,14 +15,13 @@ import 'package:koumi_app/screens/AddMateriel.dart';
 import 'package:koumi_app/screens/ListeMaterielByActeur.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/widgets/AutoComptet.dart';
+import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:koumi_app/providers/ActeurProvider.dart';
 
 class LocationMateriel extends StatefulWidget {
-  String? detectedCountry;
-  LocationMateriel({super.key, this.detectedCountry});
+  
+  LocationMateriel({super.key});
 
   @override
   State<LocationMateriel> createState() => _LocationMaterielState();
@@ -35,6 +34,7 @@ class _LocationMaterielState extends State<LocationMateriel> {
   List<Materiels> materielListe = [];
   List<Materiels> materielList = [];
   late Acteur acteur;
+  String? detectedCountry;
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late Future<List<Materiels>> materielListeFuture;
@@ -183,7 +183,7 @@ class _LocationMaterielState extends State<LocationMateriel> {
           page++;
         });
       debugPrint("yes - fetch all by pays Materiels $page");
-      fetchMateriels(widget.detectedCountry!);
+      fetchMateriels(detectedCountry!);
     }
     debugPrint("no");
   }
@@ -220,6 +220,8 @@ class _LocationMaterielState extends State<LocationMateriel> {
 
   @override
   void initState() {
+    detectedCountry =
+        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //write or call your logic
       //code will run when widget rendering complete
@@ -235,7 +237,7 @@ class _LocationMaterielState extends State<LocationMateriel> {
     _typeList = http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
 
     materielListeFuture = MaterielService().fetchMateriel(
-        widget.detectedCountry != null ? widget.detectedCountry! : "mali");
+        detectedCountry != null ? detectedCountry! : "mali");
     print("mat ${materielListeFuture.toString()}");
     materielListeFuture1 = getAllMateriel();
     super.initState();
@@ -307,7 +309,7 @@ class _LocationMaterielState extends State<LocationMateriel> {
                   fontWeight: FontWeight.bold,
                   fontSize: 20),
             ),
-            actions: !isExist
+            actions: isExist
                 ? [
                     IconButton(
                         onPressed: () {
@@ -341,7 +343,7 @@ class _LocationMaterielState extends State<LocationMateriel> {
                               ),
                               onTap: () async {
                                 Navigator.of(context).pop();
-                              
+
                                 _getResultFromNextScreen1(context);
                               },
                             ),
@@ -376,151 +378,151 @@ class _LocationMaterielState extends State<LocationMateriel> {
             return <Widget>[
               SliverToBoxAdapter(
                   child: Column(children: [
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ToggleButtons(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text('Rechercher'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text('Filtrer'),
-                      ),
-                    ],
-                    isSelected: [isSearchMode, !isSearchMode],
-                    onPressed: (index) {
-                      setState(() {
-                        isSearchMode = index == 0;
-                      });
-                    },
-                  ),
-                ),
-                if (isSearchMode)
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.blueGrey[50],
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.search, color: Colors.blueGrey[400]),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Autocomplete<String>(
-                              optionsBuilder:
-                                  (TextEditingValue textEditingValue) {
-                                if (textEditingValue.text.isEmpty) {
-                                  return const Iterable<String>.empty();
-                                }
-                                return AutoComplet.getTransportVehicles()
-                                    .where((String option) {
-                                  return option.toLowerCase().contains(
-                                      textEditingValue.text.toLowerCase());
-                                });
-                              },
-                              onSelected: (String selection) {
-                                _searchController.text = selection;
-                                setState(() {});
-                              },
-                              fieldViewBuilder: (BuildContext context,
-                                  TextEditingController
-                                      fieldTextEditingController,
-                                  FocusNode fieldFocusNode,
-                                  VoidCallback onFieldSubmitted) {
-                                return TextField(
-                                  controller: _searchController,
-                                  focusNode: fieldFocusNode,
-                                  onChanged: (value) {
-                                    setState(() {});
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Rechercher',
-                                    border: InputBorder.none,
-                                    hintStyle:
-                                        TextStyle(color: Colors.blueGrey[400]),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {});
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                if (!isSearchMode)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    child: FutureBuilder(
-                      future: _typeList,
-                      builder: (_, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return buildLoadingDropdown();
-                        }
+                // const SizedBox(height: 10),
+                // Padding(
+                //   padding: const EdgeInsets.all(10.0),
+                //   child: ToggleButtons(
+                //     children: [
+                //       Padding(
+                //         padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                //         child: Text('Rechercher'),
+                //       ),
+                //       Padding(
+                //         padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                //         child: Text('Filtrer'),
+                //       ),
+                //     ],
+                //     isSelected: [isSearchMode, !isSearchMode],
+                //     onPressed: (index) {
+                //       setState(() {
+                //         isSearchMode = index == 0;
+                //       });
+                //     },
+                //   ),
+                // ),
+                // if (isSearchMode)
+                //   Padding(
+                //     padding: const EdgeInsets.all(10.0),
+                //     child: Container(
+                //       padding: EdgeInsets.symmetric(horizontal: 10),
+                //       decoration: BoxDecoration(
+                //         color: Colors.blueGrey[50],
+                //         borderRadius: BorderRadius.circular(25),
+                //       ),
+                //       child: Row(
+                //         children: [
+                //           Icon(Icons.search, color: Colors.blueGrey[400]),
+                //           SizedBox(width: 10),
+                //           Expanded(
+                //             child: Autocomplete<String>(
+                //               optionsBuilder:
+                //                   (TextEditingValue textEditingValue) {
+                //                 if (textEditingValue.text.isEmpty) {
+                //                   return const Iterable<String>.empty();
+                //                 }
+                //                 return AutoComplet.getTransportVehicles()
+                //                     .where((String option) {
+                //                   return option.toLowerCase().contains(
+                //                       textEditingValue.text.toLowerCase());
+                //                 });
+                //               },
+                //               onSelected: (String selection) {
+                //                 _searchController.text = selection;
+                //                 setState(() {});
+                //               },
+                //               fieldViewBuilder: (BuildContext context,
+                //                   TextEditingController
+                //                       fieldTextEditingController,
+                //                   FocusNode fieldFocusNode,
+                //                   VoidCallback onFieldSubmitted) {
+                //                 return TextField(
+                //                   controller: _searchController,
+                //                   focusNode: fieldFocusNode,
+                //                   onChanged: (value) {
+                //                     setState(() {});
+                //                   },
+                //                   decoration: InputDecoration(
+                //                     hintText: 'Rechercher',
+                //                     border: InputBorder.none,
+                //                     hintStyle:
+                //                         TextStyle(color: Colors.blueGrey[400]),
+                //                   ),
+                //                 );
+                //               },
+                //             ),
+                //           ),
+                //           IconButton(
+                //             icon: Icon(Icons.clear),
+                //             onPressed: () {
+                //               _searchController.clear();
+                //               setState(() {});
+                //             },
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // if (!isSearchMode)
+                //   Padding(
+                //     padding: const EdgeInsets.symmetric(
+                //         vertical: 10, horizontal: 20),
+                //     child: FutureBuilder(
+                //       future: _typeList,
+                //       builder: (_, snapshot) {
+                //         if (snapshot.connectionState ==
+                //             ConnectionState.waiting) {
+                //           return buildLoadingDropdown();
+                //         }
 
-                        if (snapshot.hasData) {
-                          dynamic jsonString =
-                              utf8.decode(snapshot.data.bodyBytes);
-                          dynamic responseData = json.decode(jsonString);
+                //         if (snapshot.hasData) {
+                //           dynamic jsonString =
+                //               utf8.decode(snapshot.data.bodyBytes);
+                //           dynamic responseData = json.decode(jsonString);
 
-                          if (responseData is List) {
-                            final reponse = responseData;
-                            final typeList = reponse
-                                .map((e) => TypeMateriel.fromMap(e))
-                                .where((con) => con.statutType == true)
-                                .toList();
+                //           if (responseData is List) {
+                //             final reponse = responseData;
+                //             final typeList = reponse
+                //                 .map((e) => TypeMateriel.fromMap(e))
+                //                 .where((con) => con.statutType == true)
+                //                 .toList();
 
-                            if (typeList.isEmpty) {
-                              return buildEmptyDropdown();
-                            }
+                //             if (typeList.isEmpty) {
+                //               return buildEmptyDropdown();
+                //             }
 
-                            return buildDropdown(typeList);
-                          } else {
-                            return buildEmptyDropdown();
-                          }
-                        }
+                //             return buildDropdown(typeList);
+                //           } else {
+                //             return buildEmptyDropdown();
+                //           }
+                //         }
 
-                        return buildEmptyDropdown();
-                      },
-                    ),
-                  ),
-                const SizedBox(height: 10),
+                //         return buildEmptyDropdown();
+                //       },
+                //     ),
+                //   ),
+                // const SizedBox(height: 10),
               ])),
             ];
           },
           body: RefreshIndicator(
               onRefresh: () async {
-                setState(() {
-                  page = 0;
-                  isLoading = false;
-                  // Rafraîchir les données ici
-                });
-                debugPrint("refresh page ${page}");
-                // selectedType != null ?StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!) :
-                selectedType == null
-                    ? setState(() {
-                        materielListeFuture = MaterielService().fetchMateriel(
-                            widget.detectedCountry != null
-                                ? widget.detectedCountry!
-                                : "mali");
-                      })
-                    : setState(() {
-                        materielListeFuture1 = getAllMateriel();
-                      });
+                // setState(() {
+                //   page = 0;
+                //   isLoading = false;
+                //   // Rafraîchir les données ici
+                // });
+                // debugPrint("refresh page ${page}");
+                // // selectedType != null ?StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!) :
+                // selectedType == null
+                //     ? setState(() {
+                //         materielListeFuture = MaterielService().fetchMateriel(
+                //             detectedCountry != null
+                //                 ? detectedCountry!
+                //                 : "mali");
+                //       })
+                //     : setState(() {
+                //         materielListeFuture1 = getAllMateriel();
+                //       });
               },
               child: SingleChildScrollView(
                 controller: scrollableController,
@@ -769,73 +771,73 @@ class _LocationMaterielState extends State<LocationMateriel> {
     );
   }
 
-  DropdownButtonFormField<String> buildDropdown(List<TypeMateriel> typeList) {
-    return DropdownButtonFormField<String>(
-      isExpanded: true,
-      items: typeList
-          .map((e) => DropdownMenuItem(
-                value: e.idTypeMateriel,
-                child: Text(e.nom!),
-              ))
-          .toList(),
-      hint: Text("-- Filtre par catégorie --"),
-      value: typeValue,
-      onChanged: (newValue) {
-        setState(() {
-          typeValue = newValue;
-          if (newValue != null) {
-            selectedType = typeList.firstWhere(
-              (element) => element.idTypeMateriel == newValue,
-            );
-          }
-          page = 0;
-          hasMore = true;
-          fetchMaterielsByIdTypeMateriel(widget.detectedCountry!,
-              refresh: true);
-          if (page == 0 && isLoading == true) {
-            SchedulerBinding.instance.addPostFrameCallback((_) {
-              scrollableController1.jumpTo(0.0);
-            });
-          }
-        });
-      },
-      decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
-  }
+  // DropdownButtonFormField<String> buildDropdown(List<TypeMateriel> typeList) {
+  //   return DropdownButtonFormField<String>(
+  //     isExpanded: true,
+  //     items: typeList
+  //         .map((e) => DropdownMenuItem(
+  //               value: e.idTypeMateriel,
+  //               child: Text(e.nom!),
+  //             ))
+  //         .toList(),
+  //     hint: Text("-- Filtre par catégorie --"),
+  //     value: typeValue,
+  //     onChanged: (newValue) {
+  //       setState(() {
+  //         typeValue = newValue;
+  //         if (newValue != null) {
+  //           selectedType = typeList.firstWhere(
+  //             (element) => element.idTypeMateriel == newValue,
+  //           );
+  //         }
+  //         page = 0;
+  //         hasMore = true;
+  //         fetchMaterielsByIdTypeMateriel(detectedCountry!,
+  //             refresh: true);
+  //         if (page == 0 && isLoading == true) {
+  //           SchedulerBinding.instance.addPostFrameCallback((_) {
+  //             scrollableController1.jumpTo(0.0);
+  //           });
+  //         }
+  //       });
+  //     },
+  //     decoration: InputDecoration(
+  //       contentPadding:
+  //           const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+  //       border: OutlineInputBorder(
+  //         borderRadius: BorderRadius.circular(8),
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  DropdownButtonFormField buildEmptyDropdown() {
-    return DropdownButtonFormField(
-      items: [],
-      onChanged: null,
-      decoration: InputDecoration(
-        labelText: '-- Aucun type  trouvé --',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
-  }
+  // DropdownButtonFormField buildEmptyDropdown() {
+  //   return DropdownButtonFormField(
+  //     items: [],
+  //     onChanged: null,
+  //     decoration: InputDecoration(
+  //       labelText: '-- Aucun type  trouvé --',
+  //       contentPadding:
+  //           const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+  //       border: OutlineInputBorder(
+  //         borderRadius: BorderRadius.circular(8),
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  DropdownButtonFormField buildLoadingDropdown() {
-    return DropdownButtonFormField(
-      items: [],
-      onChanged: null,
-      decoration: InputDecoration(
-        labelText: 'Chargement...',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
-  }
+  // DropdownButtonFormField buildLoadingDropdown() {
+  //   return DropdownButtonFormField(
+  //     items: [],
+  //     onChanged: null,
+  //     decoration: InputDecoration(
+  //       labelText: 'Chargement...',
+  //       contentPadding:
+  //           const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+  //       border: OutlineInputBorder(
+  //         borderRadius: BorderRadius.circular(8),
+  //       ),
+  //     ),
+  //   );
+  // }
 }

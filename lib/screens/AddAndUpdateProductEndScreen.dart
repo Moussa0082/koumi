@@ -304,63 +304,25 @@ class _AddAndUpdateProductEndSreenState
                                     fontSize: 15, fontWeight: FontWeight.bold),
                               )),
                         ),
-                        Autocomplete<String>(
-                          optionsBuilder: (TextEditingValue textEditingValue) {
-                            if (textEditingValue.text.isEmpty) {
-                              return const Iterable<String>.empty();
+                       
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez saisir le type du produit";
                             }
-                            return AutoComplet.getAgriculturalProductTypes()
-                                .where((String option) {
-                              return option.toLowerCase().contains(
-                                  textEditingValue.text.toLowerCase());
-                            });
+                            return null;
                           },
-                          onSelected: (String selection) {
-                            _typeController.text = selection;
-                            print("nom : ${_typeController.text}");
-                          },
-                          fieldViewBuilder: (BuildContext context,
-                              TextEditingController fieldTextEditingController,
-                              FocusNode fieldFocusNode,
-                              VoidCallback onFieldSubmitted) {
-                            return TextFormField(
-                              controller: fieldTextEditingController,
-                              focusNode: fieldFocusNode,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Veuillez remplir le champs";
-                                }
-                                return null;
-                              },
-                              decoration: InputDecoration(
-                                hintText: "Type de produit",
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
-                          },
+                          controller: _typeController,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            hintText: "Type produit",
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
                         ),
-                        // TextFormField(
-                        //   validator: (value) {
-                        //     if (value == null || value.isEmpty) {
-                        //       return "Veuillez saisir le type du produit";
-                        //     }
-                        //     return null;
-                        //   },
-                        //   controller: ,
-                        //   keyboardType: TextInputType.text,
-                        //   decoration: InputDecoration(
-                        //     hintText: "Type produit",
-                        //     contentPadding: const EdgeInsets.symmetric(
-                        //         vertical: 10, horizontal: 20),
-                        //     border: OutlineInputBorder(
-                        //       borderRadius: BorderRadius.circular(8),
-                        //     ),
-                        //   ),
-                        // ),
                         const SizedBox(height: 10),
                         Padding(
                           padding: const EdgeInsets.all(8),

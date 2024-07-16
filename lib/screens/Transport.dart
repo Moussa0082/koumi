@@ -18,13 +18,14 @@ import 'package:koumi_app/screens/PageTransporteur.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/AutoComptet.dart';
+import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 
 class Transport extends StatefulWidget {
-  String? detectedCountry;
-  Transport({super.key, this.detectedCountry});
+  Transport({super.key});
 
   @override
   State<Transport> createState() => _TransportState();
@@ -38,6 +39,7 @@ class _TransportState extends State<Transport> {
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late TextEditingController _searchController;
+  FocusNode _focusNode = FocusNode();
   List<Vehicule> vehiculeListe = [];
   TypeVoiture? selectedType;
   String? typeValue;
@@ -54,6 +56,7 @@ class _TransportState extends State<Transport> {
   late Future<List<Vehicule>> vehiculeListeFuture;
   late Future<List<Vehicule>> vehiculeListeFuture1;
   CountryProvider? countryProvider;
+  String? detectedCountry;
 
   void _scrollListener() {
     if (scrollableController.position.pixels >=
@@ -61,13 +64,12 @@ class _TransportState extends State<Transport> {
         hasMore &&
         !isLoading &&
         selectedType == null) {
-        if(mounted)
-      setState(() {
-       
-        page++;
-      });
-      debugPrint("yes - fetch all by pays vehicule $page" );
-      fetchVehicule(widget.detectedCountry!);
+      if (mounted)
+        setState(() {
+          page++;
+        });
+      debugPrint("yes - fetch all by pays vehicule $page");
+      fetchVehicule(detectedCountry!);
     }
     debugPrint("no");
   }
@@ -81,14 +83,14 @@ class _TransportState extends State<Transport> {
       // if (selectedCat != null) {
       // Incrementez la page et récupérez les stocks par catégorie
       debugPrint("yes - fetch by type and pays");
-      if(mounted)
-      setState(() {
+      if (mounted)
+        setState(() {
           // Rafraîchir les données ici
-      page++;
+          page++;
         });
-   
-    fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!, widget.detectedCountry!);
 
+      fetchVehiculeByTypeVoitureWithPagination(
+          selectedType!.idTypeVoiture!, detectedCountry!);
     }
     debugPrint("no");
   }
@@ -126,7 +128,8 @@ class _TransportState extends State<Transport> {
           setState(() {
             List<Vehicule> newVehicule =
                 body.map((e) => Vehicule.fromMap(e)).toList();
-            vehiculeListe.addAll(newVehicule.where((newVe) => !newVehicule.any((existVe) => existVe.idVehicule == newVe.idVehicule)));
+            vehiculeListe.addAll(newVehicule.where((newVe) => !newVehicule
+                .any((existVe) => existVe.idVehicule == newVe.idVehicule)));
             // page++;
           });
         }
@@ -182,6 +185,13 @@ class _TransportState extends State<Transport> {
           setState(() {
             List<Vehicule> newVehicule =
                 body.map((e) => Vehicule.fromMap(e)).toList();
+            vehiculeListe.addAll(newVehicule.where((newVe) => !newVehicule
+                .any((existVe) => existVe.idVehicule == newVe.idVehicule)));
+            // page++;
+          });
+          setState(() {
+            List<Vehicule> newVehicule =
+                body.map((e) => Vehicule.fromMap(e)).toList();
             vehiculeListe.addAll(newVehicule);
             // page++;
           });
@@ -206,12 +216,11 @@ class _TransportState extends State<Transport> {
     return vehiculeListe;
   }
 
-
-    Future<List<Vehicule>> getAllVehicule() async {
-     if (selectedType != null) {
-      vehiculeListe = await 
-          VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,widget.detectedCountry!);
-
+  Future<List<Vehicule>> getAllVehicule() async {
+    if (selectedType != null) {
+      vehiculeListe = await VehiculeService()
+          .fetchVehiculeByTypeVoitureWithPagination(
+              selectedType!.idTypeVoiture!, detectedCountry!);
     }
 
     return vehiculeListe;
@@ -235,6 +244,30 @@ class _TransportState extends State<Transport> {
     }
   }
 
+  List<SearchFieldAutoCompleteItem<String>> get suggestions {
+    return const [
+      SearchFieldAutoCompleteItem<String>(
+          searchKey: 'Apple', value: 'apple', child: Text('1')),
+      SearchFieldAutoCompleteItem<String>(searchKey: 'Banana', value: 'banana'),
+      SearchFieldAutoCompleteItem<String>(searchKey: 'Cherry', value: 'cherry'),
+      SearchFieldAutoCompleteItem<String>(searchKey: 'Date', value: 'date'),
+      SearchFieldAutoCompleteItem<String>(searchKey: 'Fig', value: 'fig'),
+      SearchFieldAutoCompleteItem<String>(searchKey: 'Grapes', value: 'grapes'),
+      SearchFieldAutoCompleteItem<String>(searchKey: 'Kiwi', value: 'kiwi'),
+      SearchFieldAutoCompleteItem<String>(searchKey: 'Lemon', value: 'lemon'),
+      SearchFieldAutoCompleteItem<String>(searchKey: 'Mango', value: 'mango'),
+      SearchFieldAutoCompleteItem<String>(searchKey: 'Orange', value: 'orange'),
+      SearchFieldAutoCompleteItem<String>(searchKey: 'Peach', value: 'peach'),
+      SearchFieldAutoCompleteItem<String>(searchKey: 'Pear', value: 'pear'),
+      SearchFieldAutoCompleteItem<String>(
+          searchKey: 'Pineapple', value: 'pineapple'),
+      SearchFieldAutoCompleteItem<String>(
+          searchKey: 'Strawberry', value: 'strawberry'),
+      SearchFieldAutoCompleteItem<String>(
+          searchKey: 'Watermelon', value: 'watermelon'),
+    ];
+  }
+
   @override
   void initState() {
     // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -242,28 +275,30 @@ class _TransportState extends State<Transport> {
     // // selectedType == null;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
     verify();
-    widget.detectedCountry!= null ?
-   debugPrint("pays fetch transport page ${widget.detectedCountry!} ")
-     : 
-     debugPrint("null pays non fetch transport page");
+    detectedCountry =
+        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+
+    detectedCountry != null
+        ? debugPrint("pays fetch transport page ${detectedCountry!} ")
+        : debugPrint("null pays non fetch transport page");
     _searchController = TextEditingController();
-    _typeList =
-        http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
-WidgetsBinding.instance.addPostFrameCallback((_){
-    //write or call your logic
-    //code will run when widget rendering complete
-  scrollableController.addListener(_scrollListener);
-  });
-WidgetsBinding.instance.addPostFrameCallback((_){
-    //write or call your logic
-    //code will run when widget rendering complete
-  scrollableController1.addListener(_scrollListener1);
-  });
- isExist == false ? vehiculeListeFuture = VehiculeService().fetchVehicule(widget.detectedCountry!):
- vehiculeListeFuture = VehiculeService().fetchVehicule(acteur.niveau3PaysActeur!);
-  vehiculeListeFuture1 = getAllVehicule();
-
-
+    _typeList = http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //write or call your logic
+      //code will run when widget rendering complete
+      scrollableController.addListener(_scrollListener);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //write or call your logic
+      //code will run when widget rendering complete
+      scrollableController1.addListener(_scrollListener1);
+    });
+    isExist == false
+        ? vehiculeListeFuture =
+            VehiculeService().fetchVehicule(detectedCountry!)
+        : vehiculeListeFuture =
+            VehiculeService().fetchVehicule(acteur.niveau3PaysActeur!);
+    vehiculeListeFuture1 = getAllVehicule();
 
     super.initState();
   }
@@ -275,8 +310,8 @@ WidgetsBinding.instance.addPostFrameCallback((_){
     if (result == true) {
       print("Rafraichissement en cours");
       setState(() {
-        vehiculeListeFuture = VehiculeService().fetchVehicule(
-            widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+        vehiculeListeFuture = VehiculeService()
+            .fetchVehicule(detectedCountry != null ? detectedCountry! : "Mali");
       });
     }
   }
@@ -288,8 +323,8 @@ WidgetsBinding.instance.addPostFrameCallback((_){
     if (result == true) {
       print("Rafraichissement en cours");
       setState(() {
-        vehiculeListeFuture = VehiculeService().fetchVehicule(
-            widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+        vehiculeListeFuture = VehiculeService()
+            .fetchVehicule(detectedCountry != null ? detectedCountry! : "Mali");
       });
     }
   }
@@ -306,7 +341,7 @@ WidgetsBinding.instance.addPostFrameCallback((_){
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Accédez au fournisseur ici
-    countryProvider = Provider.of<CountryProvider>(context, listen: false);
+    // countryProvider = Provider.of<CountryProvider>(context, listen: false);
   }
 
   @override
@@ -333,8 +368,8 @@ WidgetsBinding.instance.addPostFrameCallback((_){
                     IconButton(
                         onPressed: () {
                           vehiculeListeFuture = VehiculeService().fetchVehicule(
-                              widget.detectedCountry != null
-                                  ? widget.detectedCountry!
+                              detectedCountry != null
+                                  ? detectedCountry!
                                   : "Mali");
                         },
                         icon: const Icon(Icons.refresh, color: d_colorGreen)),
@@ -343,8 +378,8 @@ WidgetsBinding.instance.addPostFrameCallback((_){
                     IconButton(
                         onPressed: () {
                           vehiculeListeFuture = VehiculeService().fetchVehicule(
-                              widget.detectedCountry != null
-                                  ? widget.detectedCountry!
+                              detectedCountry != null
+                                  ? detectedCountry!
                                   : "Mali");
                         },
                         icon: const Icon(Icons.refresh, color: d_colorGreen)),
@@ -462,12 +497,13 @@ WidgetsBinding.instance.addPostFrameCallback((_){
               });
               selectedType == null
                   ? setState(() {
-                      vehiculeListeFuture = VehiculeService().fetchVehicule(widget.detectedCountry!);
+                      vehiculeListeFuture =
+                          VehiculeService().fetchVehicule(detectedCountry!);
                     })
                   : setState(() {
                       vehiculeListeFuture1 = VehiculeService()
                           .fetchVehiculeByTypeVoitureWithPagination(
-                              selectedType!.idTypeVoiture!,widget.detectedCountry!);
+                              selectedType!.idTypeVoiture!, detectedCountry!);
                     });
             },
             child: Container(
@@ -478,122 +514,6 @@ WidgetsBinding.instance.addPostFrameCallback((_){
                   SliverToBoxAdapter(
                       child: Column(children: [
                     const SizedBox(height: 10),
-
-                    // const SizedBox(height: 10),
-                    //     Padding(
-                    //       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    //       child: FutureBuilder(
-                    //         future: _typeList,
-                    //         builder: (_, snapshot) {
-                    //           if (snapshot.connectionState == ConnectionState.waiting) {
-                    //             return DropdownButtonFormField(
-                    //               items: [],
-                    //               onChanged: null,
-                    //               decoration: InputDecoration(
-                    //                 labelText: 'Chargement...',
-                    //                 contentPadding: const EdgeInsets.symmetric(
-                    //                     vertical: 10, horizontal: 20),
-                    //                 border: OutlineInputBorder(
-                    //                   borderRadius: BorderRadius.circular(8),
-                    //                 ),
-                    //               ),
-                    //             );
-                    //           }
-
-                    //           if (snapshot.hasData) {
-                    //             dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
-                    //             dynamic responseData = json.decode(jsonString);
-                    //             // dynamic responseData = json.decode(snapshot.data.body);
-                    //             if (responseData is List) {
-                    //               final reponse = responseData;
-                    //               final vehiculeList = reponse
-                    //                   .map((e) => TypeVoiture.fromMap(e))
-                    //                   .where((con) => con.statutType == true)
-                    //                   .toList();
-
-                    //               if (vehiculeList.isEmpty) {
-                    //                 return DropdownButtonFormField(
-                    //                   items: [],
-                    //                   onChanged: null,
-                    //                   decoration: InputDecoration(
-                    //                     labelText: '-- Aucun type de véhicule trouvé --',
-                    //                     contentPadding: const EdgeInsets.symmetric(
-                    //                         vertical: 10, horizontal: 20),
-                    //                     border: OutlineInputBorder(
-                    //                       borderRadius: BorderRadius.circular(8),
-                    //                     ),
-                    //                   ),
-                    //                 );
-                    //               }
-
-                    //               return DropdownButtonFormField<String>(
-                    //                 isExpanded: true,
-                    //                 items: vehiculeList
-                    //                     .map(
-                    //                       (e) => DropdownMenuItem(
-                    //                         value: e.idTypeVoiture,
-                    //                         child: Text(e.nom!),
-                    //                       ),
-                    //                     )
-                    //                     .toList(),
-                    //                 hint: Text("-- Filtre par type de véhicule --"),
-                    //                 value: typeValue,
-                    //                 onChanged: (newValue) {
-                    //                   setState(() {
-                    //                     typeValue = newValue;
-                    //                     if (newValue != null) {
-                    //                       selectedType = vehiculeList.firstWhere(
-                    //                         (element) => element.idTypeVoiture == newValue,
-                    //                       );
-                    //                     }
-                    //                     page = 0;
-                    //           hasMore = true;
-                    //           fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,refresh: true);
-                    //             if (page == 0 && isLoading == true) {
-                    //     SchedulerBinding.instance.addPostFrameCallback((_) {
-                    // scrollableController1.jumpTo(0.0);
-                    //     });
-                    //   }
-                    //                   });
-                    //                 },
-                    //                 decoration: InputDecoration(
-                    //                   contentPadding: const EdgeInsets.symmetric(
-                    //                       vertical: 10, horizontal: 20),
-                    //                   border: OutlineInputBorder(
-                    //                     borderRadius: BorderRadius.circular(8),
-                    //                   ),
-                    //                 ),
-                    //               );
-                    //             } else {
-                    //               return DropdownButtonFormField(
-                    //                 items: [],
-                    //                 onChanged: null,
-                    //                 decoration: InputDecoration(
-                    //                   labelText: '-- Aucun type de véhicule trouvé --',
-                    //                   contentPadding: const EdgeInsets.symmetric(
-                    //                       vertical: 10, horizontal: 20),
-                    //                   border: OutlineInputBorder(
-                    //                     borderRadius: BorderRadius.circular(8),
-                    //                   ),
-                    //                 ),
-                    //               );
-                    //             }
-                    //           }
-                    //           return DropdownButtonFormField(
-                    //             items: [],
-                    //             onChanged: null,
-                    //             decoration: InputDecoration(
-                    //               labelText: '-- Aucun type de véhicule trouvé --',
-                    //               contentPadding: const EdgeInsets.symmetric(
-                    //                   vertical: 10, horizontal: 20),
-                    //               border: OutlineInputBorder(
-                    //                 borderRadius: BorderRadius.circular(8),
-                    //               ),
-                    //             ),
-                    //           );
-                    //         },
-                    //       ),
-                    //     ),
                     Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: ToggleButtons(
@@ -618,63 +538,76 @@ WidgetsBinding.instance.addPostFrameCallback((_){
                       ),
                     ),
                     if (isSearchMode)
-                     Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(
-          color: Colors.blueGrey[50],
-          borderRadius: BorderRadius.circular(25),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.search, color: Colors.blueGrey[400]),
-            SizedBox(width: 10),
-            Expanded(
-              child: Autocomplete<String>(
-                optionsBuilder: (TextEditingValue textEditingValue) {
-                  if (textEditingValue.text.isEmpty) {
-                    return const Iterable<String>.empty();
-                  }
-                  return AutoComplet.getTransportVehicles()
-                      .where((String option) {
-                    return option.toLowerCase()
-                        .contains(textEditingValue.text.toLowerCase());
-                  });
-                },
-                onSelected: (String selection) {
-                  _searchController.text = selection;
-                  setState(() {});
-                },
-                fieldViewBuilder: (BuildContext context,
-                    TextEditingController fieldTextEditingController,
-                    FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
-                  return TextField(
-                    controller: fieldTextEditingController,
-                    focusNode: fieldFocusNode,
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Rechercher',
-                      border: InputBorder.none,
-                      hintStyle: TextStyle(color: Colors.blueGrey[400]),
-                    ),
-                  );
-                },
-              ),
-            ),
-            IconButton(
-              icon: Icon(Icons.clear),
-              onPressed: () {
-                _searchController.clear();
-                setState(() {});
-              },
-            ),
-          ],
-        ),
-      ),
-    ),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: SearchFieldAutoComplete<String>(
+                          placeholder: 'Rechercher...',
+                          suggestions: AutoComplet.getTransportVehicles,
+                          suggestionsDecoration: SuggestionDecoration(
+                            marginSuggestions: const EdgeInsets.all(8.0),
+                            color: Colors.blueGrey[400],
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          onSuggestionSelected: (selectedItem) {
+                            _searchController.text = selectedItem.searchKey;
+                            setState(() {
+                              
+                            });
+                          },
+                          suggestionItemBuilder: (context, searchFieldItem) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                searchFieldItem.searchKey,
+                                style:
+                                    TextStyle(color: Colors.blueGrey.shade900),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    //  Padding(
+                    //   padding: const EdgeInsets.all(10.0),
+                    //   child: Container(
+                    //     padding: EdgeInsets.symmetric(horizontal: 10),
+                    //     decoration: BoxDecoration(
+                    //       color:
+                    //           Colors.blueGrey[50], // Couleur d'arrière-plan
+                    //       borderRadius: BorderRadius.circular(25),
+                    //     ),
+                    //     child: Row(
+                    //       children: [
+                    //         Icon(Icons.search,
+                    //             color: Colors.blueGrey[400],
+                    //             size:
+                    //                 28), // Utiliser une icône de recherche plus grande
+                    //         SizedBox(width: 10),
+                    //         Expanded(
+                    //           child: TextField(
+                    //             controller: _searchController,
+                    //             onChanged: (value) {
+                    //               setState(() {});
+                    //             },
+                    //             decoration: InputDecoration(
+                    //               hintText: 'Rechercher...',
+                    //               border: InputBorder.none,
+                    //               hintStyle:
+                    //                   TextStyle(color: Colors.blueGrey[400]),
+                    //             ),
+                    //           ),
+                    //         ),
+                    //         // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                    //         IconButton(
+                    //           icon: Icon(Icons.clear),
+                    //           onPressed: () {
+                    //             _searchController.clear();
+                    //             setState(() {});
+                    //           },
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
                     if (!isSearchMode)
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -725,12 +658,13 @@ WidgetsBinding.instance.addPostFrameCallback((_){
                   selectedType == null
                       ? setState(() {
                           vehiculeListeFuture =
-                              VehiculeService().fetchVehicule(widget.detectedCountry!);
+                              VehiculeService().fetchVehicule(detectedCountry!);
                         })
                       : setState(() {
                           vehiculeListeFuture1 = VehiculeService()
                               .fetchVehiculeByTypeVoitureWithPagination(
-                                  selectedType!.idTypeVoiture!,widget.detectedCountry!);
+                                  selectedType!.idTypeVoiture!,
+                                  detectedCountry!);
                         });
                 },
                 child: selectedType == null
@@ -1267,7 +1201,8 @@ WidgetsBinding.instance.addPostFrameCallback((_){
           }
           page = 0;
           hasMore = true;
-          fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,widget.detectedCountry! ,
+          fetchVehiculeByTypeVoitureWithPagination(
+              selectedType!.idTypeVoiture!, detectedCountry!,
               refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {

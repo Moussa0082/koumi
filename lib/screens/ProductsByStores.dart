@@ -15,7 +15,9 @@ import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/screens/MyProduct.dart';
 import 'package:koumi_app/service/StockService.dart';
+import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:provider/provider.dart';
+import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -422,34 +424,34 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                   ),
                 ),
                 if (isSearchMode)
-                  Padding(
+               Padding(
                     padding: const EdgeInsets.all(10.0),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.blueGrey[50],
-                        borderRadius: BorderRadius.circular(25),
+                    child: SearchFieldAutoComplete<String>(
+                      controller: _searchController,
+                      placeholder: 'Rechercher...',
+                      placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
+                      suggestions: AutoComplet.getAgriculturalProducts,
+                      suggestionsDecoration: SuggestionDecoration(
+                        marginSuggestions: const EdgeInsets.all(8.0),
+                        color: const Color.fromARGB(255, 236, 234, 234),
+                        borderRadius: BorderRadius.circular(16.0),
                       ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.search, color: Colors.blueGrey[400]),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: TextField(
-                              controller: _searchController,
-                              onChanged: (value) {
-                                setState(() {});
-                              },
-                              decoration: InputDecoration(
-                                hintText: 'Rechercher',
-                                border: InputBorder.none,
-                                hintStyle:
-                                    TextStyle(color: Colors.blueGrey[400]),
-                              ),
-                            ),
+                      onSuggestionSelected: (selectedItem) {
+                        _searchController.text = selectedItem.searchKey;
+                        // setState(() {});
+                      },
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      suggestionItemBuilder: (context, searchFieldItem) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            searchFieldItem.searchKey,
+                            style: TextStyle(color: Colors.black),
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   ),
                 if (!isSearchMode)

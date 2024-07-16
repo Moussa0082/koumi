@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,9 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/widgets/AutoComptet.dart';
+import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:provider/provider.dart';
+import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ListeIntrantByActeur extends StatefulWidget {
@@ -127,6 +130,24 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
     });
   }
 
+  Future<void> _getResultFromNextScreen1(
+      BuildContext context, Intrant? intrant) async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => DetailIntrant(
+                  intrant: intrant!,
+                )));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        futureList = IntrantService()
+            .fetchIntrantByActeurWithPagination(acteur.idActeur!);
+      });
+    }
+  }
+
   @override
   void dispose() {
     _searchController
@@ -146,7 +167,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
             onPressed: () {
               Navigator.pop(context, true);
             },
-            icon: const Icon(Icons.arrow_back_ios)),
+            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
           "Mes intrants",
           style: TextStyle(
@@ -162,69 +183,78 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
             return <Widget>[
               SliverToBoxAdapter(
                   child: Column(children: [
-                const SizedBox(height: 10),
-                 Padding(
+                     Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.blueGrey[50],
-                      borderRadius: BorderRadius.circular(25),
+                  child: SearchFieldAutoComplete<String>(
+                    controller: _searchController,
+                    placeholder: 'Rechercher...',
+                    placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
+                    suggestions: AutoComplet.getAgriculturalInputs,
+                    suggestionsDecoration: SuggestionDecoration(
+                      marginSuggestions: const EdgeInsets.all(8.0),
+                      color: const Color.fromARGB(255, 236, 234, 234),
+                      borderRadius: BorderRadius.circular(16.0),
                     ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.search, color: Colors.blueGrey[400]),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Autocomplete<String>(
-                            optionsBuilder:
-                                (TextEditingValue textEditingValue) {
-                              if (textEditingValue.text.isEmpty) {
-                                return const Iterable<String>.empty();
-                              }
-                              return AutoComplet.getAgriculturalInputs()
-                                  .where((String option) {
-                                return option.toLowerCase().contains(
-                                    textEditingValue.text.toLowerCase());
-                              });
-                            },
-                            onSelected: (String selection) {
-                              _searchController.text = selection;
-                              setState(() {});
-                            },
-                            fieldViewBuilder: (BuildContext context,
-                                TextEditingController
-                                    fieldTextEditingController,
-                                FocusNode fieldFocusNode,
-                                VoidCallback onFieldSubmitted) {
-                              return TextField(
-                                controller: fieldTextEditingController,
-                                focusNode: fieldFocusNode,
-                                onChanged: (value) {
-                                  setState(() {});
-                                },
-                                decoration: InputDecoration(
-                                  hintText: 'Rechercher',
-                                  border: InputBorder.none,
-                                  hintStyle:
-                                      TextStyle(color: Colors.blueGrey[400]),
-                                ),
-                              );
-                            },
-                          ),
+                    onSuggestionSelected: (selectedItem) {
+                      _searchController.text = selectedItem.searchKey;
+                      // setState(() {});
+                    },
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                    suggestionItemBuilder: (context, searchFieldItem) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          searchFieldItem.searchKey,
+                          style: TextStyle(color: Colors.black),
                         ),
-                        IconButton(
-                          icon: Icon(Icons.clear),
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() {});
-                          },
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(height: 10),
+                // const SizedBox(height: 10),
+                // Padding(
+                //   padding: const EdgeInsets.all(10.0),
+                //   child: Container(
+                //     padding: EdgeInsets.symmetric(horizontal: 10),
+                //     decoration: BoxDecoration(
+                //       color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                //       borderRadius: BorderRadius.circular(25),
+                //     ),
+                //     child: Row(
+                //       children: [
+                //         Icon(Icons.search,
+                //             color: Colors.blueGrey[400],
+                //             size:
+                //                 28), // Utiliser une icône de recherche plus grande
+                //         SizedBox(width: 10),
+                //         Expanded(
+                //           child: TextField(
+                //             controller: _searchController,
+                //             onChanged: (value) {
+                //               setState(() {});
+                //             },
+                //             decoration: InputDecoration(
+                //               hintText: 'Rechercher...',
+                //               border: InputBorder.none,
+                //               hintStyle: TextStyle(color: Colors.blueGrey[400]),
+                //             ),
+                //           ),
+                //         ),
+                //         // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                //         IconButton(
+                //           icon: Icon(Icons.clear),
+                //           onPressed: () {
+                //             _searchController.clear();
+                //             setState(() {});
+                //           },
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+                // const SizedBox(height: 10),
               ])),
             ];
           },
@@ -326,15 +356,17 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                     if (index < filtereSearch.length) {
                                       return GestureDetector(
                                         onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DetailIntrant(
-                                                intrant: filtereSearch[index],
-                                              ),
-                                            ),
-                                          );
+                                          // Navigator.push(
+                                          //   context,
+                                          //   MaterialPageRoute(
+                                          //     builder: (context) =>
+                                          //         DetailIntrant(
+                                          //       intrant: filtereSearch[index],
+                                          //     )
+                                          //   ),
+                                          // );
+                                          _getResultFromNextScreen1(
+                                              context, filtereSearch[index]);
                                         },
                                         child: Card(
                                           margin: EdgeInsets.all(8),
@@ -542,6 +574,50 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
                                                             leading: const Icon(
+                                                              Icons.edit,
+                                                              color:
+                                                                  Colors.green,
+                                                            ),
+                                                            title: const Text(
+                                                              "Modifier la quantité",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .green,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                            onTap: () async {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                              await afficherBottomSheet(
+                                                                      context,
+                                                                      filtereSearch[
+                                                                          index])
+                                                                  .then(
+                                                                      (value) {
+                                                                Provider.of<IntrantService>(
+                                                                        context,
+                                                                        listen:
+                                                                            false)
+                                                                    .applyChange();
+                                                                setState(() {
+                                                                  page++;
+                                                                  futureList = IntrantService()
+                                                                      .fetchIntrantByActeurWithPagination(
+                                                                          acteur
+                                                                              .idActeur!);
+                                                                });
+                                                                // Navigator.of(context).pop();
+                                                              });
+                                                            },
+                                                          ),
+                                                        ),
+                                                        PopupMenuItem<String>(
+                                                          child: ListTile(
+                                                            leading: const Icon(
                                                               Icons.delete,
                                                               color: Colors.red,
                                                             ),
@@ -623,6 +699,35 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
     );
   }
 
+  Future<dynamic?> afficherBottomSheet(
+      BuildContext context, Intrant? intrant) async {
+    return await showModalBottomSheet<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: DialodEdit(intrant: intrant)),
+        );
+      },
+    );
+  }
+
   Widget _buildShimmerEffect() {
     return Center(
       child: GridView.builder(
@@ -701,33 +806,166 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
       ),
     );
   }
+}
 
-  Widget _buildItem(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-                fontStyle: FontStyle.italic,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w800,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16),
-          )
-        ],
+class DialodEdit extends StatefulWidget {
+  Intrant? intrant;
+  DialodEdit({super.key, this.intrant});
+
+  @override
+  State<DialodEdit> createState() => _DialodEditState();
+}
+
+class _DialodEditState extends State<DialodEdit> {
+  TextEditingController quantiteController = TextEditingController();
+  late Intrant intrants;
+  String? idIntrant;
+  bool _isLoading = false;
+  final formkey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    intrants = widget.intrant!;
+    idIntrant = intrants.idIntrant!;
+    quantiteController.text = intrants.quantiteIntrant!.toString();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LoadingOverlay(
+      isLoading: _isLoading,
+      child: Container(
+        height: 250,
+        child: Form(
+            key: formkey,
+            child: Column(children: [
+              Text(
+                "Modification de la quantité",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Veuillez remplir ce champ";
+                  }
+                  return null;
+                },
+                controller: quantiteController,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                  labelText: "Quantité",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      final qte = quantiteController.text;
+
+                      final qteF = double.tryParse(qte);
+                      print(qte);
+                      if (formkey.currentState!.validate()) {
+                        try {
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          await IntrantService()
+                              .updateQuantiteIntrant(
+                                  id: intrants.idIntrant!, quantite: qteF!)
+                              .then((value) => {
+                                    setState(() {
+                                      _isLoading = false;
+                                    }),
+                                    Provider.of<IntrantService>(context,
+                                            listen: false)
+                                        .applyChange(),
+                                    Navigator.of(context).pop(),
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Row(
+                                          children: [
+                                            Text(
+                                                "Quantité modifier avec success"),
+                                          ],
+                                        ),
+                                        duration: Duration(seconds: 5),
+                                      ),
+                                    )
+                                  })
+                              .catchError((onError) => {
+                                    setState(() {
+                                      _isLoading = false;
+                                    }),
+                                    print(onError)
+                                  });
+                        } catch (e) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          final String errorMessage = e.toString();
+                          print(errorMessage);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Row(
+                                children: [
+                                  Text("Une erreur s'est produit"),
+                                ],
+                              ),
+                              duration: Duration(seconds: 5),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: d_colorGreen,
+
+                      // fixedSize: 10,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 14, horizontal: 25),
+                    ),
+                    child: Text(
+                      "Modifier",
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red, // Background color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 14, horizontal: 25),
+                    ),
+                    child: Text(
+                      "Annuler",
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              )
+            ])),
       ),
     );
   }

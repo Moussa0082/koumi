@@ -78,18 +78,18 @@ class _FormeProduitState extends State<FormeProduit> {
                 child: ListTile(
                   leading: Icon(
                     Icons.add,
-                    color:  d_colorGreen,
+                    color: d_colorGreen,
                   ),
                   title: Text(
                     "Ajouter une forme",
                     style: TextStyle(
-                      color:  d_colorGreen,
+                      color: d_colorGreen,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   onTap: () async {
                     Navigator.of(context).pop();
-                    _addForme();
+                    _showBottomSheet1();
                   },
                 ),
               ),
@@ -385,33 +385,25 @@ class _FormeProduitState extends State<FormeProduit> {
                                                                 ),
                                                               ),
                                                               onTap: () async {
-                                                                // Ouvrir la boîte de dialogue de modification
-                                                                var updatedSousRegion =
-                                                                    await showDialog(
-                                                                  context:
-                                                                      context,
-                                                                  builder: (BuildContext context) => AlertDialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      content: UpdateFormeClass(
-                                                                          forme:
-                                                                              e)),
-                                                                );
-
-                                                                // Si les détails sont modifiés, appliquer les changements
-                                                                // if (updatedSousRegion) {
-                                                                //   Provider.of<FormeService>(
-                                                                //           context,
-                                                                //           listen:
-                                                                //               false)
-                                                                //       .applyChange();
-                                                                //   setState(() {
-                                                                //     _liste =
-                                                                //         getListe();
-                                                                //   });
-                                                                //   //   // Mettre à jour la liste des sous-régions
-                                                                // }
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                                await afficherBottomSheet(
+                                                                        context,
+                                                                        e)
+                                                                    .then(
+                                                                        (value) {
+                                                                  Provider.of<FormeService>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .applyChange();
+                                                                  setState(() {
+                                                                    _liste =
+                                                                        getListe();
+                                                                  });
+                                                                  // Navigator.of(context).pop();
+                                                                });
                                                               },
                                                             ),
                                                           ),
@@ -498,6 +490,35 @@ class _FormeProduitState extends State<FormeProduit> {
     );
   }
 
+  Future<dynamic> afficherBottomSheet(
+      BuildContext context, Forme? forme) async {
+    return await showModalBottomSheet<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: UpdateFormeClass(forme: forme!)),
+        );
+      },
+    );
+  }
+
   Widget _getIconForForme(String libelle) {
     switch (libelle.toLowerCase()) {
       case 'graine':
@@ -537,149 +558,155 @@ class _FormeProduitState extends State<FormeProduit> {
     }
   }
 
-  void _addForme() {
-    showDialog(
+  void _showBottomSheet1() {
+    showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    "Ajouter une forme de produit",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  trailing: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.red,
-                      size: 24,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Form(
-                  key: formkey,
-                  child: Column(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const SizedBox(
-                        height: 10,
+                      Text(
+                        "Ajouter une forme de produit",
+                        maxLines: 2,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 18,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
                         },
-                        controller: libelleController,
-                        decoration: InputDecoration(
-                          hintText: "Libelle",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: descriptionController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Description",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          final String description = descriptionController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await FormeService()
-                                  .addFormess(
-                                    libelleForme: libelle,
-                                    descriptionForme: description,
-                                  )
-                                  .then((value) => {
-                                        Provider.of<FormeService>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        setState(() {
-                                          _liste = getListe();
-                                        }),
-                                        libelleController.clear(),
-                                        descriptionController.clear(),
-                                        Navigator.of(context).pop()
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("Une erreur s'est produite"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // Orange color code
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          minimumSize: const Size(290, 45),
-                        ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Ajouter",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                        child: Text("Fermer",
+                            style: TextStyle(color: Colors.red, fontSize: 18)),
                       )
                     ],
                   ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
+                  const SizedBox(height: 5),
+                  Form(
+                    key: formkey,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir les champs";
+                            }
+                            return null;
+                          },
+                          controller: libelleController,
+                          decoration: InputDecoration(
+                            hintText: "Libelle",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir les champs";
+                            }
+                            return null;
+                          },
+                          controller: descriptionController,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                            labelText: "Description",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final String libelle = libelleController.text;
+                            final String description =
+                                descriptionController.text;
+                            if (formkey.currentState!.validate()) {
+                              try {
+                                await FormeService()
+                                    .addFormess(
+                                      libelleForme: libelle,
+                                      descriptionForme: description,
+                                    )
+                                    .then((value) => {
+                                          Provider.of<FormeService>(context,
+                                                  listen: false)
+                                              .applyChange(),
+                                          setState(() {
+                                            _liste = getListe();
+                                          }),
+                                          libelleController.clear(),
+                                          descriptionController.clear(),
+                                          Navigator.of(context).pop()
+                                        });
+                              } catch (e) {
+                                final String errorMessage = e.toString();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Row(
+                                      children: [
+                                        Text("Une erreur s'est produite"),
+                                      ],
+                                    ),
+                                    duration: Duration(seconds: 5),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green, // Orange color code
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            minimumSize: const Size(290, 45),
+                          ),
+                          icon: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            "Ajouter",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ));
+      },
     );
   }
 }
@@ -714,26 +741,27 @@ class _UpdateFormeClassState extends State<UpdateFormeClass> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              title: Text(
-                "Ajouter une forme de produit",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontSize: 18,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Modification",
+                  maxLines: 2,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontSize: 18,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              trailing: IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                icon: Icon(
-                  Icons.close,
-                  color: Colors.red,
-                  size: 24,
-                ),
-              ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Fermer",
+                      style: TextStyle(color: Colors.red, fontSize: 18)),
+                )
+              ],
             ),
             const SizedBox(height: 5),
             Form(

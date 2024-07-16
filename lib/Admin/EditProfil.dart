@@ -222,6 +222,7 @@ class _EditProfilState extends State<EditProfil> {
             children: [
               Row(
                 children: [
+                  SizedBox(width: 15),
                   SizedBox(height: 10),
                   photo != null
                       ? Padding(
@@ -348,7 +349,7 @@ class _EditProfilState extends State<EditProfil> {
                   dropdownHeight: 320,
                   hint: typeLibelle.map((e) => e).join(','),
 
-                  fieldBackgroundColor: Color.fromARGB(255, 240, 240, 240),
+                  fieldBackgroundColor: Color.fromARGB(255, 228, 227, 227),
                   searchEnabled: false,
                   searchLabel: "Search",
                   onOptionSelected: (options) {
@@ -424,7 +425,7 @@ class _EditProfilState extends State<EditProfil> {
                   hint: libelleSpeculation.map((e) => e).join(', '),
 
                   dropdownHeight: 320,
-                  fieldBackgroundColor: Color.fromARGB(255, 240, 240, 240),
+                  fieldBackgroundColor: Color.fromARGB(255, 228, 227, 227),
                   onOptionSelected: (options) {
                     setState(() {
                       selectedSpec = options

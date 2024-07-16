@@ -38,69 +38,9 @@ class _Niveau1PageState extends State<Niveau1Page> {
   String? paysValue;
   late Future _paysList;
   late TextEditingController _searchController;
-   bool isLoadingLibelle = true;
+  bool isLoadingLibelle = true;
   String? libelleNiveau1Pays;
   late Acteur acteur;
-
-bool isLoadingLibelle2 = true;
-    String? libelleNiveau2Pays;
- 
-  Future<String> getLibelleNiveau2PaysByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau2Pays/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load libelle niveau2Pays');
-    }
-  }
-
-    Future<void> fetchPaysData2ByActor() async {
-    try {
-      String libelle2 = await getLibelleNiveau2PaysByActor(acteur.idActeur!);
-
-      setState(() { 
-        libelleNiveau2Pays = libelle2;
-        isLoadingLibelle2 = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle2 = false;
-        });
-      print('Error: $e');
-    }
-  }
-
-  Future<String> getlibelleNiveau1PaysByActor(String id) async {
-    final response = await http
-        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response
-          .body; // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load libelle niveau2Pays');
-    }
-  }
-
-  Future<void> fetchPaysDataByActor() async {
-    try {
-      String libelle2 = await getlibelleNiveau1PaysByActor(acteur.idActeur!);
-
-      setState(() {
-        libelleNiveau1Pays = libelle2;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-      });
-      print('Error: $e');
-    }
-  }
-
 
   @override
   void initState() {
@@ -112,7 +52,7 @@ bool isLoadingLibelle2 = true;
     // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
     _searchController = TextEditingController();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    fetchPaysDataByActor();
+    // fetchPaysDataByActor();
   }
 
   @override
@@ -135,7 +75,7 @@ bool isLoadingLibelle2 = true;
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-           "Niveau 1 ",
+            "Niveau 1 ",
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
@@ -149,7 +89,7 @@ bool isLoadingLibelle2 = true;
                       Icons.add,
                       color: Colors.green,
                     ),
-                    title:  Text(
+                    title: Text(
                       "Ajouter un niveau 1 ",
                       style: TextStyle(
                           color: Colors.green,
@@ -158,7 +98,7 @@ bool isLoadingLibelle2 = true;
                     ),
                     onTap: () async {
                       Navigator.of(context).pop();
-                      _showDialog();
+                      _showBottomSheet();
                     },
                   ),
                 ),
@@ -311,7 +251,7 @@ bool isLoadingLibelle2 = true;
                                                                 .spaceBetween,
                                                         children: [
                                                           Text(
-                                                              "Nombres ${libelleNiveau2Pays} :",
+                                                              "Nombres niveau 2:",
                                                               style: TextStyle(
                                                                 color: Colors
                                                                     .black87,
@@ -348,7 +288,7 @@ bool isLoadingLibelle2 = true;
                                                                 .spaceBetween,
                                                         children: [
                                                           Text(
-                                                              "Nombres ${libelleNiveau2Pays} :",
+                                                              "Nombres niveau 2 :",
                                                               style: TextStyle(
                                                                 color: Colors
                                                                     .black87,
@@ -407,10 +347,15 @@ bool isLoadingLibelle2 = true;
                                                                   color: Colors
                                                                           .orange[
                                                                       400]),
-                                                          title:  Text(
-                                                            e.statutN1 == false ? "Activer" : "Desactiver",
-                                                                 style: TextStyle(
-                                                                   color: e.statutN1 == false ? Colors.green : Colors.orange[
+                                                          title: Text(
+                                                            e.statutN1 == false
+                                                                ? "Activer"
+                                                                : "Desactiver",
+                                                            style: TextStyle(
+                                                              color: e.statutN1 ==
+                                                                      false
+                                                                  ? Colors.green
+                                                                  : Colors.orange[
                                                                       400],
                                                               fontWeight:
                                                                   FontWeight
@@ -418,45 +363,42 @@ bool isLoadingLibelle2 = true;
                                                             ),
                                                           ),
                                                           onTap: () async {
-                                                             e.statutN1 == false ? 
-                                                            await Niveau1Service()
-                                                                .activerNiveau1(e
-                                                                    .idNiveau1Pays!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<Niveau1Service>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Activer avec succèss "),
-                                                                                ],
+                                                            e.statutN1 == false
+                                                                ? await Niveau1Service()
+                                                                    .activerNiveau1(e
+                                                                        .idNiveau1Pays!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<Niveau1Service>(context, listen: false).applyChange(),
+                                                                              Navigator.of(context).pop(),
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Activer avec succèss "),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
+                                                                                ),
+                                                                              )
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
                                                                               ),
-                                                                              duration: Duration(seconds: 2),
-                                                                            ),
-                                                                          )
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        }) :  await Niveau1Service()
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                : await Niveau1Service()
                                                                     .desactiverNiveau1Pays(e
                                                                         .idNiveau1Pays!)
                                                                     .then(
@@ -517,37 +459,11 @@ bool isLoadingLibelle2 = true;
                                                             ),
                                                           ),
                                                           onTap: () async {
-                                                            // Ouvrir la boîte de dialogue de modification
-                                                            var updatedSousRegion =
-                                                                await showDialog(
-                                                              context: context,
-                                                              builder: (BuildContext
-                                                                      context) =>
-                                                                  AlertDialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(16),
-                                                                      ),
-                                                                      content:
-                                                                          UpdatesNiveau1(
-                                                                        niveau1pays:
-                                                                            e,
-                                                                      )),
-                                                            );
-
-                                                            // Si les détails sont modifiés, appliquer les changements
-                                                            if (updatedSousRegion !=
-                                                                null) {
-                                                              Provider.of<Niveau1Service>(
-                                                                      context,
-                                                                      listen:
-                                                                          false)
-                                                                  .applyChange();
-                                                            }
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                            bottomUpdatesheet(
+                                                                context, e);
                                                           },
                                                         ),
                                                       ),
@@ -613,102 +529,116 @@ bool isLoadingLibelle2 = true;
         ));
   }
 
-  void _showDialog() {
-    showDialog(
+  Future<dynamic> bottomUpdatesheet(
+      BuildContext context, Niveau1Pays? niveau1Pays) async {
+    return await showModalBottomSheet<int>(
       context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ListTile(
-                  title: Text(
-                    "Ajouter un ${libelleNiveau1Pays}",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  trailing: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.red,
-                      size: 24,
-                    ),
-                  ),
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
-                SizedBox(height: 16),
-                Form(
-                  key: formkey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: libelleController,
-                        decoration: InputDecoration(
-                          labelText: "Nom du ${libelleNiveau1Pays}",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      Consumer<PaysService>(
-                        builder: (context, paysService, child) {
-                          return FutureBuilder(
-                            future: _paysList,
-                            builder: (_, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Chargement...',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              }
-                              // if (snapshot.hasError) {
-                              //   return Text("${snapshot.error}");
-                              // }
-                              if (snapshot.hasData) {
-                                dynamic jsonString =
-                                    utf8.decode(snapshot.data.bodyBytes);
-                                dynamic responseData = json.decode(jsonString);
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: UpdatesNiveau1(
+                niveau1pays: niveau1Pays!,
+              )),
+        );
+      },
+    );
+  }
 
-                                // final reponse = json.decode(snapshot.data.body);
-                                if (responseData is List) {
-                                  final paysList = responseData
-                                      .map((e) => Pays.fromMap(e))
-                                      .where((con) => con.statutPays == true)
-                                      .toList();
-                                  if (paysList.isEmpty) {
+  void _showBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Ajouter niveau 1",
+                          maxLines: 2,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontSize: 18,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("Fermer",
+                              style:
+                                  TextStyle(color: Colors.red, fontSize: 18)),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    Form(
+                      key: formkey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          TextFormField(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Veuillez remplir ce champ";
+                              }
+                              return null;
+                            },
+                            controller: libelleController,
+                            decoration: InputDecoration(
+                              labelText: "Nom du ${libelleNiveau1Pays}",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          Consumer<PaysService>(
+                            builder: (context, paysService, child) {
+                              return FutureBuilder(
+                                future: _paysList,
+                                builder: (_, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
                                     return DropdownButtonFormField(
                                       items: [],
                                       onChanged: null,
                                       decoration: InputDecoration(
-                                        labelText: 'Aucun pays trouvé',
+                                        labelText: 'Chargement...',
                                         border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(8),
@@ -716,148 +646,184 @@ bool isLoadingLibelle2 = true;
                                       ),
                                     );
                                   }
+                                  // if (snapshot.hasError) {
+                                  //   return Text("${snapshot.error}");
+                                  // }
+                                  if (snapshot.hasData) {
+                                    dynamic jsonString =
+                                        utf8.decode(snapshot.data.bodyBytes);
+                                    dynamic responseData =
+                                        json.decode(jsonString);
 
-                                  return DropdownButtonFormField<String>(
-                                    isExpanded: true,
-                                    items: paysList
-                                        .map(
-                                          (e) => DropdownMenuItem(
-                                            value: e.idPays,
-                                            child: Text(e.nomPays!),
+                                    // final reponse = json.decode(snapshot.data.body);
+                                    if (responseData is List) {
+                                      final paysList = responseData
+                                          .map((e) => Pays.fromMap(e))
+                                          .where(
+                                              (con) => con.statutPays == true)
+                                          .toList();
+                                      if (paysList.isEmpty) {
+                                        return DropdownButtonFormField(
+                                          items: [],
+                                          onChanged: null,
+                                          decoration: InputDecoration(
+                                            labelText: 'Aucun pays trouvé',
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
                                           ),
-                                        )
-                                        .toList(),
-                                    value: paysValue,
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        paysValue = newValue;
-                                        if (newValue != null) {
-                                          pays = paysList.firstWhere(
-                                              (element) =>
-                                                  element.idPays == newValue);
-                                          // typeSelected = true;
-                                        }
-                                      });
-                                    },
+                                        );
+                                      }
+
+                                      return DropdownButtonFormField<String>(
+                                        isExpanded: true,
+                                        items: paysList
+                                            .map(
+                                              (e) => DropdownMenuItem(
+                                                value: e.idPays,
+                                                child: Text(e.nomPays!),
+                                              ),
+                                            )
+                                            .toList(),
+                                        value: paysValue,
+                                        onChanged: (newValue) {
+                                          setState(() {
+                                            paysValue = newValue;
+                                            if (newValue != null) {
+                                              pays = paysList.firstWhere(
+                                                  (element) =>
+                                                      element.idPays ==
+                                                      newValue);
+                                              // typeSelected = true;
+                                            }
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          labelText: 'Sélectionner un pays',
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
                                     decoration: InputDecoration(
-                                      labelText: 'Sélectionner un pays',
+                                      labelText: 'Aucun pays trouvé',
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                     ),
                                   );
-                                }
-                              }
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Aucun pays trouvé',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
+                                },
                               );
                             },
-                          );
-                        },
+                          ),
+                          SizedBox(height: 16),
+                          TextFormField(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Veuillez remplir ce champ";
+                              }
+                              return null;
+                            },
+                            controller: descriptionController,
+                            maxLines: null,
+                            decoration: InputDecoration(
+                              labelText: "Description",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          ElevatedButton.icon(
+                            onPressed: () async {
+                              final String libelle = libelleController.text;
+                              final String description =
+                                  descriptionController.text;
+                              if (formkey.currentState!.validate()) {
+                                try {
+                                  await Niveau1Service()
+                                      .addNiveau1Pays(
+                                          nomN1: libelle,
+                                          descriptionN1: description,
+                                          pays: pays)
+                                      .then((value) => {
+                                            Navigator.of(context).pop(),
+                                            Provider.of<Niveau1Service>(context,
+                                                    listen: false)
+                                                .applyChange(),
+                                            Provider.of<Niveau1Service>(context,
+                                                listen: false),
+                                            libelleController.clear(),
+                                            descriptionController.clear(),
+                                            setState(() {
+                                              pays == null;
+                                            }),
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Row(
+                                                  children: [
+                                                    Text(
+                                                        "${libelleNiveau1Pays} ajouté avec success"),
+                                                  ],
+                                                ),
+                                                duration: Duration(seconds: 2),
+                                              ),
+                                            )
+                                            // Navigator.of(context).pop()
+                                          });
+                                } catch (e) {
+                                  final String errorMessage = e.toString();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Row(
+                                        children: [
+                                          Text(
+                                              "${libelleNiveau1Pays} existe déjà"),
+                                        ],
+                                      ),
+                                      duration: Duration(seconds: 5),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  Colors.green, // Orange color code
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              minimumSize: const Size(290, 45),
+                            ),
+                            icon: const Icon(
+                              Icons.add,
+                              color: Colors.white,
+                            ),
+                            label: const Text(
+                              "Ajouter",
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          )
+                        ],
                       ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: descriptionController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Description",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          final String description = descriptionController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await Niveau1Service()
-                                  .addNiveau1Pays(
-                                      nomN1: libelle,
-                                      descriptionN1: description,
-                                      pays: pays)
-                                  .then((value) => {
-                                    Navigator.of(context).pop(),
-                                        Provider.of<Niveau1Service>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        Provider.of<Niveau1Service>(context,
-                                            listen: false),
-                                        libelleController.clear(),
-                                        descriptionController.clear(),
-                                        setState(() {
-                                          pays == null;
-                                        }),
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("${libelleNiveau1Pays} ajouté avec success"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 2),
-                                ),
-                              )
-                                        // Navigator.of(context).pop()
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                 SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("${libelleNiveau1Pays} existe déjà"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // Orange color code
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          minimumSize: const Size(290, 45),
-                        ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Ajouter",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
+              ),
+            ));
+      },
     );
   }
 

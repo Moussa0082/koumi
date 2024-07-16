@@ -51,26 +51,27 @@ class _UpdateTypeVehiculeState extends State<UpdateTypeVehicule> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              title: Text(
-                "Ajouter un type de véhicule ",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontSize: 18,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Modification",
+                  maxLines: 2,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontSize: 18,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.visible,
-              ),
-              trailing: IconButton(
+                TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  icon: Icon(
-                    Icons.close,
-                    color: Colors.red,
-                    size: 30,
-                  )),
+                  child: Text("Fermer",
+                      style: TextStyle(color: Colors.red, fontSize: 18)),
+                )
+              ],
             ),
             const SizedBox(height: 5),
             Form(
@@ -146,7 +147,8 @@ class _UpdateTypeVehiculeState extends State<UpdateTypeVehicule> {
                       try {
                         await TypeVoitureService()
                             .updateTypeVoiture(
-                                idTypeVoiture: widget.typeVoiture.idTypeVoiture!,
+                                idTypeVoiture:
+                                    widget.typeVoiture.idTypeVoiture!,
                                 nom: nom,
                                 nombreSieges: siege,
                                 description: description,
@@ -176,8 +178,7 @@ class _UpdateTypeVehiculeState extends State<UpdateTypeVehicule> {
                           SnackBar(
                             content: Row(
                               children: [
-                                Text(
-                                    "Une erreur s'est produit"),
+                                Text("Une erreur s'est produit"),
                               ],
                             ),
                             duration: const Duration(seconds: 5),
