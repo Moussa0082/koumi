@@ -105,7 +105,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text('Succès'),
-              content: const Text("Code envoyé par à email avec succès"),
+              content: const Text("Code envoyé par  email avec succès"),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -133,7 +133,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
             return AlertDialog(
               title: const Text('Succès'),
               content: const Text(
-                  "Code envoyé par à votre numéro whtas app avec succès"),
+                  "Code envoyé par whatsApp avec succès"),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -239,13 +239,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                     const SizedBox(
                       height: 10,
                     ),
-                    // debut email ou whats app
-                    // Row(
-                    //   children:[
-                    //     Text("Email"),
-
-                    //   ]
-                    // ),
+                  
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -287,11 +281,6 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                         ),
                       ],
                     ),
-
-                    //                Padding(
-                    //   padding: const EdgeInsets.only(left:10.0),
-                    //   child: Text( isVisible ? " Email *" : "Whats App *" , style: TextStyle(color:  (Colors.black), fontSize: 18),),
-                    // ),
 
                     Padding(
                       padding: EdgeInsets.all(2),
@@ -357,19 +346,6 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                 ),
               ),
 
-              //       TextButton(
-              //   onPressed: ()  {
-
-              //   setState(() {
-              //     isVisible = !isVisible;
-              //   });
-
-              //   },
-              //   child: Text(
-              // isVisible ? "Envoyer le code par WhatsApp" : "Envoyer le code par email",
-              // style: TextStyle(fontSize: 16),
-              //   ),
-              // ),
               const SizedBox(
                 height: 15,
               ),

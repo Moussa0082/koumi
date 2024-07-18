@@ -32,9 +32,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Position? _currentPosition;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  // var detectedCountry = "";
-  // String? detectedC = "";
-  // String dialCode = "";
 
   String _errorMessage = "";
 
@@ -301,8 +298,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 5),
                         IntlPhoneField(
-                          controller: phoneController,
                           initialCountryCode: detectedCountryCode,
+                          controller: phoneController,
                           invalidNumberMessage: "Numéro invalide",
                           searchText: "Chercher un pays",
                           decoration: InputDecoration(

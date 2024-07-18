@@ -3,6 +3,12 @@ import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 
 class AutoComplet {
 
+  static List<String> getTransport() {
+    return [
+      'Car', 'Bike', 'Bus', 'Truck', 'Van', 'Bicycle', 'Scooter', 'Motorcycle',
+      'Tractor', 'Train', 'Airplane', 'Helicopter', 'Boat', 'Ship', 'Submarine'
+    ];
+  }
   static List<SearchFieldAutoCompleteItem<String>> get getTransportVehicles {
     return const [
       SearchFieldAutoCompleteItem<String>(

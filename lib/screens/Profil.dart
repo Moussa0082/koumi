@@ -9,6 +9,7 @@ import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
+import 'package:koumi_app/screens/ResetPassword.dart';
 import 'package:koumi_app/screens/Surface.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
@@ -314,6 +315,69 @@ class _ProfilState extends State<Profil> {
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 0, horizontal: 15),
+                                child: Column(
+                                  children: [
+                                    Row(children: [
+                                      const Icon(
+                                          Icons.align_horizontal_left_outlined,
+                                          color: d_colorGreen,
+                                          size: 25),
+                                      const SizedBox(
+                                        width: 15,
+                                      ),
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ResetPassword(
+                                                          acteurs: acteur,
+                                                        )));
+                                          },
+                                          child: Text(
+                                            "Changer son mot de passe",
+                                            style: TextStyle(
+                                                fontSize: 17,
+                                                color: d_colorGreen),
+                                          ))
+                                    ]),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                alignment: Alignment.bottomRight,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: Image.asset("assets/images/settings.png",
+                                    width: 50, height: 50),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 10),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                offset: const Offset(0, 2),
+                                blurRadius: 5,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 15),
                                 child: Row(children: [
                                   const Icon(
                                       Icons.align_horizontal_left_outlined,
@@ -547,59 +611,6 @@ class _ProfilState extends State<Profil> {
                                                       color: d_colorGreen),
                                                 ))
                                           ]),
-                                          // Consumer<ZoneProductionService>(
-                                          //     builder: (context, zoneService, child) {
-                                          //   return FutureBuilder(
-                                          //       future: zoneService.fetchZoneByActeur(
-                                          //           acteur.idActeur!),
-                                          //       builder: (context, snapshot) {
-                                          //         if (snapshot.connectionState ==
-                                          //             ConnectionState.waiting) {
-                                          //           return const Center(
-                                          //             child: CircularProgressIndicator(
-                                          //               color: Colors.orange,
-                                          //             ),
-                                          //           );
-                                          //         }
-
-                                          //         if (!snapshot.hasData) {
-                                          //           return const Padding(
-                                          //             padding: EdgeInsets.all(10),
-                                          //             child: Center(
-                                          //                 child: Text(
-                                          //                     "Aucun zone trouvé")),
-                                          //           );
-                                          //         } else {
-                                          //           zoneList = snapshot.data!;
-                                          //           return Column(
-                                          //               children: zoneList
-                                          //                   .map(
-                                          //                       (ZoneProduction zone) =>
-                                          //                           Column(children: [
-                                          //                             Align(
-                                          //                               alignment:
-                                          //                                   Alignment
-                                          //                                       .topLeft,
-                                          //                               child: Text(zone.nomZoneProduction,
-                                          //                                   style: const TextStyle(
-                                          //                                       color: Colors
-                                          //                                           .black87,
-                                          //                                       fontSize:
-                                          //                                           17,
-                                          //                                       fontWeight:
-                                          //                                           FontWeight
-                                          //                                               .w500,
-                                          //                                       fontStyle:
-                                          //                                           FontStyle
-                                          //                                               .italic,
-                                          //                                       overflow:
-                                          //                                           TextOverflow.ellipsis)),
-                                          //                             )
-                                          //                           ]))
-                                          //                   .toList());
-                                          //         }
-                                          //       });
-                                          // })
                                         ],
                                       ),
                                     ),

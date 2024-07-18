@@ -38,8 +38,8 @@ class _EditProfilState extends State<EditProfil> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
   MultiSelectController _controllerTypeActeur = MultiSelectController();
-  MultiSelectController mdpController = MultiSelectController();
-  MultiSelectController confirmerController = MultiSelectController();
+  // MultiSelectController mdpController = MultiSelectController();
+  // MultiSelectController confirmerController = MultiSelectController();
   MultiSelectController _controllerSpeculation = MultiSelectController();
   List<TypeActeur> typeActeur = [];
   final _tokenTextController = TextEditingController();
@@ -194,28 +194,10 @@ class _EditProfilState extends State<EditProfil> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen),
           ),
           title: const Text(
-            "Modifier le  Profil",
+            "Modification de Profil",
             style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
-          // actions: [
-          //   isEditing
-          //       ? IconButton(
-          //           onPressed: () async {
-          //             setState(() {
-          //               isEditing = false;
-          //             });
-          //           },
-          //           icon: const Icon(Icons.save),
-          //         )
-          //       : IconButton(
-          //           onPressed: () {
-          //             setState(() {
-          //               isEditing = true; // Activer le mode édition
-          //             });
-          //           },
-          //           icon: const Icon(Icons.edit),
-          //         ),
-          // ],
+         
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -586,91 +568,91 @@ class _EditProfilState extends State<EditProfil> {
                   // onSaved: (val) => nomActeur = val!,
                 ),
               ),
-              SizedBox(
-                height: 5,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: TextFormField(
-                  controller: passwordController,
-                  decoration: InputDecoration(
-                    labelText: "Mot de passe ",
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _obscureText =
-                              !_obscureText; // Inverser l'état du texte masqué
-                        });
-                      },
-                      icon: Icon(
-                        _obscureText
-                            ? Icons.visibility_off
-                            : Icons
-                                .visibility, // Choisir l'icône basée sur l'état du texte masqué
-                        color: Colors.grey,
-                      ),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    // hintText: "Entrez votre prenom et nom",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
+              // SizedBox(
+              //   height: 5,
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.all(10.0),
+              //   child: TextFormField(
+              //     controller: passwordController,
+              //     decoration: InputDecoration(
+              //       labelText: "Mot de passe ",
+              //       suffixIcon: IconButton(
+              //         onPressed: () {
+              //           setState(() {
+              //             _obscureText =
+              //                 !_obscureText; // Inverser l'état du texte masqué
+              //           });
+              //         },
+              //         icon: Icon(
+              //           _obscureText
+              //               ? Icons.visibility_off
+              //               : Icons
+              //                   .visibility, // Choisir l'icône basée sur l'état du texte masqué
+              //           color: Colors.grey,
+              //         ),
+              //       ),
+              //       contentPadding: const EdgeInsets.symmetric(
+              //           vertical: 10, horizontal: 20),
+              //       // hintText: "Entrez votre prenom et nom",
+              //       border: OutlineInputBorder(
+              //         borderRadius: BorderRadius.circular(8),
+              //       ),
+              //     ),
 
-                  keyboardType: TextInputType.number,
-                  validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return "Veillez entrez votre prenom et nom";
-                    } else {
-                      return null;
-                    }
-                  },
-                  // onSaved: (val) => nomActeur = val!,
-                ),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: TextFormField(
-                  controller: confirmPasswordController,
-                  decoration: InputDecoration(
-                    labelText: "Confirmer",
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _obscureText =
-                              !_obscureText; // Inverser l'état du texte masqué
-                        });
-                      },
-                      icon: Icon(
-                        _obscureText
-                            ? Icons.visibility_off
-                            : Icons
-                                .visibility, // Choisir l'icône basée sur l'état du texte masqué
-                        color: Colors.grey,
-                      ),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    // hintText: "Entrez votre prenom et nom",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  keyboardType: TextInputType.text,
-                  validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return "Veillez entrez votre prenom et nom";
-                    } else {
-                      return null;
-                    }
-                  },
-                  // onSaved: (val) => nomActeur = val!,
-                ),
-              ),
+              //     keyboardType: TextInputType.number,
+              //     validator: (val) {
+              //       if (val == null || val.isEmpty) {
+              //         return "Veillez entrez votre prenom et nom";
+              //       } else {
+              //         return null;
+              //       }
+              //     },
+              //     // onSaved: (val) => nomActeur = val!,
+              //   ),
+              // ),
+              // SizedBox(
+              //   height: 5,
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.all(10.0),
+              //   child: TextFormField(
+              //     controller: confirmPasswordController,
+              //     decoration: InputDecoration(
+              //       labelText: "Confirmer",
+              //       suffixIcon: IconButton(
+              //         onPressed: () {
+              //           setState(() {
+              //             _obscureText =
+              //                 !_obscureText; // Inverser l'état du texte masqué
+              //           });
+              //         },
+              //         icon: Icon(
+              //           _obscureText
+              //               ? Icons.visibility_off
+              //               : Icons
+              //                   .visibility, // Choisir l'icône basée sur l'état du texte masqué
+              //           color: Colors.grey,
+              //         ),
+              //       ),
+              //       contentPadding: const EdgeInsets.symmetric(
+              //           vertical: 10, horizontal: 20),
+              //       // hintText: "Entrez votre prenom et nom",
+              //       border: OutlineInputBorder(
+              //         borderRadius: BorderRadius.circular(8),
+              //       ),
+              //     ),
+              //     keyboardType: TextInputType.text,
+              //     validator: (val) {
+              //       if (val == null || val.isEmpty) {
+              //         return "Veillez entrez votre prenom et nom";
+              //       } else {
+              //         return null;
+              //       }
+              //     },
+              //     // onSaved: (val) => nomActeur = val!,
+              //   ),
+              // ),
               SizedBox(
                 height: 10,
               ),
@@ -686,19 +668,8 @@ class _EditProfilState extends State<EditProfil> {
                         selectedTypes; // Assurez-vous que cette variable est correctement définie
                     final whatsApp = whatsAppController.text;
                     final tel = telephoneActeurController.text;
-                    final password = passwordController.text;
-                    final confirmer = confirmPasswordController.text;
-
-                    if (password != confirmer) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content:
-                              Text("Les mots de passe ne sont pas identiques"),
-                          duration: Duration(seconds: 5),
-                        ),
-                      );
-                      return;
-                    }
+                   
+                   
 
                     ActeurProvider acteurProvider =
                         Provider.of<ActeurProvider>(context, listen: false);
@@ -720,7 +691,7 @@ class _EditProfilState extends State<EditProfil> {
                               typeActeur, // Passez les objets TypeActeur ici
                           speculation:
                               selectedSpec, // Passez les objets Speculation ici
-                          password: password,
+                          // password: password,
                           photo:
                               photo, // Assurez-vous que cette variable est définie si nécessaire
                         );
@@ -769,7 +740,7 @@ class _EditProfilState extends State<EditProfil> {
                               statutActeur: responseBody['statutActeur'],
                               typeActeur: typeActeurList,
                               speculation: speculationsList,
-                              password: password,
+                              password: responseBody['password'],
                             );
 
                             acteurProvider.setActeur(acteurs);
@@ -803,7 +774,7 @@ class _EditProfilState extends State<EditProfil> {
                               typeActeur, // Passez les objets TypeActeur ici
                           speculation:
                               selectedSpec, // Passez les objets Speculation ici
-                          password: password,
+                          // password: password,
                         );
 
                         if (response.statusCode == 200 ||
@@ -850,7 +821,7 @@ class _EditProfilState extends State<EditProfil> {
                               statutActeur: responseBody['statutActeur'],
                               typeActeur: typeActeurList,
                               speculation: speculationsList,
-                              password: password,
+                              password: responseBody['password'],
                             );
 
                             acteurProvider.setActeur(acteurs);
@@ -877,8 +848,7 @@ class _EditProfilState extends State<EditProfil> {
                       print("Une erreur s'est produite: ${e.toString()}");
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(
-                              "Une erreur s'est produite: ${e.toString()}"),
+                          content: Text("Une erreur s'est produite "),
                           duration: Duration(seconds: 5),
                         ),
                       );

@@ -181,7 +181,7 @@ class ActeurService extends ChangeNotifier {
 // }
 // Remplacez par votre URL
 
- Future<http.Response> updateActeur({
+  Future<http.Response> updateActeur({
     required String idActeur,
     required String nomActeur,
     required String adresseActeur,
@@ -192,10 +192,11 @@ class ActeurService extends ChangeNotifier {
     required String niveau3PaysActeur,
     required List<TypeActeur> typeActeur,
     required List<Speculation> speculation,
-    required String password,
-    File? photo, 
+    // required String password,
+    File? photo,
   }) async {
-    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idActeur'));
+    var request =
+        http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idActeur'));
 
     if (photo != null) {
       request.files.add(
@@ -219,7 +220,7 @@ class ActeurService extends ChangeNotifier {
       'niveau3PaysActeur': niveau3PaysActeur,
       'typeActeur': typeActeur.map((type) => type.toMap()).toList(),
       'speculation': speculation.map((spec) => spec.toMap()).toList(),
-      'password': password,
+      // 'password': password,
     };
 
     request.fields['acteur'] = jsonEncode(acteurData);
@@ -227,7 +228,7 @@ class ActeurService extends ChangeNotifier {
     try {
       var response = await request.send();
       var responseBody = await http.Response.fromStream(response);
-        
+
       print('Response body: ${responseBody.body}');
       print('Response status code: ${responseBody.statusCode}');
 
@@ -250,7 +251,7 @@ class ActeurService extends ChangeNotifier {
   //   required List<TypeActeur> typeActeur,
   //   required List<Speculation> speculation,
   //   required String password,
-  //   File? photo, 
+  //   File? photo,
   // }) async {
   //   var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idActeur'));
 
@@ -294,8 +295,6 @@ class ActeurService extends ChangeNotifier {
   //     rethrow;
   //   }
   // }
-
-
 
 //  Future<void> updateActeur({
 //   required String idActeur,
@@ -527,7 +526,6 @@ class ActeurService extends ChangeNotifier {
   //   }
   // }
 
-
   // Future<void> updateActeur({
   //   required String idActeur,
   //   required String nomActeur,
@@ -656,23 +654,23 @@ class ActeurService extends ChangeNotifier {
       debugPrint("Erreur catch non envoyé : ${e.toString()} ");
 
       // Afficher une alerte d'erreur avec le message spécifique
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erreur'),
-            content: Text("Une erreur s'est produite veuilez reéssayer !"),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      // showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) {
+      //     return AlertDialog(
+      //       title: Text('Erreur'),
+      //       content: Text("Une erreur s'est produite veuilez reéssayer !"),
+      //       actions: <Widget>[
+      //         TextButton(
+      //           onPressed: () {
+      //             Navigator.of(context).pop();
+      //           },
+      //           child: Text('OK'),
+      //         ),
+      //       ],
+      //     );
+      //   },
+      // );
       throw Exception('Failed to verify email: $e');
     }
   }
@@ -740,23 +738,23 @@ class ActeurService extends ChangeNotifier {
       // Gérer les erreurs de requête HTTP
 
       // Afficher une alerte d'erreur avec le message spécifique
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erreur'),
-            content: Text("Une erreur s'est produite veuillez reéssayer !"),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      // showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) {
+      //     return AlertDialog(
+      //       title: Text('Erreur'),
+      //       content: Text("Une erreur s'est produite veuillez reéssayer !"),
+      //       actions: <Widget>[
+      //         TextButton(
+      //           onPressed: () {
+      //             Navigator.of(context).pop();
+      //           },
+      //           child: Text('OK'),
+      //         ),
+      //       ],
+      //     );
+      //   },
+      // );
       throw Exception('Failed to send code: $e');
     }
   }
@@ -833,23 +831,71 @@ class ActeurService extends ChangeNotifier {
       }
     } catch (e) {
       // Afficher une alerte pour les erreurs de connexion
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erreur de connexion'),
-            content: Text('Une erreur est survenue lors de la connexion .'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
+      // showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) {
+      //     return AlertDialog(
+      //       title: Text('Erreur de connexion'),
+      //       content: Text('Une erreur est survenue lors de la connexion .'),
+      //       actions: <Widget>[
+      //         TextButton(
+      //           onPressed: () {
+      //             Navigator.of(context).pop();
+      //           },
+      //           child: Text('OK'),
+      //         ),
+      //       ],
+      //     );
+      //   },
+      // );
+    }
+  }
+
+  Future<void> updatePassword({
+    required String id,
+    required newPassword,
+  }) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/$id/password?password=$newPassword'),
+        headers: {'Content-Type': 'application/json'},
       );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final donneesResponse = json.decode(response.body);
+        debugPrint('Acteur service update: ${donneesResponse.toString()}');
+      } else {
+        throw Exception(
+          'Impossible de mettre à jour du password : ${newPassword} et code : ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      debugPrint('Erreur lors de la mise à jour du password: $e');
+      throw Exception('Erreur lors de la mise à jour du password: $e');
+    }
+  }
+
+  Future<void> verifyPassword({
+    required String codeActeur,
+    required password,
+  }) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/pinLogin?codeActeur=$codeActeur&password=$password'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final donneesResponse = json.decode(response.body);
+        debugPrint('Acteur service update: ${donneesResponse.toString()}');
+      } else {
+        throw Exception(
+          'Impossible de verifier le password : ${password} et code : ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      debugPrint('Impossible de verifier le  password: $e');
+      throw Exception('Impossible de verifier le  password: $e');
     }
   }
 
@@ -904,24 +950,24 @@ class ActeurService extends ChangeNotifier {
         );
       } else {
         // Afficher une alerte pour d'autres erreurs
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Erreur'),
-              content: Text(
-                  'Une erreur est survenue lors de la vérification du code.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        // showDialog(
+        //   context: context,
+        //   builder: (BuildContext context) {
+        //     return AlertDialog(
+        //       title: Text('Erreur'),
+        //       content: Text(
+        //           'Une erreur est survenue lors de la vérification du code.'),
+        //       actions: <Widget>[
+        //         TextButton(
+        //           onPressed: () {
+        //             Navigator.of(context).pop();
+        //           },
+        //           child: Text('OK'),
+        //         ),
+        //       ],
+        //     );
+        //   },
+        // );
       }
     } catch (e) {
       // Afficher une alerte pour les erreurs de connexion

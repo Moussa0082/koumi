@@ -189,7 +189,7 @@ class StockService extends ChangeNotifier {
     }
   }
 
- Future<void> updateQuantiteStock({
+Future<void> updateQuantiteStock({
   required String id,
   required double quantite,
 }) async {

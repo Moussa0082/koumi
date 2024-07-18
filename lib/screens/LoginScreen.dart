@@ -121,11 +121,10 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setString('nomActeur', nomActeur);
         prefs.setString('idActeur', idActeur);
         //  prefs.setString('resetToken', responseBody['resetToken']);
-        //  prefs.setString('codeActeur', responseBody['codeActeur']);
+        prefs.setString('codeActeur', responseBody['codeActeur']);
         prefs.setString('adresseActeur', adresseActeur);
         prefs.setString('telephoneActeur', telephoneActeur);
         prefs.setString('whatsAppActeur', whatsAppActeur);
-
         prefs.setString('niveau3PaysActeur', niveau3PaysActeur);
         prefs.setString('localiteActeur', localiteActeur);
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
@@ -156,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
           idActeur: responseBody['idActeur'],
           nomActeur: responseBody['nomActeur'],
           adresseActeur: responseBody['adresseActeur'],
-          // codeActeur: responseBody['codeActeur'],
+          codeActeur: responseBody['codeActeur'],
           telephoneActeur: responseBody['telephoneActeur'],
           whatsAppActeur: responseBody['whatsAppActeur'],
           niveau3PaysActeur: responseBody['niveau3PaysActeur'],
@@ -247,28 +246,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // void _handleButtonPress() async {
-  //   // Afficher l'indicateur de chargement
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-
-  //   if (isActive) {
-  //     await loginUser().then((_) {
-  //       // Cacher l'indicateur de chargement lorsque votre fonction est terminée
-  //       setState(() {
-  //         _isLoading = false;
-  //       });
-  //     });
-  //   } else {
-  //     await loginUserWithoutSavedData().then((_) {
-  //       // Cacher l'indicateur de chargement lorsque votre fonction est terminée
-  //       setState(() {
-  //         _isLoading = false;
-  //       });
-  //     });
-  //   }
-  // }
   void _handleButtonPress() async {
     // Vérifier si le widget est toujours monté avant de continuer
     if (!mounted) return;

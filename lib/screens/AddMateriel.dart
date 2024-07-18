@@ -184,7 +184,7 @@ class _AddMaterielState extends State<AddMateriel> {
     );
   }
 
-   final FocusNode _fieldFocusNode = FocusNode();
+  final FocusNode _fieldFocusNode = FocusNode();
   // Liste des suggestions
   final List<String> _productNames = [
     'Apple',
@@ -670,7 +670,7 @@ class _AddMaterielState extends State<AddMateriel> {
                             ),
                           ),
                         ),
-                         Padding(
+                        Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 20),
                           child: TextFormField(
@@ -692,96 +692,83 @@ class _AddMaterielState extends State<AddMateriel> {
                             ),
                           ),
                         ),
-                        // Padding(
-                        //   padding: const EdgeInsets.symmetric(
-                        //       vertical: 10, horizontal: 20),
-                        //   child:   Autocomplete<String>(
-                        //     optionsBuilder:
-                        //         (TextEditingValue textEditingValue) {
-                        //       if (textEditingValue.text.isEmpty) {
-                        //         return const Iterable<String>.empty();
-                        //       }
-                        //       return _productNames.where((String option) {
-                        //         return option.toLowerCase().contains(
-                        //             textEditingValue.text.toLowerCase());
-                        //       });
-                        //     },
-                        //     onSelected: (String selection) {
-                        //       // Mettre à jour _nomController lorsque l'utilisateur sélectionne une suggestion
-                        //       _nomController.text = selection;
-                        //       print('You just selected $selection');
-                        //     },
-                        //     fieldViewBuilder: (BuildContext context,
-                        //         TextEditingController
-                        //             fieldTextEditingController,
-                        //         FocusNode fieldFocusNode,
-                        //         VoidCallback onFieldSubmitted) {
-                        //        fieldTextEditingController.addListener(() {
-                        //         _nomController.text =
-                        //             fieldTextEditingController.text;
-                        //       });
-                        //       return TextFormField(
-                        //         controller: fieldTextEditingController,
-                        //         focusNode: fieldFocusNode,
-                        //         autofocus: true,
-                        //         validator: (value) {
-                        //           if (value == null || value.isEmpty) {
-                        //             return "Veuillez remplir le champ";
-                        //           }
-                        //           return null;
-                        //         },
-                        //         decoration: InputDecoration(
-                        //           hintText: "Nom produit",
-                        //           contentPadding: const EdgeInsets.symmetric(
-                        //               vertical: 10, horizontal: 20),
-                        //           border: OutlineInputBorder(
-                        //             borderRadius: BorderRadius.circular(8),
-                        //           ),
-                        //         ),
-                        //       );
-                        //     },
-                        //     optionsViewBuilder: (BuildContext context,
-                        //         AutocompleteOnSelected<String> onSelected,
-                        //         Iterable<String> options) {
-                        //       return Align(
-                        //         alignment: Alignment.topLeft,
-                        //         child: Material(
-                        //           child: Container(
-                        //             width:
-                        //                 MediaQuery.of(context).size.width * 0.8,
-                        //             color: Colors.white,
-                        //             child: ListView.builder(
-                        //               padding: EdgeInsets.all(8.0),
-                        //               itemCount: options.length,
-                        //               itemBuilder:
-                        //                   (BuildContext context, int index) {
-                        //                 final String option =
-                        //                     options.elementAt(index);
+                      //  Padding(
+                      //     padding: const EdgeInsets.symmetric(
+                      //         vertical: 10, horizontal: 20),
+                      //     child: Autocomplete<String>(
+                      //       optionsBuilder:
+                      //           (TextEditingValue textEditingValue) {
+                      //         if (textEditingValue.text.isEmpty) {
+                      //           return const Iterable<String>.empty();
+                      //         } else {
+                      //           return AutoComplet.getTransport()
+                      //               .where((String option) {
+                      //             return option.toLowerCase().contains(
+                      //                 textEditingValue.text.toLowerCase());
+                      //           });
+                      //         }
+                      //       },
+                      //       fieldViewBuilder: (BuildContext context,
+                      //           TextEditingController textEditingController,
+                      //           FocusNode focusNode,
+                      //           VoidCallback onFieldSubmitted) {
+                      //         return TextField(
+                      //           controller: textEditingController,
+                      //           focusNode: focusNode,
+                      //           maxLines: null,
+                      //           decoration: InputDecoration(
+                      //             hintText: "Nom",
+                      //             contentPadding: const EdgeInsets.symmetric(
+                      //                 vertical: 10, horizontal: 20),
+                      //             border: OutlineInputBorder(
+                      //               borderRadius: BorderRadius.circular(8),
+                      //             ),
+                      //           ),
+                      //         );
+                      //       },
+                      //       optionsViewBuilder: (BuildContext context,
+                      //           AutocompleteOnSelected<String> onSelected,
+                      //           Iterable<String> options) {
+                      //         return Align(
+                      //           alignment: Alignment.topLeft,
+                      //           child: Material(
+                      //             elevation: 4.0,
+                      //             child: Container(
+                      //               width:
+                      //                   MediaQuery.of(context).size.width * 0.8,
+                      //               color: Colors.white,
+                      //               child: ListView.separated(
+                      //                 padding: EdgeInsets.all(10.0),
+                      //                 itemCount: options.length,
+                      //                 itemBuilder:
+                      //                     (BuildContext context, int index) {
+                      //                   final String option =
+                      //                       options.elementAt(index);
+                      //                   return GestureDetector(
+                      //                     onTap: () {
+                      //                       onSelected(option);
+                      //                     },
+                      //                     child: ListTile(
+                      //                       title: Text(option),
+                      //                     ),
+                      //                   );
+                      //                 },
+                      //                 separatorBuilder:
+                      //                     (BuildContext context, int index) {
+                      //                   return const Divider();
+                      //                 },
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         );
+                      //       },
+                      //       onSelected: (String value) {
+                      //         _nomController.text = value;
+                      //         print("valeur : ${_nomController.text}");
+                      //       },
+                      //     ),
+                      //   ),
 
-                        //                 return GestureDetector(
-                        //                   onTap: () {
-                        //                     onSelected(option);
-                        //                   },
-                        //                   child: ListTile(
-                        //                     title: Text(option),
-                        //                   ),
-                        //                 );
-                        //               },
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       );
-                        //     },
-                        //   ),
-
-                        // ),
-                        //   Padding(
-                        //   padding: const EdgeInsets.only(top: 20),
-                        //   child: Text(
-                        //     'Valeur sélectionnée : ${_nomController.text}',
-                        //     style: TextStyle(fontSize: 16),
-                        //   ),
-                        // ),
                         // Padding(
                         //   padding: const EdgeInsets.symmetric(
                         //       vertical: 10, horizontal: 20),
@@ -791,11 +778,7 @@ class _AddMaterielState extends State<AddMateriel> {
                         //       if (textEditingValue.text.isEmpty) {
                         //         return const Iterable<String>.empty();
                         //       }
-                        //       return AutoComplet.getTransportVehicles()
-                        //           .where((String option) {
-                        //         return option.toLowerCase().contains(
-                        //             textEditingValue.text.toLowerCase());
-                        //       });
+
                         //     },
                         //     onSelected: (String selection) {
                         //       _nomController.text = selection;

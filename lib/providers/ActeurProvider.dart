@@ -14,6 +14,7 @@ class ActeurProvider with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? idActeur = prefs.getString('idActeur');
     String? emailActeur = prefs.getString('emailActeur');
+    String? codeActeur = prefs.getString('codeActeur');
     String? password = prefs.getString('password');
     List<String>? userTypeList = prefs.getStringList('userType');
     List<String>? speculationList = prefs.getStringList('specType');
@@ -35,7 +36,8 @@ class ActeurProvider with ChangeNotifier {
     if (emailActeur != null &&
         password != null &&
         userTypeList != null &&
-       speculationList != null &&
+        speculationList != null &&
+        codeActeur != null &&
         idActeur != null &&
         nomActeur != null &&
         adresseActeur != null &&
@@ -49,6 +51,7 @@ class ActeurProvider with ChangeNotifier {
           password,
           userTypeList,
           speculationList,
+          codeActeur,
           idActeur,
           nomActeur,
           telephoneActeur,

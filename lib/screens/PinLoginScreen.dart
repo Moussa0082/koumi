@@ -121,15 +121,6 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         final emailActeur = responseBody['emailActeur'];
         prefs.setString('emailActeur', emailActeur);
         prefs.setString('password', password);
-        // prefs.setString('nomActeur', responseBody['nomActeur']);
-        // Vérifier si l'image de profil est présente, sinon, enregistrer l'image par défaut dans SharedPreferences
-
-        // if (logoActeur == null) {
-        //   prefs.setString('logoActeur', defaultProfileImage);
-        // }
-        // if (photoSiegeActeur == null) {
-        //   prefs.setString('photoSiegeActeur', defaultProfileImage);
-        // }
         final nomActeur = responseBody['nomActeur'];
         final idActeur = responseBody['idActeur'];
         final adresseActeur = responseBody['adresseActeur'];
@@ -141,12 +132,9 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
 
         prefs.setString('nomActeur', nomActeur);
         prefs.setString('idActeur', idActeur);
-        //  prefs.setString('resetToken', responseBody['resetToken']);
-        //  prefs.setString('codeActeur', responseBody['codeActeur']);
         prefs.setString('adresseActeur', adresseActeur);
         prefs.setString('telephoneActeur', telephoneActeur);
         prefs.setString('whatsAppActeur', whatsAppActeur);
-
         prefs.setString('niveau3PaysActeur', niveau3PaysActeur);
         prefs.setString('localiteActeur', localiteActeur);
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
@@ -174,7 +162,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
           idActeur: responseBody['idActeur'],
           nomActeur: responseBody['nomActeur'],
           adresseActeur: responseBody['adresseActeur'],
-          // codeActeur: responseBody['codeActeur'],
+          codeActeur: responseBody['codeActeur'],
           telephoneActeur: responseBody['telephoneActeur'],
           whatsAppActeur: responseBody['whatsAppActeur'],
           // niveau3PaysActeur: responseBody['niveau3PaysActeur'],

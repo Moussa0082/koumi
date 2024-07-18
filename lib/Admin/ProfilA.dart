@@ -9,6 +9,7 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/ResetPassword.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
@@ -126,9 +127,10 @@ class _ProfilAState extends State<ProfilA> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    ac.emailActeur! != null ?
-                                            _buildProfile(
-                                                'Email', ac.emailActeur!):Container(),
+                                    ac.emailActeur != null
+                                        ? _buildProfile(
+                                            'Email', ac.emailActeur!)
+                                        : Container(),
                                     _buildProfile(
                                         'Téléphone', ac.telephoneActeur!),
                                     _buildProfile(
@@ -186,6 +188,64 @@ class _ProfilAState extends State<ProfilA> {
                       },
                     ),
                   ],
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        offset: const Offset(0, 2),
+                        blurRadius: 5,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 0, horizontal: 15),
+                        child: Column(
+                          children: [
+                            Row(children: [
+                              const Icon(Icons.align_horizontal_left_outlined,
+                                  color: d_colorGreen, size: 25),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => ResetPassword(
+                                                  acteurs: acteur,
+                                                )));
+                                  },
+                                  child: Text(
+                                    "Changer son mot de passe",
+                                    style: TextStyle(
+                                        fontSize: 17, color: d_colorGreen),
+                                  ))
+                            ]),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.bottomRight,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Image.asset("assets/images/settings.png",
+                            width: 50, height: 50),
+                      )
+                    ],
+                  ),
                 ),
               ),
               Padding(
