@@ -6,7 +6,6 @@ import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/ParametreFiche.dart';
 
 class ParametreFicheService extends ChangeNotifier {
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/parametreFiche';
   static const String baseUrl = '$apiOnlineUrl/parametreFiche';
 
   List<ParametreFiche> paramList = [];

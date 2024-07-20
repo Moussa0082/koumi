@@ -42,7 +42,6 @@ class _DetailConseilState extends State<DetailConseil> {
 
         // Start the player as soon as the app is displayed.
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          // String audioPath = 'http://10.0.2.2/${conseils.audioConseil}';
           String audioPath =
               'https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/audio';
 
@@ -73,7 +72,6 @@ class _DetailConseilState extends State<DetailConseil> {
           videoPlayerController: VideoPlayerController.networkUrl(
             Uri.parse(
                 'https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/video'),
-            // Uri.parse('http://10.0.2.2/${conseils.videoConseil}'),
           ),
         );
       }

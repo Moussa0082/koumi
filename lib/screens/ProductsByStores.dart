@@ -253,11 +253,8 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
     verify();
     _searchController = TextEditingController();
     _catList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
-    // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
-    // updateStockList();
-
+  
     stockListeFuture = stockListeFuture1 = getAllStock();
-    // fetchPaysDataByActor();
   }
 
   @override
@@ -429,6 +426,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                     child: SearchFieldAutoComplete<String>(
                       controller: _searchController,
                       placeholder: 'Rechercher...',
+                       itemHeight: 25,
                       placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
                       suggestions: AutoComplet.getAgriculturalProducts,
                       suggestionsDecoration: SuggestionDecoration(
@@ -440,8 +438,10 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                         _searchController.text = selectedItem.searchKey;
                         // setState(() {});
                       },
-                      onChanged: (value) {
-                        setState(() {});
+                     onChanged: (value) {
+                        if (mounted) {
+                          setState(() {});
+                        }
                       },
                       suggestionItemBuilder: (context, searchFieldItem) {
                         return Padding(

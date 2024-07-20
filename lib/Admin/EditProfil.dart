@@ -63,17 +63,8 @@ class _EditProfilState extends State<EditProfil> {
     final directory = await getApplicationDocumentsDirectory();
     final name = path.basename(imagePath);
     final image = File('${directory.path}/$name');
-    return image;
-  }
 
-  Future<void> _pickImage(ImageSource source) async {
-    final image = await getImage(source);
-    if (image != null) {
-      setState(() {
-        photo = image;
-        imageSrc = image.path;
-      });
-    }
+    return File(imagePath).copy(image.path);
   }
 
   Future<File?> getImage(ImageSource source) async {
@@ -81,6 +72,16 @@ class _EditProfilState extends State<EditProfil> {
     if (image == null) return null;
 
     return File(image.path);
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final image = await getImage(source);
+    if (image != null) {
+      setState(() {
+        this.photo = image;
+        imageSrc = image.path;
+      });
+    }
   }
 
   Future<void> _showImageSourceDialog() async {
@@ -91,7 +92,7 @@ class _EditProfilState extends State<EditProfil> {
         return SizedBox(
           height: 150,
           child: AlertDialog(
-            title: const Text('Choisir une source'),
+            title: Text("Photo d'identité"),
             content: Wrap(
               alignment: WrapAlignment.center,
               children: [
@@ -100,7 +101,7 @@ class _EditProfilState extends State<EditProfil> {
                     Navigator.pop(context); // Fermer le dialogue
                     _pickImage(ImageSource.camera);
                   },
-                  child: const Column(
+                  child: Column(
                     children: [
                       Icon(Icons.camera_alt, size: 40),
                       Text('Camera'),
@@ -113,7 +114,7 @@ class _EditProfilState extends State<EditProfil> {
                     Navigator.pop(context); // Fermer le dialogue
                     _pickImage(ImageSource.gallery);
                   },
-                  child: const Column(
+                  child: Column(
                     children: [
                       Icon(Icons.image, size: 40),
                       Text('Galerie photo'),
@@ -197,7 +198,6 @@ class _EditProfilState extends State<EditProfil> {
             "Modification de Profil",
             style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
-         
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -664,12 +664,12 @@ class _EditProfilState extends State<EditProfil> {
                     final emailActeur = emailController.text;
                     final String? adresse = adresseController.text;
                     final localisation = localisationController.text;
-                    final typeActeur =
-                        selectedTypes; // Assurez-vous que cette variable est correctement définie
+                    final typeActeur = selectedTypes;
+                    final spec = selectedSpec;
                     final whatsApp = whatsAppController.text;
                     final tel = telephoneActeurController.text;
-                   
-                   
+                    print(
+                        "acteur edit  nom : ${nomActeur} ,email ${emailActeur},adresse: ${adresse},loc: $localisation, type : ${selectedTypes.toList()} , speculation ${spec.toList()} , wa : ${whatsApp}, tel : ${tel}");
 
                     ActeurProvider acteurProvider =
                         Provider.of<ActeurProvider>(context, listen: false);
@@ -690,7 +690,7 @@ class _EditProfilState extends State<EditProfil> {
                           typeActeur:
                               typeActeur, // Passez les objets TypeActeur ici
                           speculation:
-                              selectedSpec, // Passez les objets Speculation ici
+                              spec, // Passez les objets Speculation ici
                           // password: password,
                           photo:
                               photo, // Assurez-vous que cette variable est définie si nécessaire
@@ -773,7 +773,7 @@ class _EditProfilState extends State<EditProfil> {
                           typeActeur:
                               typeActeur, // Passez les objets TypeActeur ici
                           speculation:
-                              selectedSpec, // Passez les objets Speculation ici
+                              spec, // Passez les objets Speculation ici
                           // password: password,
                         );
 

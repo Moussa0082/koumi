@@ -6,7 +6,6 @@ class RemoteServices {
   int page = 1;
   int size = sized;
    var baseURL = '$apiOnlineUrl/Stock/getAllStocksWithPagination';
-  // static var baseURL = 'https://grocery-app-sc6n.onrender.com';
 
    Future<dynamic> fetchItem(int start) async {
     var response = await client.get(

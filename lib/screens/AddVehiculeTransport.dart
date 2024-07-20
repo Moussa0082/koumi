@@ -96,10 +96,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
     _niveau3List = http.get(Uri.parse(
         '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
     fetchLibelleNiveau3Pays();
-    // _typeList =
-    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
-    // _niveau3List =
-    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+   
   }
 
   @override

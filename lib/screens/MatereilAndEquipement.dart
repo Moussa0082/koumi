@@ -426,6 +426,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                           child: SearchFieldAutoComplete<String>(
                             controller: _searchController,
                             focusNode: _focusNode,
+                             itemHeight: 25,
                             placeholder: 'Rechercher...',
                             placeholderStyle:
                                 TextStyle(fontStyle: FontStyle.italic),
@@ -439,8 +440,10 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                               _searchController.text = selectedItem.searchKey;
                               // setState(() {});
                             },
-                            onChanged: (value) {
-                              setState(() {});
+                             onChanged: (value) {
+                              if (mounted) {
+                                setState(() {});
+                              }
                             },
                             suggestionItemBuilder: (context, searchFieldItem) {
                               return Padding(

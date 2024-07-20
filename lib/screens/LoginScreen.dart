@@ -43,15 +43,12 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _currentAddress;
   Position? _currentPosition;
 
-  // TextEditingController Controller = TextEditingController();
 
-  //  login methode start
   Future<void> loginUser() async {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
 
     const String baseUrl = '$apiOnlineUrl/acteur/login';
-    // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     const String defaultProfileImage = 'assets/images/profil.jpg';
 
@@ -284,7 +281,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     const String baseUrl = '$apiOnlineUrl/acteur/login';
 
-    // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);

@@ -14,7 +14,6 @@ import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/MaterielService.dart';
-import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';

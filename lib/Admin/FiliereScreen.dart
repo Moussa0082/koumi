@@ -12,6 +12,7 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
 import 'package:provider/provider.dart';
+import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 
 class FiliereScreen extends StatefulWidget {
   const FiliereScreen({super.key});
@@ -36,6 +37,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
   late Future<List<Filiere>> _liste;
   late Filiere filiere;
   late TextEditingController _searchController;
+  final FocusNode _focusNode = FocusNode();
 
   Future<List<Filiere>> getFil() async {
     return await FiliereService().fetchFiliere();
@@ -50,7 +52,6 @@ class _FiliereScreenState extends State<FiliereScreen> {
     //     .parametreList!;
     // para = paraList[0];
     _filiereList = http.get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
-    // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
     _liste = getFil();
   }
 
@@ -144,38 +145,154 @@ class _FiliereScreenState extends State<FiliereScreen> {
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(10.0),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.search,
-                        color: Colors.blueGrey[400]), // Couleur de l'icône
-                    SizedBox(
-                        width:
-                            10), // Espacement entre l'icône et le champ de recherche
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (value) {
-                          setState(() {});
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Rechercher',
-                          border: InputBorder.none,
-                          hintStyle: TextStyle(
-                              color: Colors
-                                  .blueGrey[400]), // Couleur du texte d'aide
-                        ),
+              child: FutureBuilder<List<Filiere>>(
+                future: _liste,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return SearchFieldAutoComplete<String>(
+                      itemHeight: 25,
+                      placeholder: 'Rechercher...',
+                      focusNode: _focusNode,
+                      suggestions: [],
+                    );
+                  } else {
+                    return SearchFieldAutoComplete<String>(
+                      // itemHeight: 20,
+                      controller: _searchController,
+                     itemHeight: 25,
+                      focusNode: _focusNode,
+                      placeholder: 'Rechercher...',
+                      placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
+                      suggestions: snapshot.data!
+                          .map((item) => SearchFieldAutoCompleteItem<String>(
+                                searchKey: item.libelleFiliere!,
+                                value: item.libelleFiliere!,
+                              ))
+                          .toList(),
+                      suggestionsDecoration: SuggestionDecoration(
+                        marginSuggestions: const EdgeInsets.all(8.0),
+                        color: const Color.fromARGB(255, 236, 234, 234),
+                        borderRadius: BorderRadius.circular(16.0),
                       ),
-                    ),
-                  ],
-                ),
+                      onSuggestionSelected: (selectedItem) {
+                        _searchController.text = selectedItem.searchKey;
+                        // setState(() {});
+                      },
+                       onChanged: (value) {
+                        if (mounted) {
+                          setState(() {});
+                        }
+                      },
+                      suggestionItemBuilder: (context, searchFieldItem) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            searchFieldItem.searchKey,
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        );
+                      },
+                    );
+                  }
+                },
               ),
             ),
+            // Padding(
+            //   padding: const EdgeInsets.all(10.0),
+            //   child: FutureBuilder<List<Filiere>>(
+            //     future: _liste,
+            //     builder: (context, snapshot) {
+            //       if (snapshot.connectionState == ConnectionState.waiting) {
+            //         return SearchFieldAutoComplete<String>(
+            //           itemHeight: 3,
+            //           maxSuggestionsInViewPort: 3,
+            //           placeholder: 'Rechercher...',
+            //           focusNode: _focusNode,
+            //           suggestions: [],
+            //         );
+            //       } else {
+            //         return SearchFieldAutoComplete<String>(
+            //           itemHeight: 20,
+            //           // maxSuggestionsInViewPort: 3,
+            //           controller: _searchController,
+            //           focusNode: _focusNode,
+            //           placeholder: 'Rechercher...',
+            //           suggestions: snapshot.data!
+            //               .map((item) => SearchFieldAutoCompleteItem<String>(
+            //                     searchKey: item.libelleFiliere!,
+            //                     value: item.libelleFiliere!,
+            //                   ))
+            //               .toList(),
+            //           suggestionsDecoration: SuggestionDecoration(
+            //             marginSuggestions: const EdgeInsets.all(8.0),
+            //             color: const Color.fromARGB(255, 236, 234, 234),
+            //             borderRadius: BorderRadius.circular(16.0),
+            //           ),
+            //           onSuggestionSelected: (selectedItem) {
+            //             _searchController.text = selectedItem.searchKey;
+            //             setState(() {});
+            //           },
+            //           onChanged: (value) {
+            //             setState(() {});
+            //           },
+            //           sorter: (query, list) {
+            //             if (query.isEmpty) {
+            //               return list;
+            //             }
+            //             return list
+            //                 .where((item) => item.searchKey
+            //                     .toLowerCase()
+            //                     .contains(query.toLowerCase()))
+            //                 .toList();
+            //           },
+            //           suggestionItemBuilder: (context, searchFieldItem) {
+            //             return Padding(
+            //               padding: const EdgeInsets.all(8.0),
+            //               child: Text(
+            //                 searchFieldItem.searchKey,
+            //                 style: TextStyle(color: Colors.black),
+            //               ),
+            //             );
+            //           },
+            //         );
+            //       }
+            //     },
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.all(10.0),
+            //   child: Container(
+            //     padding: EdgeInsets.symmetric(horizontal: 10),
+            //     decoration: BoxDecoration(
+            //       color: Colors.blueGrey[50], // Couleur d'arrière-plan
+            //       borderRadius: BorderRadius.circular(25),
+            //     ),
+            //     child: Row(
+            //       children: [
+            //         Icon(Icons.search,
+            //             color: Colors.blueGrey[400]), // Couleur de l'icône
+            //         SizedBox(
+            //             width:
+            //                 10), // Espacement entre l'icône et le champ de recherche
+            //         Expanded(
+            //           child: TextField(
+            //             controller: _searchController,
+            //             onChanged: (value) {
+            //               setState(() {});
+            //             },
+            //             decoration: InputDecoration(
+            //               hintText: 'Rechercher',
+            //               border: InputBorder.none,
+            //               hintStyle: TextStyle(
+            //                   color: Colors
+            //                       .blueGrey[400]), // Couleur du texte d'aide
+            //             ),
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             const SizedBox(height: 10),
             Consumer<FiliereService>(
               builder: (context, filiereService, child) {
@@ -477,7 +594,6 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                             Navigator.of(context).pop(),
                                                                             setState(() {
                                                                               _filiereList = http.get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
-                                                                              // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
                                                                             })
                                                                           })
                                                                   .catchError(
@@ -722,7 +838,6 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                         setState(() {
                                           _filiereList = http.get(Uri.parse(
                                               '$apiOnlineUrl/Filiere/getAllFiliere/'));
-                                          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
                                         }),
                                         libelleController.clear(),
                                         descriptionController.clear(),

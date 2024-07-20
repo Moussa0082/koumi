@@ -186,7 +186,6 @@ class _AddIntrantState extends State<AddIntrant> {
                                       debugPrint("valeur : $newValue");
                                       _categorieList = http.get(Uri.parse(
                                           '$apiOnlineUrl/Categorie/allCategorieByFiliere/${newValue}'
-                                          // 'http://10.0.2.2:9000/api-koumi/Categorie/allCategorieByFiliere/${newValue}'
                                           ));
                                     }
                                   });

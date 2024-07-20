@@ -415,6 +415,7 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
                           child: SearchFieldAutoComplete<String>(
                             controller: _searchController,
                             focusNode: _focusNode,
+                            itemHeight: 25,
                             placeholder: 'Rechercher...',
                             placeholderStyle:
                                 TextStyle(fontStyle: FontStyle.italic),
@@ -429,7 +430,9 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
                               // setState(() {});
                             },
                             onChanged: (value) {
-                              setState(() {});
+                              if (mounted) {
+                                setState(() {});
+                              }
                             },
                             suggestionItemBuilder: (context, searchFieldItem) {
                               return Padding(

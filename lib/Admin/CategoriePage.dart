@@ -1069,11 +1069,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                             ),
                                           ),
                                           setState(() {
-                                            // _categorieList = http
-                                            //     .
-                                            //     //  get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
-                                            //     get(Uri.parse(
-                                            //         '$apiOnlineUrl/Categorie/allCategorie'));
+                                           
                                             filiereValue = null;
                                           }),
                                           libelleController.clear(),

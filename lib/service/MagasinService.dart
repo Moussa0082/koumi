@@ -12,7 +12,6 @@ import 'package:path/path.dart';
 
 class MagasinService extends ChangeNotifier {
   static const String baseUrl = '$apiOnlineUrl/Magasin';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
   List<Magasin> magasin = [];
   int page = 0;
   bool isLoading = false;

@@ -439,6 +439,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                           child: SearchFieldAutoComplete<String>(
                             controller: _searchController,
                             placeholder: 'Rechercher...',
+                             itemHeight: 25,
                             placeholderStyle:
                                 TextStyle(fontStyle: FontStyle.italic),
                             suggestions: AutoComplet.getAgriculturalInputs,
@@ -452,7 +453,9 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                               // setState(() {});
                             },
                             onChanged: (value) {
-                              setState(() {});
+                              if (mounted) {
+                                setState(() {});
+                              }
                             },
                             suggestionItemBuilder: (context, searchFieldItem) {
                               return Padding(

@@ -9,7 +9,6 @@ import 'package:koumi_app/models/Speculation.dart';
 
 class SpeculationService extends ChangeNotifier {
   static const String baseUrl = '$apiOnlineUrl/Speculation';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Speculation';
 
   List<Speculation> speculationList = [];
 

@@ -45,11 +45,8 @@ class _Niveau1PageState extends State<Niveau1Page> {
   @override
   void initState() {
     super.initState();
-    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-    //     .parametreList!;
-    // para = paraList[0];
+   
     _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
-    // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
     _searchController = TextEditingController();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // fetchPaysDataByActor();

@@ -164,15 +164,10 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
       scrollableController.addListener(_scrollListener);
     });
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    // typeActeurData = acteur.typeActeur!;
-    // // selectedType == null;
-    // type = typeActeurData.map((data) => data.libelle).join(', ');
-
+    
     _searchController = TextEditingController();
     _niveau1PaysList = http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
     magasinListeFuture = fetchMagasinByActeur(acteur.idActeur!);
-    // magasinListeFuture1 = fetchMagasinss();
   }
 
   @override

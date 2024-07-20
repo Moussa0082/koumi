@@ -68,14 +68,11 @@ class _UpdateNiveau3State extends State<UpdateNiveau3> {
   @override
   void initState() {
     super.initState();
-    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-    //     .parametreList!;
-    // para = paraList[0];
-     fetchPaysDataByActor();
+  
+    fetchPaysDataByActor();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _niveauList =
         http.get(Uri.parse('$apiOnlineUrl/niveau2Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
     libelleController.text = widget.niveau3pays.nomN3;
     descriptionController.text = widget.niveau3pays.descriptionN3;
     niveau2 = widget.niveau3pays.niveau2Pays!;

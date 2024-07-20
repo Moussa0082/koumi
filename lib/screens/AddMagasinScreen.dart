@@ -413,12 +413,10 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     }
     debugPrint("bool" + widget.isEditable!.toString());
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    // fetchNiveau1PaysList();
     niveau1PaysList = http.get(Uri.parse(
         '$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByNomPays/${acteur.niveau3PaysActeur}'));
     debugPrint(
         '$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByNomPays/${acteur.niveau3PaysActeur}');
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
     fetchLibelleNiveau1Pays();
   }
 

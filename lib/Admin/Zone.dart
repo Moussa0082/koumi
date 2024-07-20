@@ -196,12 +196,6 @@ class _ZoneState extends State<Zone> {
                                                     ),
                                                   )
 
-                                            // : Image.network(
-                                            //     "http://10.0.2.2/${zone.photoZone!}",
-                                            //     fit: BoxFit.fitWidth,
-                                            //     height: 150,
-                                            //     width: double.infinity,
-                                            //   ),
                                             ),
                                         const SizedBox(
                                           height: 10,

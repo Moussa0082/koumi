@@ -438,6 +438,7 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
                           child: SearchFieldAutoComplete<String>(
                             controller: _searchController,
                             focusNode: _focusNode,
+                             itemHeight: 25,
                             placeholder: 'Rechercher...',
                             placeholderStyle:
                                 TextStyle(fontStyle: FontStyle.italic),
@@ -452,7 +453,9 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
                               // setState(() {});
                             },
                             onChanged: (value) {
-                              setState(() {});
+                              if (mounted) {
+                                setState(() {});
+                              }
                             },
                             suggestionItemBuilder: (context, searchFieldItem) {
                               return Padding(

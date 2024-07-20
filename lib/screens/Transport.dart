@@ -20,9 +20,9 @@ import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:provider/provider.dart';
+import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 
 class Transport extends StatefulWidget {
   Transport({super.key});
@@ -125,12 +125,12 @@ class _TransportState extends State<Transport> {
             hasMore = false;
           });
         } else {
+          List<Vehicule> newVehicule =
+              body.map((e) => Vehicule.fromMap(e)).toList();
+
           setState(() {
-            List<Vehicule> newVehicule =
-                body.map((e) => Vehicule.fromMap(e)).toList();
-            vehiculeListe.addAll(newVehicule.where((newVe) => !newVehicule
-                .any((existVe) => existVe.idVehicule == newVe.idVehicule)));
-            // page++;
+            vehiculeListe.addAll(newVehicule.where((newVe) => !vehiculeListe
+                .any((existeVe) => existeVe.idVehicule == newVe.idVehicule)));
           });
         }
 
@@ -182,18 +182,12 @@ class _TransportState extends State<Transport> {
             hasMore = false;
           });
         } else {
+          List<Vehicule> newVehicule =
+              body.map((e) => Vehicule.fromMap(e)).toList();
+
           setState(() {
-            List<Vehicule> newVehicule =
-                body.map((e) => Vehicule.fromMap(e)).toList();
-            vehiculeListe.addAll(newVehicule.where((newVe) => !newVehicule
-                .any((existVe) => existVe.idVehicule == newVe.idVehicule)));
-            // page++;
-          });
-          setState(() {
-            List<Vehicule> newVehicule =
-                body.map((e) => Vehicule.fromMap(e)).toList();
-            vehiculeListe.addAll(newVehicule);
-            // page++;
+            vehiculeListe.addAll(newVehicule.where((newVe) => !vehiculeListe
+                .any((existeVe) => existeVe.idVehicule == newVe.idVehicule)));
           });
         }
 
@@ -244,36 +238,9 @@ class _TransportState extends State<Transport> {
     }
   }
 
-  List<SearchFieldAutoCompleteItem<String>> get suggestions {
-    return const [
-      SearchFieldAutoCompleteItem<String>(
-          searchKey: 'Apple', value: 'apple', child: Text('1')),
-      SearchFieldAutoCompleteItem<String>(searchKey: 'Banana', value: 'banana'),
-      SearchFieldAutoCompleteItem<String>(searchKey: 'Cherry', value: 'cherry'),
-      SearchFieldAutoCompleteItem<String>(searchKey: 'Date', value: 'date'),
-      SearchFieldAutoCompleteItem<String>(searchKey: 'Fig', value: 'fig'),
-      SearchFieldAutoCompleteItem<String>(searchKey: 'Grapes', value: 'grapes'),
-      SearchFieldAutoCompleteItem<String>(searchKey: 'Kiwi', value: 'kiwi'),
-      SearchFieldAutoCompleteItem<String>(searchKey: 'Lemon', value: 'lemon'),
-      SearchFieldAutoCompleteItem<String>(searchKey: 'Mango', value: 'mango'),
-      SearchFieldAutoCompleteItem<String>(searchKey: 'Orange', value: 'orange'),
-      SearchFieldAutoCompleteItem<String>(searchKey: 'Peach', value: 'peach'),
-      SearchFieldAutoCompleteItem<String>(searchKey: 'Pear', value: 'pear'),
-      SearchFieldAutoCompleteItem<String>(
-          searchKey: 'Pineapple', value: 'pineapple'),
-      SearchFieldAutoCompleteItem<String>(
-          searchKey: 'Strawberry', value: 'strawberry'),
-      SearchFieldAutoCompleteItem<String>(
-          searchKey: 'Watermelon', value: 'watermelon'),
-    ];
-  }
-
   @override
   void initState() {
-    // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    // typeActeurData = acteur.typeActeur!;
-    // // selectedType == null;
-    // type = typeActeurData.map((data) => data.libelle).join(', ');
+
     verify();
     detectedCountry =
         Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
@@ -284,13 +251,11 @@ class _TransportState extends State<Transport> {
     _searchController = TextEditingController();
     _typeList = http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //write or call your logic
-      //code will run when widget rendering complete
+   
       scrollableController.addListener(_scrollListener);
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //write or call your logic
-      //code will run when widget rendering complete
+    
       scrollableController1.addListener(_scrollListener1);
     });
     isExist == false
@@ -398,11 +363,11 @@ class _TransportState extends State<Transport> {
                                 PopupMenuItem<String>(
                                   child: ListTile(
                                     leading: const Icon(
-                                      Icons.remove_red_eye,
+                                      Icons.add,
                                       color: Colors.green,
                                     ),
                                     title: const Text(
-                                      "Transporteurs",
+                                      "Ajouter un vehicule",
                                       style: TextStyle(
                                         color: Colors.green,
                                         fontWeight: FontWeight.bold,
@@ -410,11 +375,7 @@ class _TransportState extends State<Transport> {
                                     ),
                                     onTap: () async {
                                       Navigator.of(context).pop();
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PageTransporteur()));
+                                      _getResultFromNextScreen1(context);
                                     },
                                   ),
                                 ),
@@ -440,11 +401,11 @@ class _TransportState extends State<Transport> {
                                 PopupMenuItem<String>(
                                   child: ListTile(
                                     leading: const Icon(
-                                      Icons.add,
+                                      Icons.remove_red_eye,
                                       color: Colors.green,
                                     ),
                                     title: const Text(
-                                      "Ajouter un vehicule",
+                                      "Transporteurs",
                                       style: TextStyle(
                                         color: Colors.green,
                                         fontWeight: FontWeight.bold,
@@ -452,7 +413,11 @@ class _TransportState extends State<Transport> {
                                     ),
                                     onTap: () async {
                                       Navigator.of(context).pop();
-                                      _getResultFromNextScreen1(context);
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PageTransporteur()));
                                     },
                                   ),
                                 ),
@@ -539,28 +504,34 @@ class _TransportState extends State<Transport> {
                     ),
                     if (isSearchMode)
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(10.0),
                         child: SearchFieldAutoComplete<String>(
+                          controller: _searchController,
+                          itemHeight: 25,
                           placeholder: 'Rechercher...',
+                          placeholderStyle:
+                              TextStyle(fontStyle: FontStyle.italic),
                           suggestions: AutoComplet.getTransportVehicles,
                           suggestionsDecoration: SuggestionDecoration(
                             marginSuggestions: const EdgeInsets.all(8.0),
-                            color: Colors.blueGrey[400],
+                            color: const Color.fromARGB(255, 236, 234, 234),
                             borderRadius: BorderRadius.circular(16.0),
                           ),
                           onSuggestionSelected: (selectedItem) {
                             _searchController.text = selectedItem.searchKey;
-                            setState(() {
-                              
-                            });
+                            // setState(() {});
+                          },
+                          onChanged: (value) {
+                            if (mounted) {
+                              setState(() {});
+                            }
                           },
                           suggestionItemBuilder: (context, searchFieldItem) {
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
                                 searchFieldItem.searchKey,
-                                style:
-                                    TextStyle(color: Colors.blueGrey.shade900),
+                                style: TextStyle(color: Colors.black),
                               ),
                             );
                           },
@@ -1251,37 +1222,3 @@ class _TransportState extends State<Transport> {
     );
   }
 }
-
-/*
- stockListe
-                            // .where((element) => element.statutSotck == true )
-                            .isEmpty && isLoading == false
-                                ? 
-                                SingleChildScrollView(
-                                    child: Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Center(
-                                        child: Column(
-                                          children: [
-                                            Image.asset('assets/images/notif.jpg'),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            Text(
-                                              'Aucun produit trouvé',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 17,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                :  stockListe
-                            // .where((element) => element.statutSotck == true )
-                            .isEmpty && isLoading == true
-                                ? _buildShimmerEffect() :
-*/

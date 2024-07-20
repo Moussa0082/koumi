@@ -154,7 +154,6 @@ class _NextAddIntratState extends State<NextAddIntrat> {
     
     _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
     _formeList = http.get(Uri.parse('$apiOnlineUrl/formeproduit/getAllForme/'));
-    // Uri.parse('http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
   }
 
   Future<List<Forme>> fetchList() async {

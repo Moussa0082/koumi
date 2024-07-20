@@ -487,18 +487,15 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                         const SizedBox(height: 5),
                         MultiSelectDropDown.network(
                           networkConfig: NetworkConfig(
-                            // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
-                            // url:url , //e40ijxd5k0n0yrzj5f80,
+                          
                             url:
                                 '$apiOnlineUrl/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
-                            // url: 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
                             method: RequestMethod.get,
                             headers: {'Content-Type': 'application/json'},
                           ),
                           chipConfig: const ChipConfig(wrapType: WrapType.wrap),
                           responseParser: (response) {
-                            // List<dynamic> decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
-
+                           
                             listeSpeculations =
                                 (response as List<dynamic>).map((e) {
                               return Speculation(
@@ -506,8 +503,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                                 nomSpeculation: e['nomSpeculation'] as String,
                                 statutSpeculation:
                                     e['statutSpeculation'] as bool,
-                                // Assurez-vous de correspondre aux clés JSON avec les noms de propriétés de votre classe TypeActeur
-                                // Ajoutez d'autres champs si nécessaire
+                               
                               );
                             }).toList();
 

@@ -12,10 +12,9 @@ import 'package:path/path.dart';
 
 class VehiculeService extends ChangeNotifier {
   static const String baseUrl = '$apiOnlineUrl/vehicule';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/vehicule';
 
   List<Vehicule> vehiculeList = [];
-    int page = 0;
+  int page = 0;
   bool isLoading = false;
   int size = sized;
   bool hasMore = true;
@@ -28,15 +27,14 @@ class VehiculeService extends ChangeNotifier {
       required String localisation,
       required String description,
       required String nbKilometrage,
-        File? photoVehicule,
+      File? photoVehicule,
       required TypeVoiture typeVoiture,
       required Acteur acteur,
-      required Monnaie monnaie
-      }) async {
+      required Monnaie monnaie}) async {
     try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
-     if (photoVehicule != null) {
+      if (photoVehicule != null) {
         requete.files.add(http.MultipartFile('image',
             photoVehicule.readAsBytes().asStream(), photoVehicule.lengthSync(),
             filename: basename(photoVehicule.path)));
@@ -47,11 +45,11 @@ class VehiculeService extends ChangeNotifier {
         'nomVehicule': nomVehicule,
         'etatVehicule': etatVehicule,
         'localisation': localisation,
-        'description' :description,
+        'description': description,
         'photoVehicule': '',
-        'nbKilometrage' : int.tryParse(nbKilometrage),
+        'nbKilometrage': int.tryParse(nbKilometrage),
         'capaciteVehicule': capaciteVehicule,
-        'typeVoiture':typeVoiture.toMap(),
+        'typeVoiture': typeVoiture.toMap(),
         'acteur': acteur.toMap(),
         'monnaie': monnaie.toMap()
       });
@@ -75,7 +73,7 @@ class VehiculeService extends ChangeNotifier {
       {required String idVehicule,
       required String nomVehicule,
       required String capaciteVehicule,
-    required Map<String, int> prixParDestination,
+      required Map<String, int> prixParDestination,
       required String etatVehicule,
       required String localisation,
       required String description,
@@ -83,8 +81,7 @@ class VehiculeService extends ChangeNotifier {
       File? photoVehicule,
       required TypeVoiture typeVoiture,
       required Acteur acteur,
-      required Monnaie monnaie
-      }) async {
+      required Monnaie monnaie}) async {
     try {
       var requete = http.MultipartRequest(
           'PUT', Uri.parse('$baseUrl/update/$idVehicule'));
@@ -102,7 +99,7 @@ class VehiculeService extends ChangeNotifier {
         'etatVehicule': etatVehicule,
         'localisation': localisation,
         'description': description,
-        'photoVehicule':'',
+        'photoVehicule': '',
         'nbKilometrage': int.tryParse(nbKilometrage),
         'capaciteVehicule': capaciteVehicule,
         'typeVoiture': typeVoiture.toMap(),
@@ -126,10 +123,9 @@ class VehiculeService extends ChangeNotifier {
     }
   }
 
-  
-
   Future<List<Vehicule>> fetchVehiculeByTypeVehicule(String id) async {
-    final response = await http.get(Uri.parse('$baseUrl/listeVehiculeByType/$id'));
+    final response =
+        await http.get(Uri.parse('$baseUrl/listeVehiculeByType/$id'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -139,132 +135,148 @@ class VehiculeService extends ChangeNotifier {
       return vehiculeList;
     } else {
       vehiculeList = [];
-      print('Échec de la requête  v type avec le code d\'état: ${response.statusCode}');
+      print(
+          'Échec de la requête  v type avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
 
-
-  Future<List<Vehicule>> fetchVehiculeByTypeVoitureWithPagination(String idTypeVoiture, String niveau3PaysActeur, {bool refresh = false }) async {
+  Future<List<Vehicule>> fetchVehiculeByTypeVoitureWithPagination(
+      String idTypeVoiture, String niveau3PaysActeur,
+      {bool refresh = false}) async {
     if (isLoading) return [];
-      isLoading = true;
-      
+    isLoading = true;
+
     if (refresh) {
-        vehiculeList.clear();
-        page = 0;
-        hasMore = true;
+      vehiculeList.clear();
+      page = 0;
+      hasMore = true;
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getVehiculesByPaysAndTypeVoitureWithPagination?idTypeVoiture=$idTypeVoiture&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/vehicule/getVehiculesByPaysAndTypeVoitureWithPagination?idTypeVoiture=$idTypeVoiture&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         // debugPrint("url: $response");
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
         if (body.isEmpty) {
-            hasMore = false;
+          hasMore = false;
         } else {
-            List<Vehicule> newVehicule = body.map((e) => Vehicule.fromMap(e)).toList();
-          vehiculeList.addAll(newVehicule);
-          
-          
+          List<Vehicule> newVehicule =
+              body.map((e) => Vehicule.fromMap(e)).toList();
+          vehiculeList.addAll(newVehicule.where((newVe) => !vehiculeList
+              .any((existeVe) => existeVe.idVehicule == newVe.idVehicule)));
         }
 
-        debugPrint("response body vehicle by type vehicule and pays with pagination $page par défilement soit ${vehiculeList.length}");
-       return vehiculeList;
+        debugPrint(
+            "response body vehicle by type vehicule and pays with pagination $page par défilement soit ${vehiculeList.length}");
+        return vehiculeList;
       } else {
-        print('Échec de la requête v type pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print(
+            'Échec de la requête v type pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des vehicules: $e');
+      print(
+          'Une erreur s\'est produite lors de la récupération des vehicules: $e');
     } finally {
-        isLoading = false;
+      isLoading = false;
     }
     return vehiculeList;
   }
- 
-  Future<List<Vehicule>> fetchVehicule(String niveau3PaysActeur, {bool refresh = false }) async {
+
+  Future<List<Vehicule>> fetchVehicule(String niveau3PaysActeur,
+      {bool refresh = false}) async {
     if (isLoading) return [];
-         
-      isLoading = true;
+
+    isLoading = true;
 
     if (refresh) {
-       
-        vehiculeList.clear();
-        page = 0;
-        hasMore = true;
-     
+      vehiculeList.clear();
+      page = 0;
+      hasMore = true;
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getVehiculesByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/vehicule/getVehiculesByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
         if (body.isEmpty) {
-            hasMore = false;
+          hasMore = false;
         } else {
-            List<Vehicule> newVehicule = body.map((e) => Vehicule.fromMap(e)).toList();
-          vehiculeList.addAll(newVehicule);
+          List<Vehicule> newVehicule =
+              body.map((e) => Vehicule.fromMap(e)).toList();
+          vehiculeList.addAll(newVehicule.where((newVe) => !vehiculeList
+              .any((existeVe) => existeVe.idVehicule == newVe.idVehicule)));
         }
 
-        debugPrint("response body all vehicle by pays with pagination dans le service $page par défilement soit ${vehiculeList.length}");
-       return vehiculeList;
+        debugPrint(
+            "response body all vehicle by pays with pagination dans le service $page par défilement soit ${vehiculeList.length}");
+        return vehiculeList;
       } else {
-        print('Échec de la requête v type pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print(
+            'Échec de la requête v type pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des vehicules: $e');
+      print(
+          'Une erreur s\'est produite lors de la récupération des vehicules: $e');
     } finally {
-        isLoading = false;
+      isLoading = false;
     }
     return vehiculeList;
   }
 
- 
-  Future<List<Vehicule>> fetchVehiculeByActeur(String idActeur,{bool refresh = false}) async {
+  Future<List<Vehicule>> fetchVehiculeByActeur(String idActeur,
+      {bool refresh = false}) async {
     // if (_stockService.isLoading == true) return [];
 
-      isLoading = true;
+    isLoading = true;
 
     if (refresh) {
-        vehiculeList.clear();
-       page = 0;
-        hasMore = true;
+      vehiculeList.clear();
+      page = 0;
+      hasMore = true;
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getAllVehiculesByActeurWithPagination?idActeur=$idActeur&page=${page}&size=${size}'));
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/vehicule/getAllVehiculesByActeurWithPagination?idActeur=$idActeur&page=${page}&size=${size}'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
         if (body.isEmpty) {
-           hasMore = false;
+          hasMore = false;
         } else {
-           List<Vehicule> newVehicule = body.map((e) => Vehicule.fromMap(e)).toList();
-          vehiculeList.addAll(newVehicule);
+          List<Vehicule> newVehicule =
+              body.map((e) => Vehicule.fromMap(e)).toList();
+          vehiculeList.addAll(newVehicule.where((newVe) => !vehiculeList
+              .any((existeVe) => existeVe.idVehicule == newVe.idVehicule)));
         }
 
-        debugPrint("response body all vehicule by acteur with pagination ${page} par défilement soit ${vehiculeList.length}");
+        debugPrint(
+            "response body all vehicule by acteur with pagination ${page} par défilement soit ${vehiculeList.length}");
       } else {
-        print('Échec de la requête v ac avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print(
+            'Échec de la requête v ac avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des vehicule: $e');
+      print(
+          'Une erreur s\'est produite lors de la récupération des vehicule: $e');
     } finally {
-       isLoading = false;
+      isLoading = false;
     }
     return vehiculeList;
   }
-
 
   Future<void> deleteVehicule(String idVehicule) async {
     final response =

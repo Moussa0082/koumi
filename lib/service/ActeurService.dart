@@ -14,7 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ActeurService extends ChangeNotifier {
   static const String baseUrl = '$apiOnlineUrl/acteur';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur';
 
   List<Acteur> acteurList = [];
 

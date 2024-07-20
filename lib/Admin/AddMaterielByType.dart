@@ -103,14 +103,11 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _typeList =
         http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
-   _niveau3List =
+  _niveau3List =
         http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
-     fetchLibelleNiveau3Pays();
-       _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
-    // _typeList =
-    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
-    // _niveau3List =
-    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+    fetchLibelleNiveau3Pays();
+    _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
+  
   }
 
   void verifyTypeMateriel() {

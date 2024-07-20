@@ -441,6 +441,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                           child: SearchFieldAutoComplete<String>(
                             controller: _searchController,
                             placeholder: 'Rechercher...',
+                             itemHeight: 25,
                             placeholderStyle:
                                 TextStyle(fontStyle: FontStyle.italic),
                             suggestions: AutoComplet.getAgriculturalInputs,
@@ -454,7 +455,9 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                               // setState(() {});
                             },
                             onChanged: (value) {
-                              setState(() {});
+                              if (mounted) {
+                                setState(() {});
+                              }
                             },
                             suggestionItemBuilder: (context, searchFieldItem) {
                               return Padding(

@@ -42,10 +42,8 @@ class _SousRegionPageState extends State<SousRegionPage> {
 
   @override
   void initState() {
-    // continents = widget.continent;
-    // _liste = getSousRegionListe();
+  
     _continentList = http.get(Uri.parse('$apiOnlineUrl/continent/read'));
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
     _searchController = TextEditingController();
 
     super.initState();

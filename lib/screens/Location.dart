@@ -471,6 +471,7 @@ class _LocationState extends State<Location> {
                           padding: const EdgeInsets.all(10.0),
                           child: SearchFieldAutoComplete<String>(
                             controller: _searchController,
+                             itemHeight: 25,
                             placeholder: 'Rechercher...',
                             focusNode: _focusNode,
                             searchStyle:
@@ -488,7 +489,9 @@ class _LocationState extends State<Location> {
                               // setState(() {});
                             },
                             onChanged: (value) {
-                              setState(() {});
+                              if (mounted) {
+                                setState(() {});
+                              }
                             },
                             suggestionItemBuilder: (context, searchFieldItem) {
                               return Padding(

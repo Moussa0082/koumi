@@ -28,25 +28,13 @@ class _updateSousRegionsState extends State<updateSousRegions> {
     continents = widget.sousRegion.continent;
     continentValue = widget.sousRegion.continent.idContinent;
     _continentList = http.get(Uri.parse('$apiOnlineUrl/continent/read'));
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      // decoration: BoxDecoration(
-      //   color: Color.fromARGB(255, 250, 250, 250),
-      //   borderRadius: BorderRadius.circular(15),
-      //   boxShadow: [
-      //     BoxShadow(
-      //       color: Colors.grey.withOpacity(0.4),
-      //       offset: Offset(0, 4),
-      //       blurRadius: 10,
-      //       spreadRadius: 2,
-      //     ),
-      //   ],
-      // ),
+     
       padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisSize: MainAxisSize.min,

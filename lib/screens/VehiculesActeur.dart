@@ -114,10 +114,12 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
             hasMore = false;
           });
         } else {
+          List<Vehicule> newVehicule =
+              body.map((e) => Vehicule.fromMap(e)).toList();
+
           setState(() {
-            List<Vehicule> newVehicule =
-                body.map((e) => Vehicule.fromMap(e)).toList();
-            vehiculeListe.addAll(newVehicule);
+            vehiculeListe.addAll(newVehicule.where((newVe) => !vehiculeListe
+                .any((existeVe) => existeVe.idVehicule == newVe.idVehicule)));
           });
         }
 
@@ -176,7 +178,8 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
             title: Text(
               'Mes véhicules',
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold,
+                  color: d_colorGreen,
+                  fontWeight: FontWeight.bold,
                   fontSize: 20),
             ),
             actions: [
@@ -192,10 +195,9 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                       title: const Text(
                         "Ajouter un vehicule",
                         style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18
-                        ),
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18),
                       ),
                       onTap: () async {
                         Navigator.of(context).pop();
@@ -226,10 +228,11 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                       return <Widget>[
                         SliverToBoxAdapter(
                             child: Column(children: [
-                        Padding(
+                          Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: SearchFieldAutoComplete<String>(
                               controller: _searchController,
+                              itemHeight: 25,
                               placeholder: 'Rechercher...',
                               placeholderStyle:
                                   TextStyle(fontStyle: FontStyle.italic),
@@ -244,7 +247,9 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                 // setState(() {});
                               },
                               onChanged: (value) {
-                                setState(() {});
+                                if (mounted) {
+                                  setState(() {});
+                                }
                               },
                               suggestionItemBuilder:
                                   (context, searchFieldItem) {

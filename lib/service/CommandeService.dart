@@ -14,7 +14,6 @@ import 'package:koumi_app/models/Stock.dart';
 
 
       final String baseUrl = '$apiOnlineUrl/commande'; // Replace with your API URL
-    // final String baseUrl = 'http://10.0.2.2:9000/api-koumi/commande'; // Replace with your API URL
             List<Commande> commandeList = [];
             List<DetailCommande> detailCommandeList = [];
 

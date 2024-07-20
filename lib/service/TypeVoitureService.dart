@@ -8,7 +8,6 @@ import 'package:koumi_app/models/TypeVoiture.dart';
 
 class TypeVoitureService extends ChangeNotifier {
   static const String baseUrl = '$apiOnlineUrl/TypeVoiture';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/TypeVoiture';
 
   List<TypeVoiture> typeList = [];
 

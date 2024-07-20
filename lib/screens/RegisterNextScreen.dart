@@ -180,20 +180,12 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-//     String typeActeurNames = '';
-// for (TypeActeur typeActeur in widget.typeActeur) {
-//   typeActeurNames += typeActeur.libelle! + ', ';
-// }
 
     _niveau3List = http.get(Uri.parse(
         '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${widget.pays}'));
 
     debugPrint(
         "Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone},  WA : ${widget.whatsAppActeur}, Pays : ${widget.pays} ");
-
-    // _mesPays  =
-    //       http.get(Uri.parse('http://10.0.2.2:9000/pays/read'));
-    //       http.get(Uri.parse('https://koumi.ml/api-koumi/pays/read'));
   }
 
   @override
@@ -296,7 +288,6 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                       MultiSelectDropDown.network(
                         networkConfig: NetworkConfig(
                           url: '$apiOnlineUrl/typeActeur/read',
-                          // url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
                           method: RequestMethod.get,
                           headers: {
                             'Content-Type': 'application/json',

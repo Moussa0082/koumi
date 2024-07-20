@@ -89,11 +89,9 @@ class _UpdateSuperficieState extends State<UpdateSuperficie> {
 
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _liste = getCampListe(); // _categorieList = http.get(
-    //     Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
     _speculationList = http.get(Uri.parse(
         '$apiOnlineUrl/Speculation/getAllSpeculation'));
-        // 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
-    // _speculationList = fetchSpeculationList();
+      
       _niveau3List =
         http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
      fetchLibelleNiveau3Pays();

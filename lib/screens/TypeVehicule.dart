@@ -101,6 +101,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
               padding: const EdgeInsets.all(10.0),
               child: SearchFieldAutoComplete<String>(
                 controller: _searchController,
+                  itemHeight: 25,
                 placeholder: 'Rechercher...',
                 placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
                 suggestions: AutoComplet.getTransportVehicles,
@@ -114,7 +115,9 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                   // setState(() {});
                 },
                 onChanged: (value) {
-                  setState(() {});
+                  if (mounted) {
+                    setState(() {});
+                  }
                 },
                 suggestionItemBuilder: (context, searchFieldItem) {
                   return Padding(

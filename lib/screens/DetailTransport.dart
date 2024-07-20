@@ -206,11 +206,9 @@ class _DetailTransportState extends State<DetailTransport> {
   void initState() {
     verify();
   
-    // fetchPaysDataByActor();
     _niveau3List =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
 
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
     vehicules = widget.vehicule;
     rates = fetchConvert(vehicules);
     print("rates ${rates.toString()}");
@@ -529,7 +527,6 @@ class _DetailTransportState extends State<DetailTransport> {
                             !vehicules.photoVehicule!.isEmpty
                         ? Image.network(
                             "https://koumi.ml/api-koumi/vehicule/${vehicules.idVehicule}/image",
-                            // "http://10.0.2.2/${e.photoIntrant}",
                             width: double.infinity,
                             height: 200,
                             fit: BoxFit.cover,
@@ -549,11 +546,8 @@ class _DetailTransportState extends State<DetailTransport> {
                           ),
                 SizedBox(height: 30),
                 _isEditing ? _buildEditing() : _buildData(),
-                !_isEditing ? _buildPanel() : Container(),
-                !_isEditing
-                    ? _buildDescription(
-                        'Description : ', vehicules.description!)
-                    : Container(),
+               
+              
               ],
             ),
           ),
@@ -609,14 +603,6 @@ class _DetailTransportState extends State<DetailTransport> {
     );
   }
 
-  // Future<void> _openWhatsApp(String whatsappNumber) async {
-  //   final Uri url = Uri.parse("https://wa.me/$whatsappNumber");
-  //   if (await launchUrl(url)) {
-  //     await launchUrl(url);
-  //   } else {
-  //     print("Failed to launch $url");
-  //   }
-  // }
 
   Future<void> _makePhoneWa(String whatsappNumber) async {
     final Uri launchUri = Uri(
@@ -993,6 +979,25 @@ class _DetailTransportState extends State<DetailTransport> {
   Widget _buildData() {
     return Column(
       children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Container(
+            height: 40,
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(
+              color: Colors.orangeAccent,
+            ),
+            child: Center(
+              child: Text(
+                vehicules.nomVehicule.toUpperCase(),
+                style: const TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ),
         _buildItem('Nom du véhicule: ', vehicules.nomVehicule),
         _buildItem('Type de véhicule : ', vehicules.typeVoiture.nom!),
         vehicules.typeVoiture.nombreSieges != 0
@@ -1000,16 +1005,63 @@ class _DetailTransportState extends State<DetailTransport> {
                 vehicules.typeVoiture.nombreSieges.toString())
             : Container(),
         _buildItem('Capacité : ', vehicules.capaciteVehicule),
-        // _buildItem('Prix / voyage: ', vehicules.prix.toString()),
         _buildItem('Localisation : ', vehicules.localisation),
         _buildItem('Nombre de kilometrage : ',
             "${vehicules.nbKilometrage.toString()} Km"),
         _buildItem('Statut: : ',
             '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
+        
+        _buildPanel(),
+          Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Container(
+            height: 40,
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(
+              color: Colors.orangeAccent,
+            ),
+            child: Center(
+              child: Text(
+                "Description",
+                style: const TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ),
+                _buildDescription(
+                        'Description : ', vehicules.description!),
         !isExist
             ? Container()
             : acteur.idActeur != vehicules.acteur.idActeur
-                ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!)
+                ? Column(
+                  children: [
+                    Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Container(
+                          height: 40,
+                          width: MediaQuery.of(context).size.width,
+                          decoration: const BoxDecoration(
+                            color: Colors.orangeAccent,
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Autre information",
+                              style: const TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                    _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!),
+                    _buildItem('Adresse : ', vehicules.acteur.adresseActeur!),
+                    _buildItem('Pays : ', vehicules.acteur.niveau3PaysActeur!),
+                  ],
+                )
                 : Container(),
         // _buildItem('Description : ', vehicules.description!),
       ],

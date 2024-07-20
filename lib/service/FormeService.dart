@@ -8,7 +8,6 @@ import 'package:koumi_app/models/Filiere.dart';
 import 'package:koumi_app/models/Forme.dart';
 
 class FormeService extends ChangeNotifier {
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/formeproduit';
   static const String baseUrl = '$apiOnlineUrl/formeproduit';
 
   List<Forme> formeList = [];

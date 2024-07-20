@@ -177,6 +177,7 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                   padding: const EdgeInsets.all(10.0),
                   child: SearchFieldAutoComplete<String>(
                     controller: _searchController,
+                     itemHeight: 25,
                     placeholder: 'Rechercher...',
                     placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
                     suggestions: AutoComplet.getMateriels,
@@ -190,7 +191,9 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                       // setState(() {});
                     },
                     onChanged: (value) {
-                      setState(() {});
+                      if (mounted) {
+                        setState(() {});
+                      }
                     },
                     suggestionItemBuilder: (context, searchFieldItem) {
                       return Padding(

@@ -82,10 +82,10 @@ void main() async {
   //       allowWhileIdle: true
   //     )
   //   );
-  FlutterError.onError = (FlutterErrorDetails details) {
-    FlutterError.dumpErrorToConsole(details);
-    runApp(ErrorWidgetClass(details));
-  };
+  // FlutterError.onError = (FlutterErrorDetails details) {
+  //   FlutterError.dumpErrorToConsole(details);
+  //   runApp(ErrorWidgetClass(details));
+  // };
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => CountryProvider()),
@@ -173,16 +173,16 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class ErrorWidgetClass extends StatelessWidget {
-  final FlutterErrorDetails errorDetails;
-  ErrorWidgetClass(this.errorDetails);
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: CustomErrorWidget(
-        errorMessage: errorDetails.exceptionAsString(),
-      ),
-    );
-  }
-}
+// class ErrorWidgetClass extends StatelessWidget {
+//   final FlutterErrorDetails errorDetails;
+//   ErrorWidgetClass(this.errorDetails);
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       home: CustomErrorWidget(
+//         errorMessage: errorDetails.exceptionAsString(),
+//       ),
+//     );
+//   }
+// }

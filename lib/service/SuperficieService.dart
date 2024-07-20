@@ -10,7 +10,6 @@ import 'package:koumi_app/models/Superficie.dart';
 
 class SuperficieService extends ChangeNotifier {
   static const String baseUrl = '$apiOnlineUrl/Superficie';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Superficie';
 
   List<Superficie> superficieList = [];
 

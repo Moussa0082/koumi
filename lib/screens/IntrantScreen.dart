@@ -352,8 +352,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
   @override
   void dispose() {
-    _searchController
-        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    _searchController.dispose();
     scrollableController.dispose();
     scrollableController1.dispose();
 
@@ -492,11 +491,13 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             ),
                           ],
                           isSelected: [isSearchMode, !isSearchMode],
-                          onPressed: (index) {
+                        onPressed: (index) {
+                          if (mounted) {
                             setState(() {
                               isSearchMode = index == 0;
                             });
-                          },
+                          }
+                        },
                         ),
                       ),
                       if (isSearchMode)
@@ -504,6 +505,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                           padding: const EdgeInsets.all(10.0),
                           child: SearchFieldAutoComplete<String>(
                             controller: _searchController,
+                             itemHeight: 25,
                             placeholder: 'Rechercher...',
                             placeholderStyle:
                                 TextStyle(fontStyle: FontStyle.italic),
@@ -515,10 +517,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             ),
                             onSuggestionSelected: (selectedItem) {
                               _searchController.text = selectedItem.searchKey;
-                              // setState(() {});
+                             
                             },
                             onChanged: (value) {
-                              setState(() {});
+                              if (mounted) {
+                                setState(() {});
+                              }
                             },
                             suggestionItemBuilder: (context, searchFieldItem) {
                               return Padding(

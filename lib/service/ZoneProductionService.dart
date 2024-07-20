@@ -10,7 +10,7 @@ import 'package:path/path.dart';
 
 class ZoneProductionService extends ChangeNotifier {
   static const String baseUrl = '$apiOnlineUrl/ZoneProduction';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/ZoneProduction';
+
 
   List<ZoneProduction> zoneList = [];
 

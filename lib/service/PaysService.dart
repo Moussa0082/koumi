@@ -10,7 +10,6 @@ import 'package:path/path.dart';
 class PaysService extends ChangeNotifier {
 
   static const String baseUrl = '$apiOnlineUrl/pays';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/pays';
 
    List<Pays> paysList = [];
 
