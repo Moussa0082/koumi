@@ -303,7 +303,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
     intrantListeFuture1 = getAllIntrant();
     // final countryProvider = Provider.of<CountryProvider>(context , listen: false);
 
-    debugPrint("pays ${widget.detectedCountry != null ? widget.detectedCountry : "mali"}");
+    debugPrint(
+        "pays ${widget.detectedCountry != null ? widget.detectedCountry : "mali"}");
   }
 
   Future<void> _getResultFromNextScreen1(BuildContext context) async {
@@ -350,8 +351,11 @@ class _IntrantScreenState extends State<IntrantScreen> {
     }
   }
 
+  bool _disposed = false;
+
   @override
   void dispose() {
+    _disposed = true;
     _searchController.dispose();
     scrollableController.dispose();
     scrollableController1.dispose();
@@ -491,21 +495,22 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             ),
                           ],
                           isSelected: [isSearchMode, !isSearchMode],
-                        onPressed: (index) {
-                          if (mounted) {
-                            setState(() {
-                              isSearchMode = index == 0;
-                            });
-                          }
-                        },
+                          onPressed: (index) {
+                            if (mounted) {
+                              setState(() {
+                                isSearchMode = index == 0;
+                              });
+                            }
+                          },
                         ),
                       ),
                       if (isSearchMode)
                         Padding(
-                          padding: const EdgeInsets.all(10.0),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
                           child: SearchFieldAutoComplete<String>(
                             controller: _searchController,
-                             itemHeight: 25,
+                            itemHeight: 25,
                             placeholder: 'Rechercher...',
                             placeholderStyle:
                                 TextStyle(fontStyle: FontStyle.italic),
@@ -516,8 +521,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
                               borderRadius: BorderRadius.circular(16.0),
                             ),
                             onSuggestionSelected: (selectedItem) {
-                              _searchController.text = selectedItem.searchKey;
-                             
+                              if (mounted) {
+                                setState(() {
+                                  _searchController.text =
+                                      selectedItem.searchKey;
+                                });
+                              }
                             },
                             onChanged: (value) {
                               if (mounted) {
@@ -535,6 +544,41 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             },
                           ),
                         ),
+                      // Padding(
+                      //   padding: const EdgeInsets.all(10.0),
+                      //   child: SearchFieldAutoComplete<String>(
+                      //     controller: _searchController,
+                      //     itemHeight: 25,
+                      //     placeholder: 'Rechercher...',
+                      //     placeholderStyle:
+                      //         TextStyle(fontStyle: FontStyle.italic),
+                      //     suggestions: AutoComplet.getAgriculturalInputs,
+                      //     suggestionsDecoration: SuggestionDecoration(
+                      //       marginSuggestions: const EdgeInsets.all(8.0),
+                      //       color: const Color.fromARGB(255, 236, 234, 234),
+                      //       borderRadius: BorderRadius.circular(16.0),
+                      //     ),
+                      //     onSuggestionSelected: (selectedItem) {
+                      //       if (mounted) {
+                      //         _searchController.text = selectedItem.searchKey;
+                      //       }
+                      //     },
+                      //     onChanged: (value) {
+                      //       if (mounted) {
+                      //         setState(() {});
+                      //       }
+                      //     },
+                      //     suggestionItemBuilder: (context, searchFieldItem) {
+                      //       return Padding(
+                      //         padding: const EdgeInsets.all(8.0),
+                      //         child: Text(
+                      //           searchFieldItem.searchKey,
+                      //           style: TextStyle(color: Colors.black),
+                      //         ),
+                      //       );
+                      //     },
+                      //   ),
+                      // ),
                       if (!isSearchMode)
                         Padding(
                           padding: const EdgeInsets.symmetric(
@@ -1090,8 +1134,6 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             }),
                           )))));
   }
-
-  
 
   Widget _buildShimmerEffect() {
     return Center(

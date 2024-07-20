@@ -91,7 +91,7 @@ class _DetailTransportState extends State<DetailTransport> {
     }
   }
 
- Future<Map<String, Map<String, String>>> fetchConvert(
+  Future<Map<String, Map<String, String>>> fetchConvert(
       Vehicule vehicule) async {
     Monnaie monnaie = vehicule.monnaie!;
     Map<String, Map<String, String>> result = {};
@@ -125,7 +125,6 @@ class _DetailTransportState extends State<DetailTransport> {
     print("Conversion : ${result.toString()}");
     return result;
   }
-
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -173,7 +172,6 @@ class _DetailTransportState extends State<DetailTransport> {
     }
   }
 
- 
   Future<String> getLibelleNiveau3PaysByActor(String id) async {
     final response = await http
         .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
@@ -205,9 +203,8 @@ class _DetailTransportState extends State<DetailTransport> {
   @override
   void initState() {
     verify();
-  
-    _niveau3List =
-        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
+
+    _niveau3List = http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
 
     vehicules = widget.vehicule;
     rates = fetchConvert(vehicules);
@@ -478,13 +475,15 @@ class _DetailTransportState extends State<DetailTransport> {
                   ? Text(
                       'Modification',
                       style: const TextStyle(
-                          color: d_colorGreen, fontWeight: FontWeight.bold,
+                          color: d_colorGreen,
+                          fontWeight: FontWeight.bold,
                           fontSize: 20),
                     )
                   : Text(
                       'Transport',
                       style: const TextStyle(
-                          color: d_colorGreen, fontWeight: FontWeight.bold,
+                          color: d_colorGreen,
+                          fontWeight: FontWeight.bold,
                           fontSize: 20),
                     ),
               actions: acteur.idActeur == vehicules.acteur.idActeur
@@ -546,8 +545,6 @@ class _DetailTransportState extends State<DetailTransport> {
                           ),
                 SizedBox(height: 30),
                 _isEditing ? _buildEditing() : _buildData(),
-               
-              
               ],
             ),
           ),
@@ -602,7 +599,6 @@ class _DetailTransportState extends State<DetailTransport> {
               : Container()),
     );
   }
-
 
   Future<void> _makePhoneWa(String whatsappNumber) async {
     final Uri launchUri = Uri(
@@ -1010,10 +1006,11 @@ class _DetailTransportState extends State<DetailTransport> {
             "${vehicules.nbKilometrage.toString()} Km"),
         _buildItem('Statut: : ',
             '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
-        
+
         _buildPanel(),
-          Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+        SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: Container(
             height: 40,
             width: MediaQuery.of(context).size.width,
@@ -1031,38 +1028,36 @@ class _DetailTransportState extends State<DetailTransport> {
             ),
           ),
         ),
-                _buildDescription(
-                        'Description : ', vehicules.description!),
-        !isExist
-            ? Container()
-            : acteur.idActeur != vehicules.acteur.idActeur
-                ? Column(
-                  children: [
-                    Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Container(
-                          height: 40,
-                          width: MediaQuery.of(context).size.width,
-                          decoration: const BoxDecoration(
-                            color: Colors.orangeAccent,
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Autre information",
-                              style: const TextStyle(
-                                  overflow: TextOverflow.ellipsis,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
+        _buildDescription('Description : ', vehicules.description!),
+
+        acteur.idActeur != vehicules.acteur.idActeur
+            ? Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Container(
+                      height: 40,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: const BoxDecoration(
+                        color: Colors.orangeAccent,
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Autre information",
+                          style: const TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
-                    _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!),
-                    _buildItem('Adresse : ', vehicules.acteur.adresseActeur!),
-                    _buildItem('Pays : ', vehicules.acteur.niveau3PaysActeur!),
-                  ],
-                )
-                : Container(),
+                    ),
+                  ),
+                  _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!),
+                  _buildItem('Adresse : ', vehicules.acteur.adresseActeur!),
+                  _buildItem('Pays : ', vehicules.acteur.niveau3PaysActeur!),
+                ],
+              )
+            : Container(),
         // _buildItem('Description : ', vehicules.description!),
       ],
     );
@@ -1272,8 +1267,7 @@ class _DetailTransportState extends State<DetailTransport> {
                                   }).toList(),
                                 );
                               } else {
-                                return Text(
-                                    '');
+                                return Text('');
                               }
                             }
                           },

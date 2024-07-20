@@ -59,28 +59,40 @@ class _EditProfilState extends State<EditProfil> {
   List<String> libelleSpeculation = [];
   List<Speculation> listeSpeculations = [];
 
-  Future<File> saveImagePermanently(String imagePath) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final name = path.basename(imagePath);
-    final image = File('${directory.path}/$name');
-
-    return File(imagePath).copy(image.path);
+   Future<File> saveImagePermanently(String imagePath) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final name = path.basename(imagePath);
+      final image = File('${directory.path}/$name');
+      return File(imagePath).copy(image.path);
+    } catch (e) {
+      // Gérer l'exception
+      print('Erreur lors de la sauvegarde de l\'image : $e');
+      rethrow;
+    }
   }
 
   Future<File?> getImage(ImageSource source) async {
-    final image = await ImagePicker().pickImage(source: source);
-    if (image == null) return null;
-
-    return File(image.path);
+    try {
+      final image = await ImagePicker().pickImage(source: source);
+      if (image == null) return null;
+      return File(image.path);
+    } catch (e) {
+      // Gérer l'exception
+      print('Erreur lors de la sélection de l\'image : $e');
+      return null;
+    }
   }
 
   Future<void> _pickImage(ImageSource source) async {
     final image = await getImage(source);
     if (image != null) {
       setState(() {
-        this.photo = image;
+        photo = image;
         imageSrc = image.path;
       });
+      await saveImagePermanently(
+          image.path);
     }
   }
 
@@ -89,40 +101,37 @@ class _EditProfilState extends State<EditProfil> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return SizedBox(
-          height: 150,
-          child: AlertDialog(
-            title: Text("Photo d'identité"),
-            content: Wrap(
-              alignment: WrapAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context); // Fermer le dialogue
-                    _pickImage(ImageSource.camera);
-                  },
-                  child: Column(
-                    children: [
-                      Icon(Icons.camera_alt, size: 40),
-                      Text('Camera'),
-                    ],
-                  ),
+        return AlertDialog(
+          title: Text("Photo d'identité"),
+          content: Wrap(
+            alignment: WrapAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context); // Fermer le dialogue
+                  _pickImage(ImageSource.camera);
+                },
+                child: Column(
+                  children: [
+                    Icon(Icons.camera_alt, size: 40),
+                    Text('Camera'),
+                  ],
                 ),
-                const SizedBox(width: 40),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context); // Fermer le dialogue
-                    _pickImage(ImageSource.gallery);
-                  },
-                  child: Column(
-                    children: [
-                      Icon(Icons.image, size: 40),
-                      Text('Galerie photo'),
-                    ],
-                  ),
+              ),
+              const SizedBox(width: 40),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context); // Fermer le dialogue
+                  _pickImage(ImageSource.gallery);
+                },
+                child: Column(
+                  children: [
+                    Icon(Icons.image, size: 40),
+                    Text('Galerie photo'),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
