@@ -287,6 +287,30 @@ String? detectedCountry;
     }
   }
 
+  void _updateMode(int index) {
+    if (mounted) {
+      setState(() {
+        isSearchMode = index == 0;
+        if (!isSearchMode) {
+          _searchController.clear();
+          _searchController.dispose();
+          _searchController = TextEditingController();
+        }
+      });
+    }
+  }
+
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
+    }
+  }
+
   @override
   void dispose() {
     _searchController
@@ -401,11 +425,7 @@ String? detectedCountry;
                             ),
                           ],
                           isSelected: [isSearchMode, !isSearchMode],
-                          onPressed: (index) {
-                            setState(() {
-                              isSearchMode = index == 0;
-                            });
-                          },
+                          onPressed: _updateMode,
                         ),
                       ),
                       if (isSearchMode)
@@ -417,19 +437,15 @@ String? detectedCountry;
                              itemHeight: 25,
                             placeholderStyle:
                                 TextStyle(fontStyle: FontStyle.italic),
-                            suggestions: AutoComplet.getAgriculturalProducts,
+                            suggestions: AutoComplet.getFruitsAndVegetables,
                             suggestionsDecoration: SuggestionDecoration(
                               marginSuggestions: const EdgeInsets.all(8.0),
                               color: const Color.fromARGB(255, 236, 234, 234),
                               borderRadius: BorderRadius.circular(16.0),
                             ),
                             onSuggestionSelected: (selectedItem) {
-                              _searchController.text = selectedItem.searchKey;
-                              // setState(() {});
-                            },
-                            onChanged: (value) {
                               if (mounted) {
-                                setState(() {});
+                                _searchController.text = selectedItem.searchKey;
                               }
                             },
                             suggestionItemBuilder: (context, searchFieldItem) {

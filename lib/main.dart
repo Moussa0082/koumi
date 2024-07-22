@@ -153,7 +153,7 @@ class _MyAppState extends State<MyApp> {
     //         NotificationController.onNotificationDisplayMethod);
     //  connectionVerify = Get.put(ConnectionVerify(), permanent: true);
     super.initState();
-  }
+  } 
 
   @override
   Widget build(BuildContext context) {

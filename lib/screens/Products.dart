@@ -311,6 +311,31 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
   }
 
+ void _updateMode(int index) {
+    if (mounted) {
+      setState(() {
+        isSearchMode = index == 0;
+        if (!isSearchMode) {
+          _searchController.clear();
+          _searchController.dispose();
+          _searchController = TextEditingController();
+        }
+      });
+    }
+  }
+
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
+    }
+  }
+
+
   Future<void> _getResultFromNextScreen2(BuildContext context) async {
     final result = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => MyProductScreen()));
@@ -440,11 +465,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       ),
                     ],
                     isSelected: [isSearchMode, !isSearchMode],
-                    onPressed: (index) {
-                      setState(() {
-                        isSearchMode = index == 0;
-                      });
-                    },
+                     onPressed: _updateMode,
                   ),
                 ),
                 if (isSearchMode)
@@ -461,11 +482,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         borderRadius: BorderRadius.circular(16.0),
                       ),
                       onSuggestionSelected: (selectedItem) {
-                        _searchController.text = selectedItem.searchKey;
-                        // setState(() {});
-                      },
-                      onChanged: (value) {
-                        setState(() {});
+                        if (mounted) {
+                          _searchController.text = selectedItem.searchKey;
+                        }
                       },
                       suggestionItemBuilder: (context, searchFieldItem) {
                         return Padding(

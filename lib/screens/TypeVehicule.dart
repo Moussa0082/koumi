@@ -111,12 +111,8 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                   borderRadius: BorderRadius.circular(16.0),
                 ),
                 onSuggestionSelected: (selectedItem) {
-                  _searchController.text = selectedItem.searchKey;
-                  // setState(() {});
-                },
-                onChanged: (value) {
                   if (mounted) {
-                    setState(() {});
+                    _searchController.text = selectedItem.searchKey;
                   }
                 },
                 suggestionItemBuilder: (context, searchFieldItem) {

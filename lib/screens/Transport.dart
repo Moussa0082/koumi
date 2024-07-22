@@ -302,12 +302,29 @@ class _TransportState extends State<Transport> {
     super.dispose();
   }
 
+ void _updateMode(int index) {
+    if (mounted) {
+      setState(() {
+        isSearchMode = index == 0;
+        if (!isSearchMode) {
+          _searchController.clear();
+          _searchController.dispose();
+          _searchController = TextEditingController();
+        }
+      });
+    }
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Accédez au fournisseur ici
-    // countryProvider = Provider.of<CountryProvider>(context, listen: false);
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -495,11 +512,7 @@ class _TransportState extends State<Transport> {
                           ),
                         ],
                         isSelected: [isSearchMode, !isSearchMode],
-                        onPressed: (index) {
-                          setState(() {
-                            isSearchMode = index == 0;
-                          });
-                        },
+                         onPressed: _updateMode,
                       ),
                     ),
                     if (isSearchMode)
@@ -518,14 +531,10 @@ class _TransportState extends State<Transport> {
                             borderRadius: BorderRadius.circular(16.0),
                           ),
                           onSuggestionSelected: (selectedItem) {
-                            _searchController.text = selectedItem.searchKey;
-                            // setState(() {});
-                          },
-                          onChanged: (value) {
-                            if (mounted) {
-                              setState(() {});
-                            }
-                          },
+                              if (mounted) {
+                                _searchController.text = selectedItem.searchKey;
+                              }
+                            },
                           suggestionItemBuilder: (context, searchFieldItem) {
                             return Padding(
                               padding: const EdgeInsets.all(8.0),

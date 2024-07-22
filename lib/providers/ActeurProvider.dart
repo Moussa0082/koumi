@@ -6,7 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ActeurProvider with ChangeNotifier {
   Acteur? _acteur;
+  Acteur? _acteurUpdate;
   Acteur? get acteur => _acteur;
+  Acteur? get acteurs => _acteurUpdate;
   bool isLogged = false;
 
   // Méthode pour initialiser les données de l'utilisateur à partir de SharedPreferences
@@ -67,6 +69,12 @@ class ActeurProvider with ChangeNotifier {
   void setActeur(Acteur newActeur) {
     _acteur = newActeur;
     print("new acteur ${newActeur.toString()}");
+    notifyListeners();
+  }
+
+  void setActeurUpdate(Acteur newActeurs) {
+    _acteurUpdate = newActeurs;
+    print("new acteur ${newActeurs.toString()}");
     notifyListeners();
   }
 

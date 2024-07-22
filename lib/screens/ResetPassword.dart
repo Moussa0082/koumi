@@ -16,6 +16,7 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _ResetPasswordState extends State<ResetPassword> {
   late Acteur acteur;
+  bool _obscureText = true;
   bool _isLoading = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
@@ -38,8 +39,7 @@ class _ResetPasswordState extends State<ResetPassword> {
 
   @override
   Widget build(BuildContext context) {
-    return  
-    LoadingOverlay(
+    return LoadingOverlay(
       isLoading: _isLoading,
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 250, 250, 250),
@@ -90,8 +90,24 @@ class _ResetPasswordState extends State<ResetPassword> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _obscureText =
+                                        !_obscureText; // Inverser l'état du texte masqué
+                                  });
+                                },
+                                icon: Icon(
+                                  _obscureText
+                                      ? Icons.visibility_off
+                                      : Icons
+                                          .visibility, // Choisir l'icône basée sur l'état du texte masqué
+                                  color: Colors.grey,
+                                ),
+                              ),
                             ),
-                            obscureText: true,
+                            obscureText: _obscureText,
+                            keyboardType: TextInputType.number,
                             validator: (val) {
                               if (val == null || val.isEmpty) {
                                 return "Veillez entrez votre adresse mot de passe actuel";
@@ -122,8 +138,24 @@ class _ResetPasswordState extends State<ResetPassword> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _obscureText =
+                                        !_obscureText; // Inverser l'état du texte masqué
+                                  });
+                                },
+                                icon: Icon(
+                                  _obscureText
+                                      ? Icons.visibility_off
+                                      : Icons
+                                          .visibility, // Choisir l'icône basée sur l'état du texte masqué
+                                  color: Colors.grey,
+                                ),
+                              ),
                             ),
-                            obscureText: true,
+                            obscureText: _obscureText,
+                            keyboardType: TextInputType.number,
                             validator: (val) {
                               if (val == null || val.isEmpty) {
                                 return "Veillez entrez le nouveau mot de passe";
@@ -146,8 +178,24 @@ class _ResetPasswordState extends State<ResetPassword> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _obscureText =
+                                        !_obscureText; // Inverser l'état du texte masqué
+                                  });
+                                },
+                                icon: Icon(
+                                  _obscureText
+                                      ? Icons.visibility_off
+                                      : Icons
+                                          .visibility, // Choisir l'icône basée sur l'état du texte masqué
+                                  color: Colors.grey,
+                                ),
+                              ),
                             ),
-                            obscureText: true,
+                            obscureText: _obscureText,
+                            keyboardType: TextInputType.number,
                             validator: (val) {
                               if (val == null || val.isEmpty) {
                                 return "Confirmer le mot de passe";

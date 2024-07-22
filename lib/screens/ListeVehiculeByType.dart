@@ -252,11 +252,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                         _searchController.text = selectedItem.searchKey;
                         // setState(() {});
                       },
-                      onChanged: (value) {
-                        if (mounted) {
-                          setState(() {});
-                        }
-                      },
+                    
                       suggestionItemBuilder: (context, searchFieldItem) {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),

@@ -269,6 +269,29 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
     super.initState();
   }
 
+   void _updateMode(int index) {
+    if (mounted) {
+      setState(() {
+        isSearchMode = index == 0;
+        if (!isSearchMode) {
+          _searchController.clear();
+          _searchController.dispose();
+          _searchController = TextEditingController();
+        }
+      });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
+    }
+  }
+
   @override
   void dispose() {
     scrollableController.dispose();
@@ -412,11 +435,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                             ),
                           ],
                           isSelected: [isSearchMode, !isSearchMode],
-                          onPressed: (index) {
-                            setState(() {
-                              isSearchMode = index == 0;
-                            });
-                          },
+                          onPressed: _updateMode,
                         ),
                       ),
                       if (isSearchMode)
@@ -425,7 +444,6 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                           padding: const EdgeInsets.all(10.0),
                           child: SearchFieldAutoComplete<String>(
                             controller: _searchController,
-                            focusNode: _focusNode,
                              itemHeight: 25,
                             placeholder: 'Rechercher...',
                             placeholderStyle:
@@ -436,13 +454,9 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                               color: const Color.fromARGB(255, 236, 234, 234),
                               borderRadius: BorderRadius.circular(16.0),
                             ),
-                            onSuggestionSelected: (selectedItem) {
-                              _searchController.text = selectedItem.searchKey;
-                              // setState(() {});
-                            },
-                             onChanged: (value) {
+                          onSuggestionSelected: (selectedItem) {
                               if (mounted) {
-                                setState(() {});
+                                _searchController.text = selectedItem.searchKey;
                               }
                             },
                             suggestionItemBuilder: (context, searchFieldItem) {

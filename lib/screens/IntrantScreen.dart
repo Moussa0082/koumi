@@ -40,7 +40,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late TextEditingController _searchController;
+
   List<Intrant> intrantListe = [];
+  // late FocusNode _focusNode;
   // List<ParametreGeneraux> paraList = [];
   // late ParametreGeneraux para = ParametreGeneraux();
   String? catValue;
@@ -255,15 +257,13 @@ class _IntrantScreenState extends State<IntrantScreen> {
     return intrantListe;
   }
 
+
   @override
   void initState() {
     super.initState();
     verify();
-    // widget.detectedCountry! =
-    //     Provider.of<DetectorPays>(context, listen: false).widget.detectedCountry!!;
-    // _loadCountryData();
-    // getLocation();
-    _searchController = TextEditingController();
+    // _focusNode = FocusNode();
+      _searchController = TextEditingController();
     _typeList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //write or call your logic
@@ -352,6 +352,20 @@ class _IntrantScreenState extends State<IntrantScreen> {
   }
 
   bool _disposed = false;
+  Key searchFieldKey = UniqueKey();
+
+   void _updateMode(int index) {
+    if (mounted) {
+      setState(() {
+        isSearchMode = index == 0;
+        if (!isSearchMode) {
+          _searchController.clear();
+          _searchController.dispose();
+          _searchController = TextEditingController();
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -361,6 +375,16 @@ class _IntrantScreenState extends State<IntrantScreen> {
     scrollableController1.dispose();
 
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
+    }
   }
 
   String? _searchingWithQuery;
@@ -495,13 +519,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             ),
                           ],
                           isSelected: [isSearchMode, !isSearchMode],
-                          onPressed: (index) {
-                            if (mounted) {
-                              setState(() {
-                                isSearchMode = index == 0;
-                              });
-                            }
-                          },
+                          onPressed: _updateMode,
                         ),
                       ),
                       if (isSearchMode)
@@ -522,15 +540,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             ),
                             onSuggestionSelected: (selectedItem) {
                               if (mounted) {
-                                setState(() {
-                                  _searchController.text =
-                                      selectedItem.searchKey;
-                                });
-                              }
-                            },
-                            onChanged: (value) {
-                              if (mounted) {
-                                setState(() {});
+                                _searchController.text = selectedItem.searchKey;
                               }
                             },
                             suggestionItemBuilder: (context, searchFieldItem) {

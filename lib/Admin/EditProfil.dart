@@ -59,7 +59,7 @@ class _EditProfilState extends State<EditProfil> {
   List<String> libelleSpeculation = [];
   List<Speculation> listeSpeculations = [];
 
-   Future<File> saveImagePermanently(String imagePath) async {
+  Future<File> saveImagePermanently(String imagePath) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final name = path.basename(imagePath);
@@ -91,8 +91,7 @@ class _EditProfilState extends State<EditProfil> {
         photo = image;
         imageSrc = image.path;
       });
-      await saveImagePermanently(
-          image.path);
+      await saveImagePermanently(image.path);
     }
   }
 
@@ -153,8 +152,6 @@ class _EditProfilState extends State<EditProfil> {
     telephoneActeurController.text = acteur.telephoneActeur!;
     localisationController.text = acteur.localiteActeur!;
     adresseController.text = acteur.adresseActeur!;
-    passwordController.text = acteur.password!;
-    confirmPasswordController.text = acteur.password!;
 
     if (acteur.emailActeur != null) {
       emailController.text = acteur.emailActeur!;
@@ -175,17 +172,6 @@ class _EditProfilState extends State<EditProfil> {
     print("type acteur : ${typeActeur.toString()}");
 
     print("type libelle : ${typeLibelle}");
-    // _controllerTypeActeur.onOptionSelected()
-    // setSelectedOptions(options) {
-    //   typeActeur.map((type) {
-    //     return ValueItem<TypeActeur>(
-    //       label: type.libelle!,
-    //       value: type,
-    //     );
-    //   }).toList();
-    // }
-
-    // ;
   }
 
   @override
@@ -577,91 +563,6 @@ class _EditProfilState extends State<EditProfil> {
                   // onSaved: (val) => nomActeur = val!,
                 ),
               ),
-              // SizedBox(
-              //   height: 5,
-              // ),
-              // Padding(
-              //   padding: const EdgeInsets.all(10.0),
-              //   child: TextFormField(
-              //     controller: passwordController,
-              //     decoration: InputDecoration(
-              //       labelText: "Mot de passe ",
-              //       suffixIcon: IconButton(
-              //         onPressed: () {
-              //           setState(() {
-              //             _obscureText =
-              //                 !_obscureText; // Inverser l'état du texte masqué
-              //           });
-              //         },
-              //         icon: Icon(
-              //           _obscureText
-              //               ? Icons.visibility_off
-              //               : Icons
-              //                   .visibility, // Choisir l'icône basée sur l'état du texte masqué
-              //           color: Colors.grey,
-              //         ),
-              //       ),
-              //       contentPadding: const EdgeInsets.symmetric(
-              //           vertical: 10, horizontal: 20),
-              //       // hintText: "Entrez votre prenom et nom",
-              //       border: OutlineInputBorder(
-              //         borderRadius: BorderRadius.circular(8),
-              //       ),
-              //     ),
-
-              //     keyboardType: TextInputType.number,
-              //     validator: (val) {
-              //       if (val == null || val.isEmpty) {
-              //         return "Veillez entrez votre prenom et nom";
-              //       } else {
-              //         return null;
-              //       }
-              //     },
-              //     // onSaved: (val) => nomActeur = val!,
-              //   ),
-              // ),
-              // SizedBox(
-              //   height: 5,
-              // ),
-              // Padding(
-              //   padding: const EdgeInsets.all(10.0),
-              //   child: TextFormField(
-              //     controller: confirmPasswordController,
-              //     decoration: InputDecoration(
-              //       labelText: "Confirmer",
-              //       suffixIcon: IconButton(
-              //         onPressed: () {
-              //           setState(() {
-              //             _obscureText =
-              //                 !_obscureText; // Inverser l'état du texte masqué
-              //           });
-              //         },
-              //         icon: Icon(
-              //           _obscureText
-              //               ? Icons.visibility_off
-              //               : Icons
-              //                   .visibility, // Choisir l'icône basée sur l'état du texte masqué
-              //           color: Colors.grey,
-              //         ),
-              //       ),
-              //       contentPadding: const EdgeInsets.symmetric(
-              //           vertical: 10, horizontal: 20),
-              //       // hintText: "Entrez votre prenom et nom",
-              //       border: OutlineInputBorder(
-              //         borderRadius: BorderRadius.circular(8),
-              //       ),
-              //     ),
-              //     keyboardType: TextInputType.text,
-              //     validator: (val) {
-              //       if (val == null || val.isEmpty) {
-              //         return "Veillez entrez votre prenom et nom";
-              //       } else {
-              //         return null;
-              //       }
-              //     },
-              //     // onSaved: (val) => nomActeur = val!,
-              //   ),
-              // ),
               SizedBox(
                 height: 10,
               ),
@@ -765,7 +666,7 @@ class _EditProfilState extends State<EditProfil> {
                           setState(() {
                             _isLoading = false;
                           });
-                          print("Erreur HTTP: ${response.statusCode}");
+                          print("Erreur HTTP: ${response.statusCode}  ");
                           throw Exception(
                               "Erreur HTTP: ${response.statusCode}");
                         }
@@ -851,16 +752,82 @@ class _EditProfilState extends State<EditProfil> {
                         }
                       }
                     } catch (e) {
-                      setState(() {
-                        _isLoading = false;
-                      });
-                      print("Une erreur s'est produite: ${e.toString()}");
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Une erreur s'est produite "),
-                          duration: Duration(seconds: 5),
-                        ),
+                      var response = await ActeurService().updateActeur(
+                        idActeur: acteur.idActeur!,
+                        nomActeur: nomActeur,
+                        adresseActeur: adresse!,
+                        telephoneActeur: tel,
+                        whatsAppActeur: whatsApp,
+                        localiteActeur: localisation,
+                        emailActeur: emailActeur,
+                        niveau3PaysActeur: acteur.niveau3PaysActeur!,
+                        typeActeur:
+                            typeActeur, // Passez les objets TypeActeur ici
+                        speculation: spec, // Passez les objets Speculation ici
                       );
+
+                      if (response.statusCode == 200 ||
+                          response.statusCode == 201) {
+                        setState(() {
+                          _isLoading = false;
+                          final responseBody =
+                              json.decode(utf8.decode(response.bodyBytes));
+                          print("response body ${responseBody.toString()}");
+
+                          List<dynamic> typeActeurData =
+                              responseBody['typeActeur'];
+                          List<TypeActeur> typeActeurList = typeActeurData
+                              .map((data) => TypeActeur.fromMap(data))
+                              .toList();
+                          List<dynamic> speculationData =
+                              responseBody['speculation'];
+                          List<Speculation> speculationsList = speculationData
+                              .map((data) => Speculation.fromMap(data))
+                              .toList();
+
+                          Acteur acteurs = Acteur(
+                            idActeur: responseBody['idActeur'],
+                            resetToken: responseBody['resetToken'],
+                            tokenCreationDate:
+                                responseBody['tokenCreationDate'],
+                            codeActeur: responseBody['codeActeur'],
+                            nomActeur: responseBody['nomActeur'],
+                            adresseActeur: responseBody['adresseActeur'],
+                            telephoneActeur: responseBody['telephoneActeur'],
+                            latitude: responseBody['latitude'],
+                            longitude: responseBody['longitude'],
+                            photoSiegeActeur: responseBody['photoSiegeActeur'],
+                            logoActeur: responseBody['logoActeur'],
+                            whatsAppActeur: responseBody['whatsAppActeur'],
+                            niveau3PaysActeur:
+                                responseBody['niveau3PaysActeur'],
+                            dateAjout: responseBody['dateAjout'],
+                            dateModif: responseBody['dateModif'],
+                            personneModif: responseBody['personneModif'],
+                            localiteActeur: responseBody['localiteActeur'],
+                            emailActeur: emailActeur,
+                            statutActeur: responseBody['statutActeur'],
+                            typeActeur: typeActeurList,
+                            speculation: speculationsList,
+                            password: responseBody['password'],
+                          );
+
+                          acteurProvider.setActeur(acteurs);
+                        });
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Profil  modifié avec succès"),
+                            duration: Duration(seconds: 5),
+                          ),
+                        );
+                      } else {
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        print("Erreur HTTP: ${response.statusCode}  ");
+                        throw Exception("Erreur HTTP: ${response.statusCode}");
+                      }
                     }
                   },
                   child: Text(

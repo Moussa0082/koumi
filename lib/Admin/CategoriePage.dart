@@ -14,6 +14,7 @@ import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:provider/provider.dart';
+import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 
 class CategoriPage extends StatefulWidget {
   const CategoriPage({super.key});
@@ -44,7 +45,7 @@ class _CategoriPageState extends State<CategoriPage> {
   String? catValue;
 
   Filiere? selectedType;
-
+  late Future<List<CategorieProduit>> _liste;
   late CategorieProduit categorieProduit;
   late TextEditingController _searchController;
 
@@ -55,11 +56,34 @@ class _CategoriPageState extends State<CategoriPage> {
   @override
   void initState() {
     super.initState();
-
+    _liste = getCat();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _filiereList = http.get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
 
     _searchController = TextEditingController();
+  }
+
+  void _updateMode(int index) {
+    if (mounted) {
+      setState(() {
+        isSearchMode = index == 0;
+        if (!isSearchMode) {
+          _searchController.clear();
+          _searchController.dispose();
+          _searchController = TextEditingController();
+        }
+      });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
+    }
   }
 
   @override
@@ -158,11 +182,7 @@ class _CategoriPageState extends State<CategoriPage> {
                       ),
                     ],
                     isSelected: [isSearchMode, !isSearchMode],
-                    onPressed: (index) {
-                      setState(() {
-                        isSearchMode = index == 0;
-                      });
-                    },
+                     onPressed: _updateMode,
                   ),
                 ),
                 if (isSearchMode)
@@ -171,13 +191,17 @@ class _CategoriPageState extends State<CategoriPage> {
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                        color: Colors.blueGrey[50],
+                        color: Colors.blueGrey[50], // Couleur d'arrière-plan
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.search, color: Colors.blueGrey[400]),
-                          SizedBox(width: 10),
+                          Icon(Icons.search,
+                              color:
+                                  Colors.blueGrey[400]), // Couleur de l'icône
+                          SizedBox(
+                              width:
+                                  10), // Espacement entre l'icône et le champ de recherche
                           Expanded(
                             child: TextField(
                               controller: _searchController,
@@ -187,8 +211,9 @@ class _CategoriPageState extends State<CategoriPage> {
                               decoration: InputDecoration(
                                 hintText: 'Rechercher',
                                 border: InputBorder.none,
-                                hintStyle:
-                                    TextStyle(color: Colors.blueGrey[400]),
+                                hintStyle: TextStyle(
+                                    color: Colors.blueGrey[
+                                        400]), // Couleur du texte d'aide
                               ),
                             ),
                           ),
@@ -196,6 +221,56 @@ class _CategoriPageState extends State<CategoriPage> {
                       ),
                     ),
                   ),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(10.0),
+                  //   child: FutureBuilder<List<CategorieProduit>>(
+                  //     future: _liste,
+                  //     builder: (context, snapshot) {
+                  //       if (snapshot.connectionState ==
+                  //           ConnectionState.waiting) {
+                  //         return SearchFieldAutoComplete<String>(
+                  //         controller: _searchController,
+                  //           placeholder: 'Rechercher...',
+                  //           suggestions: [],
+                  //         );
+                  //       } else {
+                  //         return SearchFieldAutoComplete<String>(
+                  //           // itemHeight: 20,
+                  //           controller: _searchController,
+                  //           itemHeight: 30,
+                  //           placeholder: 'Rechercher...',
+                  //           placeholderStyle:
+                  //               TextStyle(fontStyle: FontStyle.italic),
+                  //           suggestions: snapshot.data!
+                  //               .map((item) =>
+                  //                   SearchFieldAutoCompleteItem<String>(
+                  //                     searchKey: item.libelleCategorie!,
+                  //                     value: item.libelleCategorie!,
+                  //                   ))
+                  //               .toList(),
+                  //           suggestionsDecoration: SuggestionDecoration(
+                  //             marginSuggestions: const EdgeInsets.all(8.0),
+                  //             color: const Color.fromARGB(255, 236, 234, 234),
+                  //             borderRadius: BorderRadius.circular(16.0),
+                  //           ),
+                  //           onSuggestionSelected: (selectedItem) {
+                              
+                  //               _searchController.text = selectedItem.searchKey;
+                  //           },
+                  //           suggestionItemBuilder: (context, searchFieldItem) {
+                  //             return Padding(
+                  //               padding: const EdgeInsets.all(8.0),
+                  //               child: Text(
+                  //                 searchFieldItem.searchKey,
+                  //                 style: TextStyle(color: Colors.black),
+                  //               ),
+                  //             );
+                  //           },
+                  //         );
+                  //       }
+                  //     },
+                  //   ),
+                  // ),
                 if (!isSearchMode)
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -1069,7 +1144,6 @@ class _CategoriPageState extends State<CategoriPage> {
                                             ),
                                           ),
                                           setState(() {
-                                           
                                             filiereValue = null;
                                           }),
                                           libelleController.clear(),

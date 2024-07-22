@@ -7,9 +7,7 @@ import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
-import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:path/path.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ActeurService extends ChangeNotifier {
@@ -191,7 +189,6 @@ class ActeurService extends ChangeNotifier {
     required String niveau3PaysActeur,
     required List<TypeActeur> typeActeur,
     required List<Speculation> speculation,
-    // required String password,
     File? photo,
   }) async {
     var request =
@@ -200,7 +197,7 @@ class ActeurService extends ChangeNotifier {
     if (photo != null) {
       request.files.add(
         http.MultipartFile(
-          'image1',
+          'image2',
           photo.readAsBytes().asStream(),
           photo.lengthSync(),
           filename: photo.path.split('/').last,
@@ -219,11 +216,10 @@ class ActeurService extends ChangeNotifier {
       'niveau3PaysActeur': niveau3PaysActeur,
       'typeActeur': typeActeur.map((type) => type.toMap()).toList(),
       'speculation': speculation.map((spec) => spec.toMap()).toList(),
-      // 'password': password,
     };
 
     request.fields['acteur'] = jsonEncode(acteurData);
-
+    print('Acteur Data: ${jsonEncode(acteurData)}');
     try {
       var response = await request.send();
       var responseBody = await http.Response.fromStream(response);
@@ -233,7 +229,8 @@ class ActeurService extends ChangeNotifier {
 
       return responseBody;
     } catch (e) {
-      print('Erreur lors de la requête HTTP : $e');
+      print(
+          'Erreur lors de la requête HTTP : $e acteurData : ${acteurData.toString()}');
       rethrow;
     }
   }
@@ -880,7 +877,8 @@ class ActeurService extends ChangeNotifier {
   }) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/pinLogin?codeActeur=$codeActeur&password=$password'),
+        Uri.parse(
+            '$baseUrl/pinLogin?codeActeur=$codeActeur&password=$password'),
         headers: {'Content-Type': 'application/json'},
       );
 

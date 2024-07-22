@@ -1,9 +1,15 @@
+import 'dart:io';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:koumi_app/screens/CodeConfirmScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
+import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
+import 'package:provider/provider.dart';
 
 class ForgetPassScreen extends StatefulWidget {
   const ForgetPassScreen({super.key});
@@ -22,8 +28,32 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
 
   String email = "";
   String whatsApp = "";
-
+  String processedNumberWA = "";
+  String selectedCountry = "";
+  String detectedCountryCode = "";
   String _errorMessage = "";
+
+  PhoneNumber locale =
+      PhoneNumber(isoCode: Platform.localeName.split('_').last);
+  // String detectedCountryCode = '';
+  PhoneNumber number = PhoneNumber();
+
+  void getPhoneNumber(String phoneNumber) async {
+    PhoneNumber number = await PhoneNumber.getRegionInfoFromPhoneNumber(
+        phoneNumber, Platform.localeName.split('_').last);
+
+    setState(() {
+      this.number = number;
+    });
+  }
+
+  String removePlus(String phoneNumber) {
+    if (phoneNumber.startsWith('+')) {
+      return phoneNumber.substring(1); // Remove the first character
+    } else {
+      return phoneNumber; // No change if "+" is not present
+    }
+  }
 
   void validateEmail(String val) {
     if (val.isEmpty) {
@@ -95,7 +125,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
 
     try {
       final emailActeur = emailController.text;
-      final whatsAppActeur = whatsAppController.text;
+      final whatsAppActeur = processedNumberWA;
 
       if (isVisible) {
         await ActeurService.sendOtpCodeEmail(emailActeur, context);
@@ -116,7 +146,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                             builder: (context) => CodeConfirmScreen(
                                 isVisible: isVisible,
                                 emailActeur: emailController.text,
-                                whatsAppActeur: whatsAppController.text)));
+                                whatsAppActeur: processedNumberWA)));
                   },
                   child: const Text('OK'),
                 ),
@@ -126,14 +156,13 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
         );
       } else {
         await ActeurService.sendOtpCodeWhatsApp(whatsAppActeur, context);
-        debugPrint("Code envoyé par whats app");
+        debugPrint("Code envoyé par whatsApp");
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text('Succès'),
-              content: const Text(
-                  "Code envoyé par whatsApp avec succès"),
+              content: const Text("Code envoyé par whatsApp avec succès"),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -144,7 +173,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                             builder: (context) => CodeConfirmScreen(
                                 isVisible: isVisible,
                                 emailActeur: emailController.text,
-                                whatsAppActeur: whatsAppController.text)));
+                                whatsAppActeur: processedNumberWA)));
                   },
                   child: const Text('OK'),
                 ),
@@ -192,9 +221,17 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
+    whatsAppController.addListener(() {
+      setState(() {
+        processedNumberWA = removePlus(whatsAppController.text);
+      });
+    });
+    detectedCountryCode =
+        Provider.of<DetectorPays>(context, listen: false).detectedCountryCode!;
+    selectedCountry =
+        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
     isVisible = !isVisible;
+    super.initState();
   }
 
   @override
@@ -203,25 +240,35 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
     return LoadingOverlay(
       isLoading: isLoading,
       child: Scaffold(
-          backgroundColor: const Color(0xFFFFFFFF),
+          backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+          appBar: AppBar(
+            centerTitle: true,
+            toolbarHeight: 100,
+            leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.arrow_back_ios),
+            ),
+          ),
           body: SingleChildScrollView(
               child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  onPressed: () {
-                    // Fonction de retour
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.arrow_back_ios),
-                  iconSize: 30,
-                  splashRadius: 20,
-                  padding: EdgeInsets.zero,
-                  constraints: BoxConstraints(minWidth: 40, minHeight: 40),
-                ),
-              ),
+              // Align(
+              //   alignment: Alignment.topLeft,
+              //   child: IconButton(
+              //     onPressed: () {
+              //       // Fonction de retour
+              //       Navigator.pop(context);
+              //     },
+              //     icon: const Icon(Icons.arrow_back_ios),
+              //     iconSize: 30,
+              //     splashRadius: 20,
+              //     padding: EdgeInsets.zero,
+              //     constraints: BoxConstraints(minWidth: 40, minHeight: 40),
+              //   ),
+              // ),
               Center(child: Image.asset('assets/images/fg-pass.png')),
               // connexion
               const Text(
@@ -239,7 +286,6 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                     const SizedBox(
                       height: 10,
                     ),
-                  
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -281,7 +327,6 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                         ),
                       ],
                     ),
-
                     Padding(
                       padding: EdgeInsets.all(2),
                       child: Center(
@@ -319,27 +364,26 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                     ),
                     Visibility(
                       visible: !isVisible,
-                      child: TextFormField(
+                      child: IntlPhoneField(
+                        initialCountryCode: detectedCountryCode,
                         controller: whatsAppController,
+                        invalidNumberMessage: "Numéro invalide",
+                        searchText: "Chercher un pays",
                         decoration: InputDecoration(
-                          hintText: "EX: 223 12345678",
                           contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
+                              vertical: 0, horizontal: 20),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        keyboardType: TextInputType.phone,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) {
-                            return "Veillez entrez votre numéro WhatsApp";
-                          } else if (val.length < 8) {
-                            return "Veillez entrez au moins 8 chiffres";
-                          } else {
-                            return null;
-                          }
+                        languageCode: "fr",
+                        onChanged: (phone) {
+                          print("num complet ${phone.completeNumber}");
+                          processedNumberWA =
+                              removePlus(phone.completeNumber.toString());
+                          print("wa selected  $processedNumberWA");
                         },
-                        onSaved: (val) => whatsApp = val!,
+                        onCountryChanged: (country) {},
                       ),
                     ),
                   ],

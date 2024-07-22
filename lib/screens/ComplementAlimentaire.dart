@@ -22,7 +22,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ComplementAlimentaire extends StatefulWidget {
-
   ComplementAlimentaire({super.key});
 
   @override
@@ -94,8 +93,7 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
           page++;
         });
 
-      fetchStockByCategorie(
-              detectedCountry != null ? detectedCountry! : "Mali")
+      fetchStockByCategorie(detectedCountry != null ? detectedCountry! : "Mali")
           .then((value) {
         setState(() {
           // Rafraîchir les données ici
@@ -181,8 +179,7 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
         page++;
       });
 
-      fetchStock(
-              detectedCountry != null ? detectedCountry! : "Mali")
+      fetchStock(detectedCountry != null ? detectedCountry! : "Mali")
           .then((value) {
         setState(() {
           // Rafraîchir les données ici
@@ -266,10 +263,11 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController1.addListener(_scrollListener1);
     });
-    _catList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorieByLibelleFiliere/$libelle'));
+    _catList = http.get(Uri.parse(
+        '$apiOnlineUrl/Categorie/allCategorieByLibelleFiliere/$libelle'));
     stockListeFuture1 = getAllStock();
-    stockListeFuture = fetchStock(
-        detectedCountry != null ? detectedCountry! : "Mali");
+    stockListeFuture =
+        fetchStock(detectedCountry != null ? detectedCountry! : "Mali");
     verify();
   }
 
@@ -284,9 +282,32 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
     if (result == true) {
       print("Rafraichissement en cours");
       setState(() {
-        stockListeFuture = fetchStock(
-            detectedCountry != null ? detectedCountry! : "Mali");
+        stockListeFuture =
+            fetchStock(detectedCountry != null ? detectedCountry! : "Mali");
       });
+    }
+  }
+
+  void _updateMode(int index) {
+    if (mounted) {
+      setState(() {
+        isSearchMode = index == 0;
+        if (!isSearchMode) {
+          _searchController.clear();
+          _searchController.dispose();
+          _searchController = TextEditingController();
+        }
+      });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
     }
   }
 
@@ -323,10 +344,9 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
                 ? [
                     IconButton(
                         onPressed: () {
-                          stockListeFuture = fetchStock(
-                              detectedCountry != null
-                                  ? detectedCountry!
-                                  : "Mali");
+                          stockListeFuture = fetchStock(detectedCountry != null
+                              ? detectedCountry!
+                              : "Mali");
                         },
                         icon: const Icon(Icons.refresh, color: d_colorGreen)),
                     (typeActeurData
@@ -372,10 +392,9 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
                 : [
                     IconButton(
                         onPressed: () {
-                          stockListeFuture = fetchStock(
-                              detectedCountry != null
-                                  ? detectedCountry!
-                                  : "Mali");
+                          stockListeFuture = fetchStock(detectedCountry != null
+                              ? detectedCountry!
+                              : "Mali");
                         },
                         icon: const Icon(Icons.refresh, color: d_colorGreen)),
                   ]),
@@ -402,19 +421,14 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
                             ),
                           ],
                           isSelected: [isSearchMode, !isSearchMode],
-                          onPressed: (index) {
-                            setState(() {
-                              isSearchMode = index == 0;
-                            });
-                          },
+                          onPressed: _updateMode,
                         ),
                       ),
                       if (isSearchMode)
-                         Padding(
+                        Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: SearchFieldAutoComplete<String>(
                             controller: _searchController,
-                            focusNode: _focusNode,
                             itemHeight: 25,
                             placeholder: 'Rechercher...',
                             placeholderStyle:
@@ -426,12 +440,8 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
                               borderRadius: BorderRadius.circular(16.0),
                             ),
                             onSuggestionSelected: (selectedItem) {
-                              _searchController.text = selectedItem.searchKey;
-                              // setState(() {});
-                            },
-                            onChanged: (value) {
                               if (mounted) {
-                                setState(() {});
+                                _searchController.text = selectedItem.searchKey;
                               }
                             },
                             suggestionItemBuilder: (context, searchFieldItem) {

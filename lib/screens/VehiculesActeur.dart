@@ -246,11 +246,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                 _searchController.text = selectedItem.searchKey;
                                 // setState(() {});
                               },
-                              onChanged: (value) {
-                                if (mounted) {
-                                  setState(() {});
-                                }
-                              },
+                            
                               suggestionItemBuilder:
                                   (context, searchFieldItem) {
                                 return Padding(
