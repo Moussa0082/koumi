@@ -168,7 +168,7 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
   Future<List<Intrant>> getAllIntrant() async {
     if (selectedCat != null) {
       intrantListe = await IntrantService().fetchIntrantByCategorieAndFilieres(
-          selectedCat!.idCategorieProduit!, libelle, detectedCountry!);
+          selectedCat!.idCategorieProduit!, libelle, detectedCountry != null ? detectedCountry! : "Mali");
     }
 
     return intrantListe;
@@ -540,7 +540,9 @@ void _updateMode(int index) {
                                   .fetchIntrantByCategorieAndFilieres(
                                       selectedCat!.idCategorieProduit!,
                                       libelle,
-                                      detectedCountry!);
+                                      detectedCountry != null
+                                          ? detectedCountry!
+                                          : "Mali");
                             })
                           : setState(() {
                               intrantListeFuture = fetchIntrantByCategorie(

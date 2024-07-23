@@ -181,15 +181,15 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         final List<String> type =
             acteur.typeActeur!.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
-          );
+            Get.off(BottomNavBarAdmin(),
+              duration: Duration(seconds: 1),
+              transition: Transition.leftToRight);
+
         } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => BottomNavigationPage()),
-          );
+            Get.off(BottomNavigationPage(),
+              duration: Duration(seconds: 1),
+              transition: Transition.leftToRight);
+        
         }
       } else {
         // Traitement en cas d'échec

@@ -134,7 +134,7 @@ String? detectedCountry;
    Future<List<Stock>> getAllStock() async {
     if (selectedCat != null) {
       stockListe = await StockService().fetchStockByCategorieAndFiliere(
-          selectedCat!.idCategorieProduit!, libelle , detectedCountry!);
+          selectedCat!.idCategorieProduit!, libelle , detectedCountry != null ? detectedCountry! : "Mali");
     }
 
     return stockListe;

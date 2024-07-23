@@ -85,7 +85,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Future<List<Stock>> getAllStock() async {
     if (selectedCat != null) {
       stockListe = await StockService().fetchStockByCategorie(
-          selectedCat!.idCategorieProduit!, detectedCountry!);
+          selectedCat!.idCategorieProduit!, detectedCountry != null ? detectedCountry! : "mali");
     }
 
     return stockListe;

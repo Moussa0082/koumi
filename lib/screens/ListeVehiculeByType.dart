@@ -47,7 +47,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
   String? detectedCountry;
   Future<List<Vehicule>> getListe(String id) async {
     final response = await VehiculeService()
-        .fetchVehiculeByTypeVoitureWithPagination(id, detectedCountry!);
+        .fetchVehiculeByTypeVoitureWithPagination(id, detectedCountry != null ? detectedCountry! : "mali");
     return response;
   }
 
@@ -63,7 +63,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
         page++;
       });
       fetchVehiculeByTypeVoitureWithPagination(
-              typeVoiture.idTypeVoiture!, detectedCountry!)
+              typeVoiture.idTypeVoiture!, detectedCountry != null ? detectedCountry! : "mali")
           .then((value) {
         setState(() {
           // Rafraîchir les données ici
@@ -317,7 +317,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                   // Rafraîchir les données ici
                   futureListe = VehiculeService()
                       .fetchVehiculeByTypeVoitureWithPagination(
-                          typeVoiture.idTypeVoiture!, detectedCountry!);
+                          typeVoiture.idTypeVoiture!, detectedCountry != null ? detectedCountry! : "mali");
                 });
               },
               child: SingleChildScrollView(

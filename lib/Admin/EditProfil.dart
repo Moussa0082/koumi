@@ -175,6 +175,13 @@ class _EditProfilState extends State<EditProfil> {
   }
 
   @override
+  void dispose() {
+    _controllerTypeActeur.dispose();
+    _controllerSpeculation.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LoadingOverlay(
       isLoading: _isLoading,

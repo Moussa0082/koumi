@@ -4,29 +4,22 @@ import 'package:get/get.dart';
 
 class ConnectionVerify extends GetxController {
   final Connectivity _connectivity = Connectivity();
-  final Rx<ConnectivityResult> _connectionStatus = ConnectivityResult.none.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    initConnectivity();
-    _connectivity.onConnectivityChanged.listen((result) {
-      _connectionStatus.value = result;
-      checkConnection(result);
-    });
-  }
+  final RxList<ConnectivityResult> _connectionStatus =
+      <ConnectivityResult>[].obs;
 
   void initConnectivity() async {
     print("Initialisation de la connexion");
-    ConnectivityResult connectivityResult;
+    List<ConnectivityResult> connectivityResults;
     try {
-      connectivityResult = await _connectivity.checkConnectivity();
+      connectivityResults = await _connectivity.checkConnectivity();
     } catch (e) {
       print(e.toString());
       return;
     }
-    _connectionStatus.value = connectivityResult;
-    checkConnection(connectivityResult);
+    _connectionStatus.value = connectivityResults;
+    if (connectivityResults.isNotEmpty) {
+      checkConnection(connectivityResults.first);
+    }
   }
 
   void checkConnection(ConnectivityResult result) {
@@ -38,6 +31,18 @@ class ConnectionVerify extends GetxController {
         Get.closeCurrentSnackbar();
       }
     }
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    initConnectivity();
+    _connectivity.onConnectivityChanged.listen((results) {
+      _connectionStatus.value = results;
+      if (results.isNotEmpty) {
+        checkConnection(results.first);
+      }
+    });
   }
 
   void showNoConnectionSnackbar() {
@@ -62,7 +67,7 @@ class ConnectionVerify extends GetxController {
             ElevatedButton(
               onPressed: () {
                 Get.back();
-                // SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+                //  SystemChannels.platform.invokeMethod('SystemNavigator.pop');
               },
               child: Text('Quitter'),
             ),

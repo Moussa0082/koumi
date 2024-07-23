@@ -50,8 +50,8 @@ class _AddAlerteState extends State<AddAlerte> {
     });
   }
 
-  String selectedCountry = "";
-  String selectedCountryCode = "";
+  String? selectedCountry;
+  String? selectedCountryCode;
 
   Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -537,8 +537,8 @@ class _AddAlerteState extends State<AddAlerte> {
                                           .creerAlertes(
                                               titreAlerte: titre,
                                               descriptionAlerte: description,
-                                              pays: selectedCountry,
-                                              codePays: selectedCountryCode,
+                                              pays: selectedCountry != null ? selectedCountry! : "Mali",
+                                              codePays: selectedCountryCode != null ? selectedCountryCode! : "ML",
                                               videoAlerte: _videoUploaded,
                                               audioAlerte: audiosUploaded,
                                               photoAlerte: photoUploaded)
@@ -594,8 +594,13 @@ class _AddAlerteState extends State<AddAlerte> {
                                           .creerAlertes(
                                             titreAlerte: titre,
                                             descriptionAlerte: description,
-                                            pays: selectedCountry,
-                                            codePays: selectedCountryCode,
+                                             pays: selectedCountry != null
+                                                ? selectedCountry!
+                                                : "Mali",
+                                            codePays:
+                                                selectedCountryCode != null
+                                                    ? selectedCountryCode!
+                                                    : "ML",
                                           )
                                           .then((value) => {
                                                 // FirebaseApi()

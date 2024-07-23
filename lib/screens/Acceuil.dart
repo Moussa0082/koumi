@@ -138,8 +138,13 @@ class _AccueilState extends State<Accueil> {
             detectedCountryCode = place.isoCountryCode!;
             detectedCountry = place.country!;
             print("pays : ${detectedCountry} code: ${detectedCountryCode}");
-            detectorPays.setDetectedCountryAndCode(
-                detectedCountry, detectedCountryCode);
+            if (detectedCountry != null) {
+          detectorPays.setDetectedCountryAndCode(detectedCountry!, detectedCountryCode!);
+          print("pays : $detectedCountry code: $detectedCountryCode");
+        } else {
+          print("Le pays n'a pas pu être détecté.");
+        }
+      
           });
         }
 

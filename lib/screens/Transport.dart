@@ -69,7 +69,7 @@ class _TransportState extends State<Transport> {
           page++;
         });
       debugPrint("yes - fetch all by pays vehicule $page");
-      fetchVehicule(detectedCountry!);
+      fetchVehicule(detectedCountry != null ? detectedCountry! : "Mali");
     }
     debugPrint("no");
   }
@@ -90,7 +90,7 @@ class _TransportState extends State<Transport> {
         });
 
       fetchVehiculeByTypeVoitureWithPagination(
-          selectedType!.idTypeVoiture!, detectedCountry!);
+          selectedType!.idTypeVoiture!,  detectedCountry != null ? detectedCountry! : "Mali");
     }
     debugPrint("no");
   }
@@ -214,7 +214,7 @@ class _TransportState extends State<Transport> {
     if (selectedType != null) {
       vehiculeListe = await VehiculeService()
           .fetchVehiculeByTypeVoitureWithPagination(
-              selectedType!.idTypeVoiture!, detectedCountry!);
+              selectedType!.idTypeVoiture!,  detectedCountry != null ? detectedCountry! : "Mali");
     }
 
     return vehiculeListe;
@@ -260,9 +260,9 @@ class _TransportState extends State<Transport> {
     });
     isExist == false
         ? vehiculeListeFuture =
-            VehiculeService().fetchVehicule(detectedCountry!)
+            VehiculeService().fetchVehicule(detectedCountry != null ? detectedCountry! : "Mali")
         : vehiculeListeFuture =
-            VehiculeService().fetchVehicule(acteur.niveau3PaysActeur!);
+            VehiculeService().fetchVehicule(detectedCountry != null ? detectedCountry! : "Mali");
     vehiculeListeFuture1 = getAllVehicule();
 
     super.initState();
@@ -480,12 +480,15 @@ class _TransportState extends State<Transport> {
               selectedType == null
                   ? setState(() {
                       vehiculeListeFuture =
-                          VehiculeService().fetchVehicule(detectedCountry!);
+                          VehiculeService().fetchVehicule(
+                          detectedCountry != null ? detectedCountry! : "Mali");
                     })
                   : setState(() {
                       vehiculeListeFuture1 = VehiculeService()
                           .fetchVehiculeByTypeVoitureWithPagination(
-                              selectedType!.idTypeVoiture!, detectedCountry!);
+                              selectedType!.idTypeVoiture!,  detectedCountry != null
+                                  ? detectedCountry!
+                                  : "Mali");
                     });
             },
             child: Container(
@@ -638,13 +641,18 @@ class _TransportState extends State<Transport> {
                   selectedType == null
                       ? setState(() {
                           vehiculeListeFuture =
-                              VehiculeService().fetchVehicule(detectedCountry!);
+                              VehiculeService().fetchVehicule(
+                              detectedCountry != null
+                                  ? detectedCountry!
+                                  : "Mali");
                         })
                       : setState(() {
                           vehiculeListeFuture1 = VehiculeService()
                               .fetchVehiculeByTypeVoitureWithPagination(
                                   selectedType!.idTypeVoiture!,
-                                  detectedCountry!);
+                                   detectedCountry != null
+                                      ? detectedCountry!
+                                      : "Mali");
                         });
                 },
                 child: selectedType == null
@@ -1182,7 +1190,7 @@ class _TransportState extends State<Transport> {
           page = 0;
           hasMore = true;
           fetchVehiculeByTypeVoitureWithPagination(
-              selectedType!.idTypeVoiture!, detectedCountry!,
+              selectedType!.idTypeVoiture!,  detectedCountry != null ? detectedCountry! : "Mali",
               refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {

@@ -354,15 +354,28 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
       debugPrint("yes ");
       // Navigate to the next page if necessary
     } catch (error) {
-      // Handle any exceptions that might occur during the request
-      final String errorMessage = error.toString();
+      String errorMessage = "";
+      if (error is Exception) {
+        final exception = error;
+        if (exception.toString().contains(
+            'Un compte avec le même numéro de téléphone existe déjà')) {
+          errorMessage =
+              'Un compte avec le même numéro de téléphone existe déjà';
+        } else {
+          errorMessage = 'Un compte avec le même email existe déjà';
+        }
+        print(errorMessage);
+      }
+
       debugPrint("no " + errorMessage);
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: Text("Erreur lors de l'inscription"),
-          content:
-              Text("Une erreur s'est produite veuillez réessayer plus tard"),
+          content: Text(errorMessage,
+              style: TextStyle(
+                color: Colors.black87,
+              )),
           actions: [
             TextButton(
               child: Text("OK"),
@@ -487,7 +500,6 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                         const SizedBox(height: 5),
                         MultiSelectDropDown.network(
                           networkConfig: NetworkConfig(
-                          
                             url:
                                 '$apiOnlineUrl/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
                             method: RequestMethod.get,
@@ -495,7 +507,6 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                           ),
                           chipConfig: const ChipConfig(wrapType: WrapType.wrap),
                           responseParser: (response) {
-                           
                             listeSpeculations =
                                 (response as List<dynamic>).map((e) {
                               return Speculation(
@@ -503,7 +514,6 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                                 nomSpeculation: e['nomSpeculation'] as String,
                                 statutSpeculation:
                                     e['statutSpeculation'] as bool,
-                               
                               );
                             }).toList();
 

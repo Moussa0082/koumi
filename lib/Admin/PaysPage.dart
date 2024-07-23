@@ -772,7 +772,6 @@ class _PaysPageState extends State<PaysPage> {
             code,
             height: 48,
             width: 62,
-            borderRadius: 8,
           );
   }
 }

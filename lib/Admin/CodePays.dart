@@ -223,7 +223,6 @@ class CodePays{
             code,
             height: 48,
             width: 62,
-            borderRadius: 8,
           );
   }
 }

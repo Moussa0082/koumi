@@ -85,8 +85,20 @@ class ActeurService extends ChangeNotifier {
         throw Exception(' ${errorMessage}');
       }
     } catch (e) {
-      throw Exception(
-          'Une erreur s\'est produite lors de l\'ajout de acteur : $e ');
+      String errorMessage =
+          'Une erreur s\'est produite lors de l\'ajout de acteur';
+      if (e is Exception) {
+        final exception = e;
+        if (exception.toString().contains(
+            'Un compte avec le même numéro de téléphone existe déjà')) {
+          errorMessage =
+              'Un compte avec le même numéro de téléphone existe déjà';
+        } else {
+          errorMessage = 'Un compte avec le même email existe déjà';
+        }
+        print(errorMessage);
+        throw Exception(errorMessage);
+      }
     }
   }
 

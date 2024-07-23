@@ -161,7 +161,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
   Future<List<Intrant>> getAllIntrant() async {
     if (selectedCat != null) {
       intrantListe = await IntrantService().fetchIntrantByCategorieAndFilieres(
-          selectedCat!.idCategorieProduit!, libelle, detectedCountry!);
+          selectedCat!.idCategorieProduit!, libelle, detectedCountry != null ? detectedCountry! : "mali");
     }
 
     return intrantListe;

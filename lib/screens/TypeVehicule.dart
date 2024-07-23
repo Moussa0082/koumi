@@ -13,8 +13,8 @@ import 'package:provider/provider.dart';
 import 'package:search_field_autocomplete/search_field_autocomplete.dart';
 
 class TypeVehicule extends StatefulWidget {
-  String? detectedCountry;
-  TypeVehicule({super.key, this.detectedCountry});
+  
+  TypeVehicule({super.key});
 
   @override
   State<TypeVehicule> createState() => _TypeVehiculeState();

@@ -160,8 +160,14 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
             detectedC = place.isoCountryCode;
             detectedCountryCode = place.isoCountryCode!;
             detectedCountry = place.country!;
-            detectorPays.setDetectedCountryAndCode(
-                detectedCountry, detectedCountryCode);
+            print("pays : ${detectedCountry} code: ${detectedCountryCode}");
+            if (detectedCountry != null) {
+              detectorPays.setDetectedCountryAndCode(
+                  detectedCountry!, detectedCountryCode!);
+              print("pays : $detectedCountry code: $detectedCountryCode");
+            } else {
+              print("Le pays n'a pas pu être détecté.");
+            }
           });
         }
 

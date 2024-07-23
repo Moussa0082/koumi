@@ -25,8 +25,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       PhoneNumber(isoCode: Platform.localeName.split('_').last);
 
   String? typeValue;
-  String selectedCountry = "";
-  String detectedCountryCode = "";
+  String? selectedCountry = "";
+  String? detectedCountryCode = "";
   // late TypeActeur monTypeActeur;
   // late Future _mesTypeActeur;
   Position? _currentPosition;
@@ -261,7 +261,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 4),
                         IntlPhoneField(
-                          initialCountryCode: detectedCountryCode,
+                          initialCountryCode: detectedCountryCode != null ? detectedCountryCode : "ML",
                           controller: whatsAppController,
                           invalidNumberMessage: "Numéro invalide",
                           searchText: "Chercher un pays",
@@ -298,7 +298,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 5),
                         IntlPhoneField(
-                          initialCountryCode: detectedCountryCode,
+                          initialCountryCode: detectedCountryCode != null
+                              ? detectedCountryCode
+                              : "ML",
                           controller: phoneController,
                           invalidNumberMessage: "Numéro invalide",
                           searchText: "Chercher un pays",
@@ -342,7 +344,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                                   nomActeurController.text,
                                               whatsAppActeur: processedNumberWA,
                                               telephone: processedNumberTel,
-                                              pays: selectedCountry,
+                                              pays: selectedCountry!,
                                             )));
                               }
                             },

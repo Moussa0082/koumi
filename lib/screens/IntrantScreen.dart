@@ -95,7 +95,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
       isExist
           ? fetchIntrantByCategorie(
-              widget.detectedCountry!, selectedType!.idCategorieProduit!)
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali", selectedType!.idCategorieProduit!)
           : fetchIntrantByCategorie(
               acteur.niveau3PaysActeur!, selectedType!.idCategorieProduit!);
     }
@@ -237,7 +237,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
       setState(() {
         isExist = false;
         intrantListeFuture = IntrantService().fetchIntrantByPays(
-            widget.detectedCountry! != null ? widget.detectedCountry! : "mali");
+            widget.detectedCountry != null ? widget.detectedCountry! : "mali");
       });
     }
   }
@@ -247,7 +247,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
       isExist
           ? intrantListe = await IntrantService().fetchIntrantByCategorie(
               selectedType!.idCategorieProduit!,
-              widget.detectedCountry! != null
+              widget.detectedCountry != null
                   ? widget.detectedCountry!
                   : "mali")
           : intrantListe = await IntrantService().fetchIntrantByCategorie(
