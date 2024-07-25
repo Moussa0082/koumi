@@ -117,6 +117,7 @@ class _CarrouselState extends State<Carrousel> {
   String? detectedC = '';
   String? detectedCountryCode = '';
   String? detectedCountry = '';
+  final String baseUrl = '$apiOnlineUrl/alertes';
 
   @override
   void initState() {
@@ -261,7 +262,7 @@ class _CarrouselState extends State<Carrousel> {
   bool isLoading = true;
 
   Future<List<Alertes>> fetchAlertes(String pays) async {
-    const String baseUrl = '$apiOnlineUrl/alertes';
+    
     int page = 0;
     int size = 3;
     try {
@@ -313,8 +314,8 @@ class _CarrouselState extends State<Carrousel> {
           .entries
           .map((entry) => buildImageSlider(
               entry.value.photoAlerte!.isNotEmpty ||
-                      entry.value.photoAlerte! != null
-                  ? "https://koumi.ml/api-koumi/alertes/${entry.value.idAlerte}/image"
+                      entry.value.photoAlerte != null
+                  ? "$baseUrl/${entry.value.idAlerte}/image"
                   : "assets/images/alert_default.jpg",
               entry.value.titreAlerte ?? '',
               entry.key,

@@ -9,6 +9,7 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/ForgetPassScreen.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
 import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
@@ -27,27 +28,21 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
   String enteredPin = '';
   bool isPinVisible = false;
   bool isLoading = false;
-
+  String? codeActeur;
   late SharedPreferences prefs;
 
-//   Future<Acteur> connexionActeurWithPin(String codeActeur, String password) async {
-//   final Uri uri = Uri.parse('http://votre_api/pinLogin?codeActeur=$codeActeur&password=$password');
+  @override
+  void initState() {
+    super.initState();
+    _loadCodeActeur();
+  }
 
-//   try {
-//     final response = await http.get(uri);
-
-//     if (response.statusCode == 200) {
-//       // Si la requête réussit, retournez le corps de la réponse converti en un objet Acteur
-//       return acteurFromJson(response.body);
-//     } else {
-//       // Si la requête échoue, lancez une exception avec le statut de la réponse
-//       throw Exception('Failed to load data, status code: ${response.statusCode}');
-//     }
-//   } catch (e) {
-//     // Si une erreur se produit lors de l'envoi de la requête, lancez une exception avec le message d'erreur
-//     throw Exception('Failed to load data: $e');
-//   }
-// }
+  Future<void> _loadCodeActeur() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      codeActeur = prefs.getString('codeActeur');
+    });
+  }
 
   _handleButtonPress() async {
     setState(() {
@@ -63,38 +58,21 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
   Future<void> loginUser() async {
     const String baseUrl = '$apiOnlineUrl/acteur/pinLogin';
 
-    const String defaultProfileImage = 'assets/images/profil.jpg';
-
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);
     prefs = await SharedPreferences.getInstance();
 
-    // Récupérer le codeActeur depuis SharedPreferences
-    String? codeActeur = prefs.getString('codeActeur');
-
-    // Vérifier si le codeActeur est présent dans SharedPreferences
-    if (codeActeur == null || codeActeur.isEmpty) {
-      // Afficher une erreur si le codeActeur est manquant
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Center(child: Text('Erreur')),
-            content: const Text(
-              "Une erreur s'est produite veuillez réessayer plus tard",
-              textAlign: TextAlign.justify,
-              style: TextStyle(color: Colors.black, fontSize: 20),
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
+    // Assurez-vous que le code acteur est chargé
+    if (codeActeur == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Center(
+              child: Text(
+            "Veillez vous connectez d'abord email et le mot de passe puis réesayer plus tard",
+            maxLines: 2,
+          )),
+          duration: Duration(seconds: 5),
+        ),
       );
       return;
     }
@@ -115,7 +93,6 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
         // Sauvegarder les données de l'utilisateur dans shared preferences
-        prefs = await SharedPreferences.getInstance();
         final password = responseBody['password'];
         final emailActeur = responseBody['emailActeur'];
         prefs.setString('emailActeur', emailActeur);
@@ -125,7 +102,6 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         final adresseActeur = responseBody['adresseActeur'];
         final telephoneActeur = responseBody['telephoneActeur'];
         final whatsAppActeur = responseBody['whatsAppActeur'];
-
         final niveau3PaysActeur = responseBody['niveau3PaysActeur'];
         final localiteActeur = responseBody['localiteActeur'];
 
@@ -136,27 +112,25 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         prefs.setString('whatsAppActeur', whatsAppActeur);
         prefs.setString('niveau3PaysActeur', niveau3PaysActeur);
         prefs.setString('localiteActeur', localiteActeur);
-        // Enregistrer la liste des types d'utilisateur dans SharedPreferences
 
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
         List<dynamic> speculationData = responseBody['speculation'];
-
         List<Speculation> speculationList =
             speculationData.map((data) => Speculation.fromMap(data)).toList();
 
         List<dynamic> typeActeurData = responseBody['typeActeur'];
         List<TypeActeur> typeActeurList =
             typeActeurData.map((data) => TypeActeur.fromMap(data)).toList();
-// Extraire les libellés des types d'utilisateur et les ajouter à une nouvelle liste de chaînes
+
         List<String> userTypeLabels =
             typeActeurList.map((typeActeur) => typeActeur.libelle!).toList();
-
         List<String> speculationLabels = speculationList
             .map((typeActeur) => typeActeur.nomSpeculation!)
             .toList();
+
         prefs.setStringList('speculation', speculationLabels);
-// Enregistrer la liste des libellés des types d'utilisateur dans SharedPreferences
         prefs.setStringList('userType', userTypeLabels);
+
         Acteur acteur = Acteur(
           idActeur: responseBody['idActeur'],
           nomActeur: responseBody['nomActeur'],
@@ -164,7 +138,6 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
           codeActeur: responseBody['codeActeur'],
           telephoneActeur: responseBody['telephoneActeur'],
           whatsAppActeur: responseBody['whatsAppActeur'],
-          // niveau3PaysActeur: responseBody['niveau3PaysActeur'],
           dateAjout: responseBody['dateAjout'],
           localiteActeur: responseBody['localiteActeur'],
           emailActeur: emailActeur,
@@ -176,82 +149,219 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
 
         acteurProvider.setActeur(acteur);
 
-        print("acteur pin : ${acteur}");
-
         final List<String> type =
             acteur.typeActeur!.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
-            Get.off(BottomNavBarAdmin(),
+          Get.off(BottomNavBarAdmin(),
               duration: Duration(seconds: 1),
               transition: Transition.leftToRight);
-
         } else {
-            Get.off(BottomNavigationPage(),
+          Get.off(BottomNavigationPage(),
               duration: Duration(seconds: 1),
               transition: Transition.leftToRight);
-        
         }
       } else {
-        // Traitement en cas d'échec
         enteredPin = '';
+        String errorMessage = '';
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+        errorMessage = responseBody['message'];
+        if (errorMessage.contains('Code Pin incorrect')) {
+          errorMessage = 'Code Pin incorrect';
+        } else if (errorMessage.contains(
+            'votre compte est désactivé. Veuillez contacter l\'administrateur pour la procédure d\'activation de votre compte !')) {
+          errorMessage =
+              'votre compte est désactivé. Veuillez contacter l\'administrateur pour la procédure d\'activation de votre compte !';
+        }
+        print("if : $errorMessage");
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Center(child: Text("Code pin incorrecte ")),
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: Center(
+                child: Text(
+              errorMessage,
+              maxLines: 2,
+            )),
+            duration: Duration(seconds: 5),
           ),
         );
-        final responseBody = json.decode(utf8.decode(response.bodyBytes));
-        final errorMessage = responseBody['message'];
-        print(errorMessage);
-        // showDialog(
-        //   context: context,
-        //   builder: (BuildContext context) {
-        //     return AlertDialog(
-        //       title: const Center(child: Text('Connexion échouée !')),
-        //       content: Text(
-        //         'Coe pin incorrect',
-        //         // errorMessage,
-        //         textAlign: TextAlign.justify,
-        //         style: const TextStyle(color: Colors.black, fontSize: 20),
-        //       ),
-        //       actions: <Widget>[
-        //         TextButton(
-        //           onPressed: () {
-        //             Navigator.of(context).pop();
-        //           },
-        //           child: const Text('OK'),
-        //         ),
-        //       ],
-        //     );
-        //   },
-        // );
       }
     } catch (e) {
-      // Gérer les exceptionn
+      String errorMessage = "";
       debugPrint(e.toString());
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Center(child: Text('Erreur')),
-            content: const Text(
-              "Une erreur s'est produite veuillez vérifier votre connexion internet", // Afficher l'exception
-              textAlign: TextAlign.justify,
-              style: TextStyle(color: Colors.black, fontSize: 20),
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      if (e is Exception) {
+        final exception = e;
+        if (exception.toString().contains('Code Pin incorrect')) {
+          errorMessage = 'Code Pin incorrect';
+        } else if (exception.toString().contains(
+            'votre compte est désactivé. Veuillez contacter l\'administrateur pour la procédure d\'activation de votre compte !')) {
+          errorMessage =
+              'votre compte est désactivé. Veuillez contacter l\'administrateur pour la procédure d\'activation de votre compte !';
+        }
+        print("error : $errorMessage");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Center(child: Text(errorMessage, maxLines: 2)),
+            duration: Duration(seconds: 5),
+          ),
+        );
+        throw Exception(errorMessage);
+      }
     }
   }
+
+//   Future<void> loginUser() async {
+//     const String baseUrl = '$apiOnlineUrl/acteur/pinLogin';
+
+//     ActeurProvider acteurProvider =
+//         Provider.of<ActeurProvider>(context, listen: false);
+//     prefs = await SharedPreferences.getInstance();
+
+//     // Récupérer le codeActeur depuis SharedPreferences
+//     String? codeActeur = prefs.getString('codeActeur');
+
+//     // Construire l'URL de l'API avec le codeActeur récupéré
+//     final Uri apiUrl =
+//         Uri.parse('$baseUrl?codeActeur=$codeActeur&password=$enteredPin');
+
+//     try {
+//       final response = await http.get(
+//         apiUrl,
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//       );
+
+//       if (response.statusCode == 200) {
+//         final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+//         // Sauvegarder les données de l'utilisateur dans shared preferences
+//         prefs = await SharedPreferences.getInstance();
+//         final password = responseBody['password'];
+//         final emailActeur = responseBody['emailActeur'];
+//         prefs.setString('emailActeur', emailActeur);
+//         prefs.setString('password', password);
+//         final nomActeur = responseBody['nomActeur'];
+//         final idActeur = responseBody['idActeur'];
+//         final adresseActeur = responseBody['adresseActeur'];
+//         final telephoneActeur = responseBody['telephoneActeur'];
+//         final whatsAppActeur = responseBody['whatsAppActeur'];
+
+//         final niveau3PaysActeur = responseBody['niveau3PaysActeur'];
+//         final localiteActeur = responseBody['localiteActeur'];
+
+//         prefs.setString('nomActeur', nomActeur);
+//         prefs.setString('idActeur', idActeur);
+//         prefs.setString('adresseActeur', adresseActeur);
+//         prefs.setString('telephoneActeur', telephoneActeur);
+//         prefs.setString('whatsAppActeur', whatsAppActeur);
+//         prefs.setString('niveau3PaysActeur', niveau3PaysActeur);
+//         prefs.setString('localiteActeur', localiteActeur);
+//         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
+
+//         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
+//         List<dynamic> speculationData = responseBody['speculation'];
+
+//         List<Speculation> speculationList =
+//             speculationData.map((data) => Speculation.fromMap(data)).toList();
+
+//         List<dynamic> typeActeurData = responseBody['typeActeur'];
+//         List<TypeActeur> typeActeurList =
+//             typeActeurData.map((data) => TypeActeur.fromMap(data)).toList();
+// // Extraire les libellés des types d'utilisateur et les ajouter à une nouvelle liste de chaînes
+//         List<String> userTypeLabels =
+//             typeActeurList.map((typeActeur) => typeActeur.libelle!).toList();
+
+//         List<String> speculationLabels = speculationList
+//             .map((typeActeur) => typeActeur.nomSpeculation!)
+//             .toList();
+//         prefs.setStringList('speculation', speculationLabels);
+// // Enregistrer la liste des libellés des types d'utilisateur dans SharedPreferences
+//         prefs.setStringList('userType', userTypeLabels);
+//         Acteur acteur = Acteur(
+//           idActeur: responseBody['idActeur'],
+//           nomActeur: responseBody['nomActeur'],
+//           adresseActeur: responseBody['adresseActeur'],
+//           codeActeur: responseBody['codeActeur'],
+//           telephoneActeur: responseBody['telephoneActeur'],
+//           whatsAppActeur: responseBody['whatsAppActeur'],
+//           // niveau3PaysActeur: responseBody['niveau3PaysActeur'],
+//           dateAjout: responseBody['dateAjout'],
+//           localiteActeur: responseBody['localiteActeur'],
+//           emailActeur: emailActeur,
+//           statutActeur: responseBody['statutActeur'],
+//           typeActeur: typeActeurList,
+//           speculation: speculationList,
+//           password: password,
+//         );
+
+//         acteurProvider.setActeur(acteur);
+
+//         print("acteur pin : ${acteur}");
+
+//         final List<String> type =
+//             acteur.typeActeur!.map((e) => e.libelle!).toList();
+//         if (type.contains('admin') || type.contains('Admin')) {
+//             Get.off(BottomNavBarAdmin(),
+//               duration: Duration(seconds: 1),
+//               transition: Transition.leftToRight);
+
+//         } else {
+//             Get.off(BottomNavigationPage(),
+//               duration: Duration(seconds: 1),
+//               transition: Transition.leftToRight);
+
+//         }
+//       } else {
+//         // Traitement en cas d'échec
+//         enteredPin = '';
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(
+//             content: Center(child: Text("Code pin incorrecte ")),
+//             duration: Duration(seconds: 2),
+//           ),
+//         );
+//         final responseBody = json.decode(utf8.decode(response.bodyBytes));
+//         final errorMessage = responseBody['message'];
+//         print(errorMessage);
+//       }
+//     } catch (e) {
+//       // Gérer les exceptionn
+//        String errorMessage = "";
+//       debugPrint(e.toString());
+//        if (e is Exception) {
+//         final exception = e;
+//         if (exception.toString().contains(
+//             'Code Pin incorrect')) {
+//           errorMessage =
+//               'Code Pin incorrect';
+//         } else if (exception.toString().contains(
+//             'Connexion échouée : votre compte est désactivé. Veuillez contacter l\'administrateur pour la procédure d\'activation de votre compte !')) {
+//           errorMessage =
+//               'Connexion échouée : votre compte est désactivé. Veuillez contacter l\'administrateur pour la procédure d\'activation de votre compte !';
+//         }
+//         print(errorMessage);
+//         throw Exception(errorMessage);
+//       }
+  // showDialog(
+  //   context: context,
+  //   builder: (BuildContext context) {
+  //     return AlertDialog(
+  //       title: const Center(child: Text('Erreur')),
+  //       content: const Text(
+  //         "Une erreur s'est produite veuillez vérifier votre connexion internet", // Afficher l'exception
+  //         textAlign: TextAlign.justify,
+  //         style: TextStyle(color: Colors.black, fontSize: 20),
+  //       ),
+  //       actions: <Widget>[
+  //         TextButton(
+  //           onPressed: () {
+  //             Navigator.of(context).pop();
+  //           },
+  //           child: const Text('OK'),
+  //         ),
+  //       ],
+  //     );
+  //   },
+  // );
 
   /// this widget will be use for each digit
   Widget numButton(int number) {
@@ -410,13 +520,16 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
               /// reset button
               TextButton(
                 onPressed: () {
-                  setState(() {
-                    enteredPin = '';
-                    if (enteredPin.length < 1) {
-                      Get.snackbar(
-                          "Alerte", "Le champ de saisi est déjà vide !");
-                    }
-                  });
+                  // setState(() {
+                  //   enteredPin = '';
+                  //   if (enteredPin.length < 1) {
+                  //     Get.snackbar(
+                  //         "Alerte", "Le champ de saisi est déjà vide !");
+                  //   }
+                  // });
+                  Get.to(ForgetPassScreen(),
+                      duration: Duration(seconds: 1),
+                      transition: Transition.leftToRight);
                 },
                 child: const Text(
                   'Réinitialiser',

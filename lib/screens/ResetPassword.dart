@@ -156,9 +156,14 @@ class _ResetPasswordState extends State<ResetPassword> {
                             ),
                             obscureText: _obscureText,
                             keyboardType: TextInputType.number,
-                            validator: (val) {
+                           validator: (val) {
                               if (val == null || val.isEmpty) {
-                                return "Veillez entrez le nouveau mot de passe";
+                                return "Veillez entrez votre  mot de passe ";
+                              }
+                              if (val.length < 6) {
+                                return 'Le mot de passe doit contenir au moins 6 caractères';
+                              } else if (val.length > 6) {
+                                return 'Le mot de passe ne doit pas dépassé 6 caractères';
                               } else {
                                 return null;
                               }
@@ -198,7 +203,12 @@ class _ResetPasswordState extends State<ResetPassword> {
                             keyboardType: TextInputType.number,
                             validator: (val) {
                               if (val == null || val.isEmpty) {
-                                return "Confirmer le mot de passe";
+                                return "Veillez entrez votre  mot de passe ";
+                              }
+                              if (val.length < 6) {
+                                return 'Le mot de passe doit contenir au moins 6 caractères';
+                              } else if (val.length > 6) {
+                                return 'Le mot de passe ne doit pas dépassé 6 caractères';
                               } else {
                                 return null;
                               }

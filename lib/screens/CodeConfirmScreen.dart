@@ -316,7 +316,7 @@ class _CodeConfirmScreenState extends State<CodeConfirmScreen> {
                               //  ),
                               // );
                               //   }
-                              handleSendButton(context);
+                              _handleClick(context);
                               printPinCode();
                             },
                             style: ButtonStyle(

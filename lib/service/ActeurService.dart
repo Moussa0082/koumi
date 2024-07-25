@@ -32,8 +32,7 @@ class ActeurService extends ChangeNotifier {
     required String password,
   }) async {
     try {
-      //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
-      // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
+    
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
       if (photoSiegeActeur != null) {

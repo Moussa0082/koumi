@@ -226,10 +226,10 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
         processedNumberWA = removePlus(whatsAppController.text);
       });
     });
-    detectedCountryCode =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountryCode!;
-    selectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+      detectedCountryCode =
+          Provider.of<DetectorPays>(context, listen: false).detectedCountryCode!;
+      selectedCountry =
+          Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
     isVisible = !isVisible;
     super.initState();
   }

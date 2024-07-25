@@ -135,13 +135,14 @@ class _AccueilState extends State<Accueil> {
         if (mounted) {
           setState(() {
             detectedC = place.isoCountryCode;
-            detectedCountryCode = place.isoCountryCode!;
-            detectedCountry = place.country!;
+            detectedCountryCode = place.isoCountryCode ?? "ML";
+            detectedCountry = place.country ?? "Mali";
             print("pays : ${detectedCountry} code: ${detectedCountryCode}");
-            if (detectedCountry != null) {
+          if (detectedCountry != null || detectedCountry!.isNotEmpty) {
           detectorPays.setDetectedCountryAndCode(detectedCountry!, detectedCountryCode!);
           print("pays : $detectedCountry code: $detectedCountryCode");
         } else {
+          detectorPays.setDetectedCountryAndCode("Mali", "ML");
           print("Le pays n'a pas pu être détecté.");
         }
       
@@ -151,10 +152,12 @@ class _AccueilState extends State<Accueil> {
         debugPrint(
             "Address: ${place.locality}, ${place.country}, ${place.isoCountryCode}");
       } else {
+        detectorPays.setDetectedCountryAndCode("Mali", "ML");
         debugPrint(
             "Aucun emplacement trouvé dans admin accueil pour les coordonnées fournies.");
       }
     } catch (e) {
+      detectorPays.setDetectedCountryAndCode("Mali", "ML");
       debugPrint(
           "Une erreur est survenue lors de la récupération de l'adresse : $e");
     }

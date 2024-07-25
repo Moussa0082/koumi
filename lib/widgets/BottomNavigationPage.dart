@@ -34,7 +34,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
     }
     return true; // Indiquez que l'application peut se fermer
   }
-
+ 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),

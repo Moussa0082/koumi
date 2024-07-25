@@ -175,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
           //   context,
           //   MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
           // );
-          Get.off(BottomNavBarAdmin(),
+          Get.offAll(BottomNavBarAdmin(),
               duration: Duration(seconds: 1),
               transition: Transition.leftToRight);
         } else {
@@ -184,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
           //   MaterialPageRoute(
           //       builder: (context) => const BottomNavigationPage()),
           // );
-          Get.off(BottomNavigationPage(),
+          Get.offAll(BottomNavigationPage(),
               duration: Duration(seconds: 1),
               transition: Transition.leftToRight);
         }
@@ -378,7 +378,7 @@ class _LoginScreenState extends State<LoginScreen> {
           //   context,
           //   MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
           // );
-          Get.off(BottomNavBarAdmin(),
+          Get.offAll(BottomNavBarAdmin(),
               duration: Duration(seconds: 1),
               transition: Transition.leftToRight);
         } else {
@@ -387,7 +387,7 @@ class _LoginScreenState extends State<LoginScreen> {
           //   MaterialPageRoute(
           //       builder: (context) => const BottomNavigationPage()),
           // );
-          Get.off(BottomNavigationPage(),
+          Get.offAll(BottomNavigationPage(),
               duration: Duration(seconds: 1),
               transition: Transition.leftToRight);
         }
@@ -622,12 +622,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           GestureDetector(
                             onTap: () {
                               print("ho");
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => ForgetPassScreen(),
-                              //   ),
-                              // );
+                             
                               Get.to(ForgetPassScreen(),
                                   duration: Duration(seconds: 1),
                                   transition: Transition.leftToRight);

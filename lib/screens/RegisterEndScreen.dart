@@ -613,7 +613,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                             if (val.length < 6) {
                               return 'Le mot de passe doit contenir au moins 6 caractères';
                             } else if (val.length > 6) {
-                              return 'Le mot de passe ne doit pas 6 caractères';
+                              return 'Le mot de passe ne doit pas dépassé 6 caractères';
                             } else {
                               return null;
                             }
@@ -671,7 +671,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                             if (val.length < 6) {
                               return 'Le mot de passe doit contenir au moins 6 caractères';
                             } else if (val.length > 6) {
-                              return 'Le mot de passe ne doit pas 6 caractères';
+                              return 'Le mot de passe ne doit pas dépassé 6 caractères';
                             } else {
                               return null;
                             }
