@@ -1,7 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 
@@ -113,6 +112,9 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
         await ActeurService.resetPasswordWhatsApp(
                 widget.whatsAppActeur!, passwordController.text)
             .then((value) => {
+                  setState(() {
+                    _isLoading = false;
+                  }),
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("Mot de passe modifier avec succès"),
@@ -125,6 +127,9 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
 
       // Fermez la boîte de dialogue de chargement après l'envoi du code
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Mot de passe non modifier"),
@@ -157,7 +162,7 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
   @override
   Widget build(BuildContext context) {
     return LoadingOverlay(
-       isLoading: _isLoading,
+      isLoading: _isLoading,
       child: Scaffold(
           backgroundColor: const Color.fromARGB(255, 250, 250, 250),
           body: SingleChildScrollView(
@@ -185,7 +190,7 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
               Center(child: Image.asset('assets/images/fg-pass.png')),
               // connexion
               const Text(
-                " Saisisser votre nouveau mot de passe  ",
+                " Saisissez votre nouveau mot de passe  ",
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -252,7 +257,7 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
                       onSaved: (val) => password = val!,
                     ),
                     // fin mot de pass
-      
+
                     // confirm password
                     const SizedBox(
                       height: 10,
@@ -313,7 +318,7 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
                   ],
                 ),
               ),
-      
+
               const SizedBox(
                 height: 15,
               ),
@@ -360,7 +365,8 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF8A00), // Orange color code
+                    backgroundColor:
+                        const Color(0xFFFF8A00), // Orange color code
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),

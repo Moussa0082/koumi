@@ -10,6 +10,7 @@ import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/ForgetPassScreen.dart';
+import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
 import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
@@ -64,16 +65,32 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
 
     // Assurez-vous que le code acteur est chargé
     if (codeActeur == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Center(
-              child: Text(
-            "Veillez vous connectez d'abord email et le mot de passe puis réesayer plus tard",
-            maxLines: 2,
-          )),
-          duration: Duration(seconds: 5),
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Connexion"),
+          content: Text(
+              "Veillez vous connectez d'abord email et le mot de passe puis réesayer plus tard",
+              style: TextStyle(
+                color: Colors.black87,
+              )),
+          actions: [
+            TextButton(
+              child: Text("OK"),
+              onPressed: () => Navigator.pop(context),
+            ),
+            TextButton(
+              child: Text("connexion"),
+              onPressed: () {
+                Get.offAll(LoginScreen(),
+                    duration: Duration(seconds: 1),
+                    transition: Transition.leftToRight);
+              },
+            ),
+          ],
         ),
       );
+
       return;
     }
 

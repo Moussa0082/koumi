@@ -316,7 +316,21 @@ class _CodeConfirmScreenState extends State<CodeConfirmScreen> {
                               //  ),
                               // );
                               //   }
-                              _handleClick(context);
+                              // if(pinCode.isEmpty || pinCode == null){
+                              //    ScaffoldMessenger.of(context)
+                              //                         .showSnackBar(
+                              //                       const SnackBar(
+                              //                         content: Text(
+                              //                             "Veuillez saisir le code"),
+                              //                         duration:
+                              //                             Duration(seconds: 5),
+                              //                       ),
+                              //                     );
+                              // }
+                              // else{
+
+                              // }
+                              handleSendButton(context);
                               printPinCode();
                             },
                             style: ButtonStyle(
