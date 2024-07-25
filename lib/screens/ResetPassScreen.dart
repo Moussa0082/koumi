@@ -1,8 +1,12 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:koumi_app/service/ActeurService.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
+import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
+import 'package:provider/provider.dart';
 
 class ResetPassScreen extends StatefulWidget {
   final bool? isVisible;
@@ -165,28 +169,30 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
       isLoading: _isLoading,
       child: Scaffold(
           backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+          appBar: AppBar(
+            // leading: null,
+            automaticallyImplyLeading: false,
+            centerTitle: true,
+            toolbarHeight: 100,
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Get.offAll(BottomNavigationPage(),
+                      transition: Transition.leftToRight);
+                  Provider.of<BottomNavigationService>(context, listen: false)
+                      .changeIndex(0);
+                },
+                child: const Text(
+                  'Fermer',
+                  style: TextStyle(color: Colors.orange, fontSize: 17),
+                ),
+              ),
+            ],
+          ),
           body: SingleChildScrollView(
               child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  onPressed: () {
-                    // Fonction de retour
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.black,
-                    size: 30,
-                  ),
-                  iconSize: 30,
-                  splashRadius: 20,
-                  padding: EdgeInsets.zero,
-                  constraints: BoxConstraints(minWidth: 40, minHeight: 40),
-                ),
-              ),
               Center(child: Image.asset('assets/images/fg-pass.png')),
               // connexion
               const Text(

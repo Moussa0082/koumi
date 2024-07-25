@@ -549,7 +549,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                       transition: Transition.leftToRight);
                 },
                 child: const Text(
-                  'Réinitialiser',
+                  'Réinitialiser le code ',
                   style: TextStyle(
                     fontSize: 20,
                     color: Colors.black,

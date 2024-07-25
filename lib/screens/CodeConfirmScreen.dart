@@ -2,9 +2,13 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:koumi_app/screens/ResetPassScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
+import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
+import 'package:provider/provider.dart';
 
 class CodeConfirmScreen extends StatefulWidget {
   final bool? isVisible;
@@ -193,6 +197,12 @@ class _CodeConfirmScreenState extends State<CodeConfirmScreen> {
   }
 
   @override
+  void dispose() {
+    timere.cancel();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     startTimer();
     super.initState();
@@ -214,9 +224,28 @@ class _CodeConfirmScreenState extends State<CodeConfirmScreen> {
     return LoadingOverlay(
       isLoading: _isLoading,
       child: Scaffold(
-        appBar: AppBar(),
+        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+        appBar: AppBar(
+          // leading: null,
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          toolbarHeight: 100,
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Get.offAll(BottomNavigationPage(),
+                    transition: Transition.leftToRight);
+                Provider.of<BottomNavigationService>(context, listen: false)
+                    .changeIndex(0);
+              },
+              child: const Text(
+                'Fermer',
+                style: TextStyle(color: Colors.orange, fontSize: 17),
+              ),
+            ),
+          ],
+        ),
         resizeToAvoidBottomInset: false,
-        backgroundColor: Color(0xfff7f6fb),
         body: SingleChildScrollView(
           child: SafeArea(
             child: Padding(

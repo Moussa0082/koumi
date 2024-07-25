@@ -226,10 +226,18 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
         processedNumberWA = removePlus(whatsAppController.text);
       });
     });
-      detectedCountryCode =
-          Provider.of<DetectorPays>(context, listen: false).detectedCountryCode!;
-      selectedCountry =
-          Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountryCode =
+            Provider.of<DetectorPays>(context, listen: false)
+                .detectedCountryCode!
+        : detectedCountryCode = "ML";
+    paysProvider.hasLocation
+        ? selectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : selectedCountry = "Mali";
+
     isVisible = !isVisible;
     super.initState();
   }
@@ -378,12 +386,39 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                         ),
                         languageCode: "fr",
                         onChanged: (phone) {
+                          setState(() {
+                            processedNumberWA =
+                                removePlus(phone.completeNumber.toString());
+                          });
                           print("num complet ${phone.completeNumber}");
-                          processedNumberWA =
-                              removePlus(phone.completeNumber.toString());
-                          print("wa selected  $processedNumberWA");
+                          print("wa selected $processedNumberWA");
                         },
-                        onCountryChanged: (country) {},
+                        onCountryChanged: (country) {
+                          setState(() {
+                            processedNumberWA =
+                                removePlus(whatsAppController.text);
+                          });
+                          print("wa change country $processedNumberWA");
+
+                          // Obtenir le numéro actuel sans indicatif
+                          String currentNumber = whatsAppController.text
+                              .replaceAll(RegExp(r'^\+\d+\s'), '');
+
+                          // Ajouter l'indicatif du nouveau pays au numéro actuel
+                          String newCompleteNumber =
+                              '+${country.dialCode}$currentNumber';
+
+                          // Mettre à jour le controller avec le nouveau numéro complet
+                          // whatsAppController.text = newCompleteNumber;
+
+                          // Mettre à jour processedNumberWA avec le nouveau numéro complet sans le signe +
+                          setState(() {
+                            processedNumberWA = removePlus(newCompleteNumber);
+                          });
+
+                          print(
+                              "wa updated with country change $processedNumberWA");
+                        },
                       ),
                     ),
                   ],

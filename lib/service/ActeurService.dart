@@ -32,7 +32,6 @@ class ActeurService extends ChangeNotifier {
     required String password,
   }) async {
     try {
-    
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
       if (photoSiegeActeur != null) {
@@ -631,10 +630,14 @@ class ActeurService extends ChangeNotifier {
         debugPrint("Code envoyé par mail : ${response.body} ");
         return response.body;
       } else {
+        String errorMessage = '';
         // Si la réponse n'est pas réussie, lancer une exception avec le message d'erreur
         final Map<String, dynamic> body = json.decode(response.body);
-        final String errorMessage = body['message'] ?? 'Code non envoyé.';
+        errorMessage = body['message'] ?? 'Code non envoyé.';
         // Afficher une alerte d'erreur avec le message spécifique
+        if (errorMessage.contains('https://api.greenapi.com/waInstance')) {
+          errorMessage = 'Code non envoyé. Vérifie votre email saisi';
+        }
         debugPrint(
             "Non envoyé : ${response.statusCode}  message : $errorMessage");
         showDialog(
@@ -715,10 +718,14 @@ class ActeurService extends ChangeNotifier {
 
         return response.body;
       } else {
+        String errorMessage = '';
         // Si la réponse n'est pas réussie, lancer une exception avec le message d'erreur
         final Map<String, dynamic> body = json.decode(response.body);
-        final String errorMessage = body['message'] ?? 'Code non envoyé.';
+        errorMessage = body['message'] ?? 'Code non envoyé.';
         // Afficher une alerte d'erreur avec le message spécifique
+        if (errorMessage.contains('https://api.greenapi.com/waInstance')) {
+          errorMessage = 'Code non envoyé.Vérifie le numéro saisi';
+        }
         debugPrint(
             "Non envoyé : ${response.statusCode}  message : ${errorMessage}");
         showDialog(

@@ -42,9 +42,8 @@ import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  // awai       t AwesomeNotifications().initial ize(
+  // await AwesomeNotifications().initialize(
   //    'resource://@drawable/launcher_icon',
-
   //   [
   //   Not
   //       channelGroupKey: "basic_channel_group",

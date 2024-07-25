@@ -280,10 +280,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             print("wa selected  $processedNumberWA");
                           },
                           onCountryChanged: (country) {
-                            setState(() {
+                           
+                              setState(() {
                               selectedCountry = country.name.toString();
                               updateCountryCode(country.code.toString());
-                            });
+                                processedNumberWA =
+                                    removePlus(whatsAppController.text);
+                              });
+                              print("wa change country $processedNumberWA");
+
+                              // Obtenir le numéro actuel sans indicatif
+                              String currentNumber = whatsAppController.text
+                                  .replaceAll(RegExp(r'^\+\d+\s'), '');
+
+                              // Ajouter l'indicatif du nouveau pays au numéro actuel
+                              String newCompleteNumber =
+                                  '+${country.dialCode}$currentNumber';
+
+                              // Mettre à jour le controller avec le nouveau numéro complet
+                              // whatsAppController.text = newCompleteNumber;
+
+                              // Mettre à jour processedNumberWA avec le nouveau numéro complet sans le signe +
+                              setState(() {
+                                processedNumberWA =
+                                    removePlus(newCompleteNumber);
+                              });
+
+                              print(
+                                  "wa updated with country change $processedNumberWA");
+                           
 
                             print('Country changed to: ' + country.name);
                           },
@@ -319,6 +344,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             print("tel selected  $processedNumberTel");
                           },
                           onCountryChanged: (country) {
+                            setState(() {
+                              // selectedCountry = country.name.toString();
+                              // updateCountryCode(country.code.toString());
+                              processedNumberTel =
+                                  removePlus(phoneController.text);
+                            });
+                            print("wa change country $processedNumberWA");
+
+                            // Obtenir le numéro actuel sans indicatif
+                            String currentNumber = phoneController.text
+                                .replaceAll(RegExp(r'^\+\d+\s'), '');
+
+                            // Ajouter l'indicatif du nouveau pays au numéro actuel
+                            String newCompleteNumber =
+                                '+${country.dialCode}$currentNumber';
+
+                            // Mettre à jour le controller avec le nouveau numéro complet
+                            // whatsAppController.text = newCompleteNumber;
+
+                            // Mettre à jour processedNumberWA avec le nouveau numéro complet sans le signe +
+                            setState(() {
+                              processedNumberTel = removePlus(newCompleteNumber);
+                            });
+
+                            print(
+                                "wa updated with country change $processedNumberTel");
+
                             print('Country changed to: ' + country.name);
                           },
                         ),
