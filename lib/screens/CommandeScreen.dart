@@ -74,8 +74,6 @@ class _CommandeScreenState extends State<CommandeScreen> {
     super.initState();
     _searchController = TextEditingController();
     verify();
-
-   
   }
 
   @override

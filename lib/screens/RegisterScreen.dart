@@ -95,11 +95,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+     final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountryCode =
+            Provider.of<DetectorPays>(context, listen: false)
+                .detectedCountryCode!
+        : detectedCountryCode = "ML";
+    paysProvider.hasLocation
+        ? selectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : selectedCountry = "Mali";
 
-    detectedCountryCode =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountryCode!;
-    selectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
     print("pays code : ${detectedCountryCode}, ${selectedCountry}");
 
    whatsAppController.addListener(() {
@@ -339,6 +345,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           languageCode: "fr",
                           onChanged: (phone) {
                             print(phone.completeNumber);
+                          
                             processedNumberTel =
                                 removePlus(phone.completeNumber.toString());
                             print("tel selected  $processedNumberTel");

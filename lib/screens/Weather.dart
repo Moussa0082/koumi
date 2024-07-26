@@ -9,8 +9,10 @@ import 'package:koumi_app/days/Day.dart';
 import 'package:koumi_app/days/DayToday.dart';
 import 'package:koumi_app/models/OpenWeatherAPI.dart';
 import 'package:koumi_app/models/WeatherData.dart';
+import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:koumi_app/widgets/Tabs.dart';
 import 'package:koumi_app/widgets/loader.dart';
+import 'package:provider/provider.dart';
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
@@ -22,7 +24,7 @@ class WeatherScreen extends StatefulWidget {
 class _WeatherScreenState extends State<WeatherScreen> {
 
  
-  String location = "Bamako";
+  String location = "";
   String? error;
 
   double lat = 0.0;
@@ -43,7 +45,11 @@ class _WeatherScreenState extends State<WeatherScreen> {
   @override
   void initState() {
     super.initState();
-
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? location =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : location = "Mali";
     checkLocationStatus();
   }
 

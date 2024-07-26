@@ -123,7 +123,7 @@ class _AccueilState extends State<Accueil> {
 
   Future<void> getAddressFromLatLang(Position position) async {
     final detectorPays = Provider.of<DetectorPays>(context, listen: false);
-    if (!detectorPays.hasLocation){
+    // if (!detectorPays.hasLocation){
        try {
         List<Placemark> placemark = await placemarkFromCoordinates(
             position.latitude, position.longitude);
@@ -162,7 +162,7 @@ class _AccueilState extends State<Accueil> {
         debugPrint(
             "Une erreur est survenue lors de la récupération de l'adresse : $e");
       }
-    }
+    // }
   }
 
   void verify() async {

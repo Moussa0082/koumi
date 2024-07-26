@@ -146,44 +146,46 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
 
   Future<void> getAddressFromLatLang(Position position) async {
     final detectorPays = Provider.of<DetectorPays>(context, listen: false);
-    try {
-      List<Placemark> placemark =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
-      if (placemark.isNotEmpty) {
-        Placemark place = placemark[0];
-        debugPrint("Address ISO: $detectedC");
-        address.value =
-            'Address : ${place.locality}, ${place.country}, ${place.isoCountryCode}';
+    // if (!detectorPays.hasLocation) {
+      try {
+        List<Placemark> placemark = await placemarkFromCoordinates(
+            position.latitude, position.longitude);
+        if (placemark.isNotEmpty) {
+          Placemark place = placemark[0];
+          debugPrint("Address ISO: $detectedC");
+          address.value =
+              'Address : ${place.locality}, ${place.country}, ${place.isoCountryCode}';
 
-       if (mounted) {
-          setState(() {
-            detectedC = place.isoCountryCode;
-            detectedCountryCode = place.isoCountryCode ?? "ML";
-            detectedCountry = place.country ?? "Mali";
-            print("pays : ${detectedCountry} code: ${detectedCountryCode}");
-            if (detectedCountry != null || detectedCountry!.isNotEmpty) {
-              detectorPays.setDetectedCountryAndCode(
-                  detectedCountry!, detectedCountryCode!);
-              print("pays : $detectedCountry code: $detectedCountryCode");
-            } else {
-              detectorPays.setDetectedCountryAndCode("Mali", "ML");
-              print("Le pays n'a pas pu être détecté.");
-            }
-          });
+          if (mounted) {
+            setState(() {
+              detectedC = place.isoCountryCode;
+              detectedCountryCode = place.isoCountryCode ?? "ML";
+              detectedCountry = place.country ?? "Mali";
+              print("pays : ${detectedCountry} code: ${detectedCountryCode}");
+              if (detectedCountry != null || detectedCountry!.isNotEmpty) {
+                detectorPays.setDetectedCountryAndCode(
+                    detectedCountry!, detectedCountryCode!);
+                print("pays : $detectedCountry code: $detectedCountryCode");
+              } else {
+                detectorPays.setDetectedCountryAndCode("Mali", "ML");
+                print("Le pays n'a pas pu être détecté.");
+              }
+            });
+          }
+
+          debugPrint(
+              "Address: ${place.locality}, ${place.country}, ${place.isoCountryCode}");
+        } else {
+          detectorPays.setDetectedCountryAndCode("Mali", "ML");
+          debugPrint(
+              "Aucun emplacement trouvé dans admin accueil pour les coordonnées fournies.");
         }
-
-        debugPrint(
-            "Address: ${place.locality}, ${place.country}, ${place.isoCountryCode}");
-      } else {
+      } catch (e) {
         detectorPays.setDetectedCountryAndCode("Mali", "ML");
         debugPrint(
-            "Aucun emplacement trouvé dans admin accueil pour les coordonnées fournies.");
+            "Une erreur est survenue lors de la récupération de l'adresse : $e");
       }
-    } catch (e) {
-      detectorPays.setDetectedCountryAndCode("Mali", "ML");
-      debugPrint(
-          "Une erreur est survenue lors de la récupération de l'adresse : $e");
-    }
+    // }
   }
 
   void verify() async {

@@ -59,7 +59,6 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
     typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
-    // _liste = getAlerteOffLineListe();
   }
 
   @override

@@ -263,8 +263,11 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController1.addListener(_scrollListener1);
     });
-    detectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : detectedCountry = "Mali";
     verify();
     _typeList = http.get(Uri.parse(
         '$apiOnlineUrl/Categorie/allCategorieByLibelleFiliere/$libelle'));

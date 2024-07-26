@@ -263,9 +263,11 @@ class _LocationState extends State<Location> {
     //   }
     // });
     verify();
-    detectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
-    // fetchPaysDataByActor();
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : detectedCountry = "Mali";
     detectedCountry != null
         ? debugPrint("pays fetch location materiel page ${detectedCountry!} ")
         : debugPrint("null pays non fetch location materiel page");

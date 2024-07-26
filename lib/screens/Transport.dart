@@ -242,9 +242,11 @@ class _TransportState extends State<Transport> {
   void initState() {
 
     verify();
-    detectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
-
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : detectedCountry = "Mali";
     detectedCountry != null
         ? debugPrint("pays fetch transport page ${detectedCountry!} ")
         : debugPrint("null pays non fetch transport page");
