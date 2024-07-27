@@ -773,7 +773,7 @@ class ActeurService extends ChangeNotifier {
     }
   }
 
-  static Future<void> verifyOtpCodeWhatsApp(
+   Future<void> verifyOtpCodeWhatsApp(
       String whatsAppActeur, String resetToken, BuildContext context) async {
     final Uri url = Uri.parse(
         '$baseUrl/verifierOtpCodeWhatsApp?whatsAppActeur=$whatsAppActeur&resetToken=$resetToken');
@@ -914,7 +914,7 @@ class ActeurService extends ChangeNotifier {
     }
   }
 
-  static Future<void> verifyOtpCodeEmail(
+   Future<void> verifyOtpCodeEmail(
       String emailActeur, String resetToken, BuildContext context) async {
     final Uri url = Uri.parse(
         '$baseUrl/verifierOtpCodeEmail?emailActeur=$emailActeur&resetToken=$resetToken');

@@ -191,7 +191,7 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
           ),
           body: SingleChildScrollView(
               child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(10.0),
             child: Column(children: [
               Center(child: Image.asset('assets/images/fg-pass.png')),
               // connexion
