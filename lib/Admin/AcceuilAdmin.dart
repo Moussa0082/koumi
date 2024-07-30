@@ -147,44 +147,44 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
   Future<void> getAddressFromLatLang(Position position) async {
     final detectorPays = Provider.of<DetectorPays>(context, listen: false);
     // if (!detectorPays.hasLocation) {
-      try {
-        List<Placemark> placemark = await placemarkFromCoordinates(
-            position.latitude, position.longitude);
-        if (placemark.isNotEmpty) {
-          Placemark place = placemark[0];
-          debugPrint("Address ISO: $detectedC");
-          address.value =
-              'Address : ${place.locality}, ${place.country}, ${place.isoCountryCode}';
+    try {
+      List<Placemark> placemark =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (placemark.isNotEmpty) {
+        Placemark place = placemark[0];
+        debugPrint("Address ISO: $detectedC");
+        address.value =
+            'Address : ${place.locality}, ${place.country}, ${place.isoCountryCode}';
 
-          if (mounted) {
-            setState(() {
-              detectedC = place.isoCountryCode;
-              detectedCountryCode = place.isoCountryCode ?? "ML";
-              detectedCountry = place.country ?? "Mali";
-              print("pays : ${detectedCountry} code: ${detectedCountryCode}");
-              if (detectedCountry != null || detectedCountry!.isNotEmpty) {
-                detectorPays.setDetectedCountryAndCode(
-                    detectedCountry!, detectedCountryCode!);
-                print("pays : $detectedCountry code: $detectedCountryCode");
-              } else {
-                detectorPays.setDetectedCountryAndCode("Mali", "ML");
-                print("Le pays n'a pas pu être détecté.");
-              }
-            });
-          }
-
-          debugPrint(
-              "Address: ${place.locality}, ${place.country}, ${place.isoCountryCode}");
-        } else {
-          detectorPays.setDetectedCountryAndCode("Mali", "ML");
-          debugPrint(
-              "Aucun emplacement trouvé dans admin accueil pour les coordonnées fournies.");
+        if (mounted) {
+          setState(() {
+            detectedC = place.isoCountryCode;
+            detectedCountryCode = place.isoCountryCode ?? "ML";
+            detectedCountry = place.country ?? "Mali";
+            print("pays : ${detectedCountry} code: ${detectedCountryCode}");
+            if (detectedCountry != null || detectedCountry!.isNotEmpty) {
+              detectorPays.setDetectedCountryAndCode(
+                  detectedCountry!, detectedCountryCode!);
+              print("pays : $detectedCountry code: $detectedCountryCode");
+            } else {
+              detectorPays.setDetectedCountryAndCode("Mali", "ML");
+              print("Le pays n'a pas pu être détecté.");
+            }
+          });
         }
-      } catch (e) {
+
+        debugPrint(
+            "Address: ${place.locality}, ${place.country}, ${place.isoCountryCode}");
+      } else {
         detectorPays.setDetectedCountryAndCode("Mali", "ML");
         debugPrint(
-            "Une erreur est survenue lors de la récupération de l'adresse : $e");
+            "Aucun emplacement trouvé dans admin accueil pour les coordonnées fournies.");
       }
+    } catch (e) {
+      detectorPays.setDetectedCountryAndCode("Mali", "ML");
+      debugPrint(
+          "Une erreur est survenue lors de la récupération de l'adresse : $e");
+    }
     // }
   }
 
@@ -247,10 +247,8 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 2,
-              mainAxisSpacing: 2,
-              crossAxisSpacing: 5,
-              childAspectRatio:
-                  2, // Ajustez cette valeur pour contrôler le rapport d'aspect
+        crossAxisSpacing: 4,
+        childAspectRatio: 2,
               children: _buildCards(),
             ),
           ),
@@ -291,51 +289,34 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
 
   Widget _buildAccueilCard(String titre, String imgLocation, int index) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       child: InkWell(
           onTap: () {
             if (index == 20) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          ProduitTransforme()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProduitTransforme()));
             } else if (index == 19) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          ProduitElevage()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProduitElevage()));
             } else if (index == 18) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ComplementAlimentaire(
-                         )));
+                      builder: (context) => ComplementAlimentaire()));
             } else if (index == 17) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          EngraisAndApport()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => EngraisAndApport()));
             } else if (index == 16) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          FruitAndLegumes()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => FruitAndLegumes()));
             } else if (index == 15) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ProduitPhytosanitaire(
-                          )));
+                      builder: (context) => ProduitPhytosanitaire()));
             } else if (index == 14) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          SemenceAndPlant()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => SemenceAndPlant()));
             } else if (index == 13) {
               Navigator.push(
                   context,
@@ -360,8 +341,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        ProductsScreen(),
+                    builder: (context) => ProductsScreen(),
                   ));
             } else if (index == 8) {
               Navigator.push(
@@ -370,28 +350,19 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                       // builder: (context) => const AlertesOffLineScreen()));
                       builder: (context) => const AlerteScreen()));
             } else if (index == 7) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          l.Location()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => l.Location()));
             } else if (index == 6) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          Transport()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => Transport()));
             } else if (index == 5) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => const WeatherScreen()));
             } else if (index == 4) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => StoreScreen(
-                          )));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => StoreScreen()));
             } else if (index == 3) {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const MesCommande()));
@@ -416,27 +387,30 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               boxShadow: const [
                 BoxShadow(
                   blurRadius: 5.0,
-                  color: Color.fromRGBO(0, 0, 0, 0.25), // Opacité de 10%
+                color: Color.fromRGBO(0, 0, 0, 0.20),
                 ),
               ],
             ),
             child: Row(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Image.asset(
-                    "assets/images/$imgLocation",
-                    width: 38,
-                    height: 38,
-                    fit: BoxFit.contain,
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: Image.asset(
+                      "assets/images/$imgLocation",
+                      fit: BoxFit.contain,
+                      scale: 1,
+                    ),
                   ),
                 ),
                 Expanded(
                   child: Text(
                     titre,
-                    maxLines: 2,
+                    maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.left,
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
