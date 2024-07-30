@@ -30,7 +30,7 @@ class _CodeConfirmScreenState extends State<CodeConfirmScreen> {
 
   int _time = 120;
   late Timer timere;
-  String pinCode = '';
+  // String pinCode = '';
 
   // Fonction pour vérifier la connectivité réseau
   Future<bool> checkInternetConnectivity() async {
@@ -97,12 +97,12 @@ class _CodeConfirmScreenState extends State<CodeConfirmScreen> {
   }
 
   // Fonction pour imprimer le code PIN saisi dans la console
-  void printPinCode() {
-    for (var controller in otpControllers) {
-      pinCode += controller.text;
-    }
-    print('Code saisi: $pinCode');
-  }
+  // void printPinCode() {
+  //   for (var controller in otpControllers) {
+  //     pinCode += controller.text;
+  //   }
+  //   print('Code saisi: $pinCode');
+  // }
 
   String get timerText {
     int minutes = _time ~/ 60;
@@ -250,174 +250,125 @@ class _CodeConfirmScreenState extends State<CodeConfirmScreen> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () async {
-                              try {
-                                setState(() {
-                                  _isLoading = true;
-                                });
-                                if (widget.isVisible!) {
-                                  await ActeurService()
-                                      .verifyOtpCodeEmail(
-                                          widget.emailActeur!, pinCode, context)
-                                      .then((value) => {
-                                            setState(() {
-                                              _isLoading = false;
-                                            }),
-                                            debugPrint(
-                                                "Code verifier par mail"),
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AlertDialog(
-                                                  title: const Text('Succès'),
-                                                  content: const Text(
-                                                      'Code vérifier avec succès.'),
-                                                  actions: <Widget>[
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                        Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder: (context) => ResetPassScreen(
-                                                                    isVisible:
-                                                                        widget
-                                                                            .isVisible!,
-                                                                    emailActeur:
-                                                                        widget
-                                                                            .emailActeur!,
-                                                                    whatsAppActeur:
-                                                                        widget
-                                                                            .whatsAppActeur!)));
-                                                      },
-                                                      child: const Text('OK'),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            )
-                                          })
-                                      .catchError((onError) {
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Succès'),
-                                          content: const Text(
-                                              'Le code saisi est incorrect'),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: const Text('OK'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  });
-                                } else {
-                                  await ActeurService()
-                                      .verifyOtpCodeWhatsApp(
-                                          widget.whatsAppActeur!,
-                                          pinCode,
-                                          context)
-                                      .then((value) => {
-                                            setState(() {
-                                              _isLoading = false;
-                                            }),
-                                            debugPrint(
-                                                "Code verifier par whats app"),
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AlertDialog(
-                                                  title: const Text('Succès'),
-                                                  content: const Text(
-                                                      'Code vérifier avec succès.'),
-                                                  actions: <Widget>[
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                        Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder: (context) => ResetPassScreen(
-                                                                    isVisible:
-                                                                        widget
-                                                                            .isVisible!,
-                                                                    emailActeur:
-                                                                        widget
-                                                                            .emailActeur!,
-                                                                    whatsAppActeur:
-                                                                        widget
-                                                                            .whatsAppActeur!)));
-                                                      },
-                                                      child: const Text('OK'),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            )
-                                          })
-                                      .catchError((onError) {
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Succès'),
-                                          content: const Text(
-                                              'Le code saisi est incorrect'),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: const Text('OK'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  });
-                                }
+    String pinCode = otpControllers.map((controller) => controller.text).join();
+    print('Code saisi: $pinCode');
 
-                                // Fermez la boîte de dialogue de chargement après l'envoi du code
-                              } catch (e) {
-                                setState(() {
-                                  _isLoading = false;
-                                });
-                                // En cas d'erreur, fermez également la boîte de dialogue de chargement
-                                // Gérez l'erreur ici
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text('Erreur '),
-                                      content: const Text(
-                                          'Une erreur s\'est  produit veuillez réessayer.'),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('OK'),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              }
-                              printPinCode();
-                            },
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      if (widget.isVisible!) {
+        await ActeurService()
+            .verifyOtpCodeEmail(widget.emailActeur!, pinCode, context)
+            .then((value) {
+          setState(() {
+            _isLoading = false;
+            pinCode = '';
+          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResetPassScreen(
+                isVisible: widget.isVisible!,
+                emailActeur: widget.emailActeur!,
+                whatsAppActeur: widget.whatsAppActeur!,
+              ),
+            ),
+          );
+          debugPrint("Code vérifié par email");
+        }).catchError((onError) {
+          setState(() {
+            _isLoading = false;
+            pinCode = '';
+          });
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Erreur de vérification'),
+                content: const Text('Le code saisi est incorrect.'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        });
+      } else {
+        await ActeurService()
+            .verifyOtpCodeWhatsApp(widget.whatsAppActeur!, pinCode, context)
+            .then((value) {
+          setState(() {
+            _isLoading = false;
+            pinCode = '';
+          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResetPassScreen(
+                isVisible: widget.isVisible!,
+                emailActeur: widget.emailActeur!,
+                whatsAppActeur: widget.whatsAppActeur!,
+              ),
+            ),
+          );
+          debugPrint("Code vérifié par WhatsApp");
+        }).catchError((onError) {
+          print('Code saisi: $pinCode, error: $onError');
+          setState(() {
+            _isLoading = false;
+            pinCode = '';
+          });
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Erreur de vérification'),
+                content: const Text('Le code saisi est incorrect.'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        pinCode = '';
+      });
+      print('Code saisi: $pinCode, error catch: ${e.toString()}');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Erreur'),
+            content: const Text('Une erreur s\'est produite, veuillez réessayer.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  },
                             style: ButtonStyle(
                               foregroundColor: MaterialStateProperty.all<Color>(
                                   Colors.white),
@@ -501,7 +452,7 @@ class _CodeConfirmScreenState extends State<CodeConfirmScreen> {
                                       )
                                     })
                                 .catchError((onError) {
-                                    print(onError.toString());
+                              print(onError.toString());
                               setState(() {
                                 _isLoading == false;
                               });
@@ -551,7 +502,7 @@ class _CodeConfirmScreenState extends State<CodeConfirmScreen> {
                                       )
                                     })
                                 .catchError((onError) {
-                                   print(onError.toString());
+                              print(onError.toString());
                               setState(() {
                                 _isLoading == false;
                               });

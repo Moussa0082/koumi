@@ -247,8 +247,8 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 2,
-        crossAxisSpacing: 4,
-        childAspectRatio: 2,
+              crossAxisSpacing: 4,
+              childAspectRatio: 2,
               children: _buildCards(),
             ),
           ),
@@ -289,7 +289,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
 
   Widget _buildAccueilCard(String titre, String imgLocation, int index) {
     return Padding(
-       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 7),
       child: InkWell(
           onTap: () {
             if (index == 20) {
@@ -387,24 +387,22 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               boxShadow: const [
                 BoxShadow(
                   blurRadius: 5.0,
-                color: Color.fromRGBO(0, 0, 0, 0.20),
+                  color: Color.fromRGBO(0, 0, 0, 0.20),
                 ),
               ],
             ),
             child: Row(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: Image.asset(
-                      "assets/images/$imgLocation",
-                      fit: BoxFit.contain,
-                      scale: 1,
-                    ),
+                  padding: const EdgeInsets.all(5),
+                  child: Image.asset(
+                    "assets/images/$imgLocation",
+                    width: 38,
+                    height: 38,
+                    fit: BoxFit.contain,
                   ),
                 ),
+                SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     titre,

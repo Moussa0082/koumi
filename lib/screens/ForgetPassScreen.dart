@@ -128,59 +128,29 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
       final whatsAppActeur = processedNumberWA;
 
       if (isVisible) {
-        await ActeurService.sendOtpCodeEmail(emailActeur, context);
+        await ActeurService.sendOtpCodeEmail(emailActeur, context).then(
+          (value) => {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CodeConfirmScreen(
+                        isVisible: isVisible,
+                        emailActeur: emailController.text,
+                        whatsAppActeur: processedNumberWA)))
+          },
+        );
         debugPrint("Code envoyé par mail");
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Succès'),
-              content: const Text("Code envoyé par  email avec succès"),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CodeConfirmScreen(
-                                isVisible: isVisible,
-                                emailActeur: emailController.text,
-                                whatsAppActeur: processedNumberWA)));
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
       } else {
-        await ActeurService.sendOtpCodeWhatsApp(whatsAppActeur, context);
-        debugPrint("Code envoyé par whatsApp");
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Succès'),
-              content: const Text("Code envoyé par whatsApp avec succès"),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.push(
+        await ActeurService.sendOtpCodeWhatsApp(whatsAppActeur, context).then((value) => {
+           Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => CodeConfirmScreen(
                                 isVisible: isVisible,
                                 emailActeur: emailController.text,
-                                whatsAppActeur: processedNumberWA)));
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+                                whatsAppActeur: processedNumberWA)))
+        },);
+        debugPrint("Code envoyé par whatsApp");
       }
 
       // Fermez la boîte de dialogue de chargement après l'envoi du code

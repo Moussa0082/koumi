@@ -610,23 +610,23 @@ class ActeurService extends ChangeNotifier {
           response.statusCode == 201 ||
           response.statusCode == 202) {
         // Si la réponse est réussie, renvoyer le message de réussite
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Succès'),
-              content: Text("Code envoyé avec succès"),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        // showDialog(
+        //   context: context,
+        //   builder: (BuildContext context) {
+        //     return AlertDialog(
+        //       title: Text('Succès'),
+        //       content: Text("Code envoyé avec succès"),
+        //       actions: <Widget>[
+        //         TextButton(
+        //           onPressed: () {
+        //             Navigator.of(context).pop();
+        //           },
+        //           child: Text('OK'),
+        //         ),
+        //       ],
+        //     );
+        //   },
+        // );
         debugPrint("Code envoyé par mail : ${response.body} ");
         return response.body;
       } else {
@@ -698,23 +698,23 @@ class ActeurService extends ChangeNotifier {
         // Si la réponse est réussie, renvoyer le message de réussite
 
         // Afficher une alerte d'erreur avec le message spécifique
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Succès'),
-              content: Text("Code envoyé avec succès"),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        // showDialog(
+        //   context: context,
+        //   builder: (BuildContext context) {
+        //     return AlertDialog(
+        //       title: Text('Succès'),
+        //       content: Text("Code envoyé avec succès"),
+        //       actions: <Widget>[
+        //         TextButton(
+        //           onPressed: () {
+        //             Navigator.of(context).pop();
+        //           },
+        //           child: Text('OK'),
+        //         ),
+        //       ],
+        //     );
+        //   },
+        // );
 
         return response.body;
       } else {
@@ -773,97 +773,142 @@ class ActeurService extends ChangeNotifier {
     }
   }
 
-   Future<void> verifyOtpCodeWhatsApp(
-      String whatsAppActeur, String resetToken, BuildContext context) async {
+ Future<void> verifyOtpCodeWhatsApp(
+      String whatsAppActeur, String code, BuildContext context) async {
     final Uri url = Uri.parse(
-        '$baseUrl/verifierOtpCodeWhatsApp?whatsAppActeur=$whatsAppActeur&resetToken=$resetToken');
+        '$baseUrl/verifierOtpCodeWhatsApp?whatsAppActeur=${Uri.encodeComponent(whatsAppActeur)}&code=${Uri.encodeComponent(code)}');
 
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
-        // Afficher une alerte de succès
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Succès'),
-              content: Text('Le code a été vérifié avec succès.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      } else if (response.statusCode == 400 || response.statusCode == 500) {
-        // Extraire le message d'erreur du corps de la réponse
-        final Map<String, dynamic> body = json.decode(response.body);
-        final String errorMessage = body['message'] ?? 'Le code est incorrect.';
-
-        // Afficher une alerte d'erreur avec le message spécifique
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Erreur'),
-              content: Text(errorMessage),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        // Code vérifié avec succès
+        // Traitez la réponse ici si nécessaire
       } else {
-        // Afficher une alerte pour d'autres erreurs
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Erreur'),
-              content: Text(
-                  'Une erreur est survenue lors de la vérification du code.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        // Code incorrect
+        throw Exception('Une erreur est survenue lors de la vérification : ${response.statusCode}');
       }
     } catch (e) {
       // Afficher une alerte pour les erreurs de connexion
-      // showDialog(
-      //   context: context,
-      //   builder: (BuildContext context) {
-      //     return AlertDialog(
-      //       title: Text('Erreur de connexion'),
-      //       content: Text('Une erreur est survenue lors de la connexion .'),
-      //       actions: <Widget>[
-      //         TextButton(
-      //           onPressed: () {
-      //             Navigator.of(context).pop();
-      //           },
-      //           child: Text('OK'),
-      //         ),
-      //       ],
-      //     );
-      //   },
-      // );
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Erreur de vérification'),
+            content: Text('Le code saisi est incorrect.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      throw Exception('Une erreur est survenue : $e');
     }
   }
+
+  Future<void> verifyOtpCodeEmail(
+      String emailActeur, String resetToken, BuildContext context) async {
+    final Uri url = Uri.parse(
+        '$baseUrl/verifierOtpCodeEmail?emailActeur=${Uri.encodeComponent(emailActeur)}&resetToken=${Uri.encodeComponent(resetToken)}');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        // Code vérifié avec succès
+        // Traitez la réponse ici si nécessaire
+      } else {
+        // Code incorrect
+        throw Exception('Une erreur est survenue lors de la vérification : ${response.statusCode}');
+      }
+    } catch (e) {
+      // Afficher une alerte pour les erreurs de connexion
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Erreur de vérification'),
+            content: Text('Le code saisi est incorrect.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      throw Exception('Une erreur est survenue : $e');
+    }
+  }
+
+
+  // Future<void> verifyOtpCodeWhatsApp(
+  //     String whatsAppActeur, String resetToken, BuildContext context) async {
+  //   final Uri url = Uri.parse(
+  //       '$baseUrl/verifierOtpCodeWhatsAppActeur?whatsAppActeur=$whatsAppActeur&resetToken=$resetToken');
+
+  //   try {
+  //     final response = await http.get(url);
+  //     if (response.statusCode == 200 || response.statusCode == 201) {}
+  //   } catch (e) {
+  //     // Afficher une alerte pour les erreurs de connexion
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           title: Text('Erreur de vérification'),
+  //           content: Text('Le code saisi est incorrect .'),
+  //           actions: <Widget>[
+  //             TextButton(
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //               child: Text('OK'),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //     throw Exception('Une erreur est survenue : $e');
+  //   }
+  // }
+
+  // Future<void> verifyOtpCodeEmail(
+  //     String emailActeur, String resetToken, BuildContext context) async {
+  //   final Uri url = Uri.parse(
+  //       '$baseUrl/verifierOtpCodeEmail?emailActeur=$emailActeur&resetToken=$resetToken');
+
+  //   try {
+  //     final response = await http.get(url);
+  //     if (response.statusCode == 200) {}
+  //   } catch (e) {
+  //     // Afficher une alerte pour les erreurs de connexion
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           title: Text('Erreur de vérification'),
+  //           content: Text('Code incorrect'),
+  //           actions: <Widget>[
+  //             TextButton(
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //               child: Text('OK'),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //     throw Exception('Une erreur est survenue : $e');
+  //   }
+  // }
 
   Future<void> updatePassword({
     required String id,
@@ -911,98 +956,6 @@ class ActeurService extends ChangeNotifier {
     } catch (e) {
       debugPrint('Impossible de verifier le  password: $e');
       throw Exception('Impossible de verifier le  password: $e');
-    }
-  }
-
-   Future<void> verifyOtpCodeEmail(
-      String emailActeur, String resetToken, BuildContext context) async {
-    final Uri url = Uri.parse(
-        '$baseUrl/verifierOtpCodeEmail?emailActeur=$emailActeur&resetToken=$resetToken');
-
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        // Afficher une alerte de succès
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Succès'),
-              content: Text('Le code a été vérifié avec succès.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      } else if (response.statusCode == 400 || response.statusCode == 500) {
-        // Extraire le message d'erreur du corps de la réponse
-        final Map<String, dynamic> body = json.decode(response.body);
-        final String errorMessage = body['message'] ?? 'Le code est incorrect.';
-
-        // Afficher une alerte d'erreur avec le message spécifique
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Erreur'),
-              content: Text(errorMessage),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        // Afficher une alerte pour d'autres erreurs
-        // showDialog(
-        //   context: context,
-        //   builder: (BuildContext context) {
-        //     return AlertDialog(
-        //       title: Text('Erreur'),
-        //       content: Text(
-        //           'Une erreur est survenue lors de la vérification du code.'),
-        //       actions: <Widget>[
-        //         TextButton(
-        //           onPressed: () {
-        //             Navigator.of(context).pop();
-        //           },
-        //           child: Text('OK'),
-        //         ),
-        //       ],
-        //     );
-        //   },
-        // );
-      }
-    } catch (e) {
-      // Afficher une alerte pour les erreurs de connexion
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erreur de connexion'),
-            content: Text('Une erreur est survenue lors de la connexion .'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
     }
   }
 
