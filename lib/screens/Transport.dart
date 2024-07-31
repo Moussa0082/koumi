@@ -276,10 +276,19 @@ class _TransportState extends State<Transport> {
     log(result.toString());
     if (result == true) {
       print("Rafraichissement en cours");
-      setState(() {
-        vehiculeListeFuture = VehiculeService()
-            .fetchVehicule(detectedCountry != null ? detectedCountry! : "Mali");
-      });
+      selectedType == null
+                  ? setState(() {
+                      vehiculeListeFuture =
+                          VehiculeService().fetchVehicule(
+                          detectedCountry != null ? detectedCountry! : "Mali");
+                    })
+                  : setState(() {
+                      vehiculeListeFuture1 = VehiculeService()
+                          .fetchVehiculeByTypeVoitureWithPagination(
+                              selectedType!.idTypeVoiture!,  detectedCountry != null
+                                  ? detectedCountry!
+                                  : "Mali");
+                    });
     }
   }
 
@@ -289,10 +298,19 @@ class _TransportState extends State<Transport> {
     log(result.toString());
     if (result == true) {
       print("Rafraichissement en cours");
-      setState(() {
-        vehiculeListeFuture = VehiculeService()
-            .fetchVehicule(detectedCountry != null ? detectedCountry! : "Mali");
-      });
+      selectedType == null
+                  ? setState(() {
+                      vehiculeListeFuture =
+                          VehiculeService().fetchVehicule(
+                          detectedCountry != null ? detectedCountry! : "Mali");
+                    })
+                  : setState(() {
+                      vehiculeListeFuture1 = VehiculeService()
+                          .fetchVehiculeByTypeVoitureWithPagination(
+                              selectedType!.idTypeVoiture!,  detectedCountry != null
+                                  ? detectedCountry!
+                                  : "Mali");
+                    });
     }
   }
 
@@ -351,20 +369,38 @@ class _TransportState extends State<Transport> {
                 ? [
                     IconButton(
                         onPressed: () {
-                          vehiculeListeFuture = VehiculeService().fetchVehicule(
-                              detectedCountry != null
+                           selectedType == null
+                  ? setState(() {
+                      vehiculeListeFuture =
+                          VehiculeService().fetchVehicule(
+                          detectedCountry != null ? detectedCountry! : "Mali");
+                    })
+                  : setState(() {
+                      vehiculeListeFuture1 = VehiculeService()
+                          .fetchVehiculeByTypeVoitureWithPagination(
+                              selectedType!.idTypeVoiture!,  detectedCountry != null
                                   ? detectedCountry!
                                   : "Mali");
+                    });
                         },
                         icon: const Icon(Icons.refresh, color: d_colorGreen)),
                   ]
                 : [
                     IconButton(
                         onPressed: () {
-                          vehiculeListeFuture = VehiculeService().fetchVehicule(
-                              detectedCountry != null
+                          selectedType == null
+                  ? setState(() {
+                      vehiculeListeFuture =
+                          VehiculeService().fetchVehicule(
+                          detectedCountry != null ? detectedCountry! : "Mali");
+                    })
+                  : setState(() {
+                      vehiculeListeFuture1 = VehiculeService()
+                          .fetchVehiculeByTypeVoitureWithPagination(
+                              selectedType!.idTypeVoiture!,  detectedCountry != null
                                   ? detectedCountry!
                                   : "Mali");
+                    });
                         },
                         icon: const Icon(Icons.refresh, color: d_colorGreen)),
                     (typeActeurData

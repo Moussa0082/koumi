@@ -311,7 +311,8 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                       ],
                     );
                   },
-                ));
+                ))
+            .catchError((error) => {print("CatchError : ${error.toString()}")});
       } else {
         await acteurService
             .creerActeur(
@@ -348,7 +349,8 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                       ],
                     );
                   },
-                ));
+                ))
+            .catchError((error) => {print("CatchError : ${error.toString()}")});
       }
       // print("Demande envoyée avec succès: ${updatedDemande.toString()}");
       debugPrint("yes ");

@@ -12,6 +12,7 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/ForgetPassScreen.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
@@ -460,7 +461,10 @@ class _LoginScreenState extends State<LoginScreen> {
         appBar: AppBar(
             leading: IconButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                 Get.offAll(BottomNavigationPage(),
+                    transition: Transition.leftToRight);
+                Provider.of<BottomNavigationService>(context, listen: false)
+                    .changeIndex(0);
                 },
                 icon: const Icon(Icons.arrow_back_ios))),
         backgroundColor: const Color(0xFFFFFFFF),

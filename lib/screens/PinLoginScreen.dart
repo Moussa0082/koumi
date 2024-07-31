@@ -70,7 +70,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         builder: (context) => AlertDialog(
           title: Text("Connexion"),
           content: Text(
-              "Veillez vous connectez d'abord email et le mot de passe puis réesayer plus tard",
+              "Veillez vous connectez d'abord avec votre email et le mot de passe puis réessayer plus tard",
               style: TextStyle(
                 color: Colors.black87,
               )),

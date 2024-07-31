@@ -340,25 +340,26 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
                         const String errorMessage =
                             "Les mot de passe ne correspondent pas ";
                         // Gérez le cas où l'email ou le mot de passe est vide.
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Center(child: Text('Erreur')),
-                              content: const Text(errorMessage),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('OK'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
+                        ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                    content: Text(
+                                        'Vérifie les mots de passe'),
+                                  ));
                         return;
-                      }
+                      }else if (passwordController.text
+                                            .toString()
+                                            .trim() ==
+                                        "123456" ||
+                                    confirmPasswordController.text
+                                            .toString()
+                                            .trim() ==
+                                        "123456") {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                    content: Text(
+                                        'Mot de passe faible, veuillez saisir un mot de passe sécurisé.'),
+                                  ));
+                                }
                       handleSendButton(context);
                     }
                   },
