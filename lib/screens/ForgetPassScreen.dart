@@ -141,15 +141,17 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
         );
         debugPrint("Code envoyé par mail");
       } else {
-        await ActeurService.sendOtpCodeWhatsApp(whatsAppActeur, context).then((value) => {
-           Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CodeConfirmScreen(
-                                isVisible: isVisible,
-                                emailActeur: emailController.text,
-                                whatsAppActeur: processedNumberWA)))
-        },);
+        await ActeurService.sendOtpCodeWhatsApp(whatsAppActeur, context).then(
+          (value) => {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CodeConfirmScreen(
+                        isVisible: isVisible,
+                        emailActeur: emailController.text,
+                        whatsAppActeur: processedNumberWA)))
+          },
+        );
         debugPrint("Code envoyé par whatsApp");
       }
 
@@ -345,6 +347,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                       child: IntlPhoneField(
                         initialCountryCode: detectedCountryCode,
                         controller: whatsAppController,
+                        disableLengthCheck: true,
                         invalidNumberMessage: "Numéro invalide",
                         searchText: "Chercher un pays",
                         decoration: InputDecoration(

@@ -32,7 +32,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Position? _currentPosition;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-
   String _errorMessage = "";
 
   String dropdownvalue = 'Item 1';
@@ -95,7 +94,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-     final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
     paysProvider.hasLocation
         ? detectedCountryCode =
             Provider.of<DetectorPays>(context, listen: false)
@@ -108,7 +107,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     print("pays code : ${detectedCountryCode}, ${selectedCountry}");
 
-   whatsAppController.addListener(() {
+    whatsAppController.addListener(() {
       if (isPhoneEditing) return;
       setState(() {
         processedNumberWA = removePlus(whatsAppController.text);
@@ -267,8 +266,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 4),
                         IntlPhoneField(
-                          initialCountryCode: detectedCountryCode != null ? detectedCountryCode : "ML",
+                          initialCountryCode: detectedCountryCode != null
+                              ? detectedCountryCode
+                              : "ML",
                           controller: whatsAppController,
+                          disableLengthCheck: true,
                           invalidNumberMessage: "Numéro invalide",
                           searchText: "Chercher un pays",
                           decoration: InputDecoration(
@@ -286,40 +288,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             print("wa selected  $processedNumberWA");
                           },
                           onCountryChanged: (country) {
-                           
-                              setState(() {
+                            setState(() {
                               selectedCountry = country.name.toString();
                               updateCountryCode(country.code.toString());
-                                processedNumberWA =
-                                    removePlus(whatsAppController.text);
-                              });
-                              print("wa change country $processedNumberWA");
+                              processedNumberWA =
+                                  removePlus(whatsAppController.text);
+                            });
+                            print("wa change country $processedNumberWA");
 
-                              // Obtenir le numéro actuel sans indicatif
-                              String currentNumber = whatsAppController.text
-                                  .replaceAll(RegExp(r'^\+\d+\s'), '');
+                            // Obtenir le numéro actuel sans indicatif
+                            String currentNumber = whatsAppController.text
+                                .replaceAll(RegExp(r'^\+\d+\s'), '');
 
-                              // Ajouter l'indicatif du nouveau pays au numéro actuel
-                              String newCompleteNumber =
-                                  '+${country.dialCode}$currentNumber';
+                            // Ajouter l'indicatif du nouveau pays au numéro actuel
+                            String newCompleteNumber =
+                                '+${country.dialCode}$currentNumber';
 
-                              // Mettre à jour le controller avec le nouveau numéro complet
-                              // whatsAppController.text = newCompleteNumber;
+                            // Mettre à jour le controller avec le nouveau numéro complet
+                            // whatsAppController.text = newCompleteNumber;
 
-                              // Mettre à jour processedNumberWA avec le nouveau numéro complet sans le signe +
-                              setState(() {
-                                processedNumberWA =
-                                    removePlus(newCompleteNumber);
-                              });
+                            // Mettre à jour processedNumberWA avec le nouveau numéro complet sans le signe +
+                            setState(() {
+                              processedNumberWA = removePlus(newCompleteNumber);
+                            });
 
-                              print(
-                                  "wa updated with country change $processedNumberWA");
-                           
+                            print(
+                                "wa updated with country change $processedNumberWA");
 
                             print('Country changed to: ' + country.name);
                           },
                         ),
-
+                        SizedBox(height: 15),
                         Padding(
                           padding: const EdgeInsets.only(left: 10.0),
                           child: Text(
@@ -333,6 +332,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ? detectedCountryCode
                               : "ML",
                           controller: phoneController,
+                          disableLengthCheck: true,
                           invalidNumberMessage: "Numéro invalide",
                           searchText: "Chercher un pays",
                           decoration: InputDecoration(
@@ -345,7 +345,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           languageCode: "fr",
                           onChanged: (phone) {
                             print(phone.completeNumber);
-                          
+
                             processedNumberTel =
                                 removePlus(phone.completeNumber.toString());
                             print("tel selected  $processedNumberTel");
@@ -372,7 +372,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                             // Mettre à jour processedNumberWA avec le nouveau numéro complet sans le signe +
                             setState(() {
-                              processedNumberTel = removePlus(newCompleteNumber);
+                              processedNumberTel =
+                                  removePlus(newCompleteNumber);
                             });
 
                             print(

@@ -185,6 +185,8 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
         '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${widget.pays}'));
 
     debugPrint(
+        '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${widget.pays}');
+    debugPrint(
         "Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone},  WA : ${widget.whatsAppActeur}, Pays : ${widget.pays} ");
   }
 
@@ -571,14 +573,15 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                           onPressed: () {
                             // Handle button press action here
                             if (_formKey.currentState!.validate()) {
-                              // Navigator.push(context, MaterialPageRoute(builder: (context)=>  RegisterEndScreen(
-                              //   nomActeur: widget.nomActeur, email: emailController.text,
-                              //   telephoneActeur: widget.telephone,
-                              //    adresse:adresseController.text,
-                              //   numeroWhatsApp: widget.whatsAppActeur, localistaion: localisationController.text,
-                              //    pays: widget.pays, typeActeur: typeActeur,
-                              //    image1: image1,
-                              //   )));
+                              if (niveau3.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        "Veuillez sélectionner une localité"),
+                                    duration: Duration(seconds: 5),
+                                  ),
+                                );
+                              }
 
                               // Vérifier si au moins un type d'acteur est sélectionné
                               if (selectedTypes.isNotEmpty) {
