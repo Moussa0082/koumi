@@ -342,45 +342,28 @@ class ActeurService extends ChangeNotifier {
           response.statusCode == 201 ||
           response.statusCode == 202) {
       } else {
-       showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erreur de vérification 1 '),
-            content: Text('Le code saisi est incorrect.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
         throw Exception(
             'Une erreur est survenue lors de la vérification : ${response.statusCode}');
       }
     } catch (e) {
       // Afficher une alerte pour les erreurs de connexion
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erreur de vérification 2'),
-            content: Text('Le code saisi est incorrect.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      // showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) {
+      //     return AlertDialog(
+      //       title: Text('Erreur de vérification '),
+      //       content: Text('Le code saisi est incorrect.'),
+      //       actions: <Widget>[
+      //         TextButton(
+      //           onPressed: () {
+      //             Navigator.of(context).pop();
+      //           },
+      //           child: Text('OK'),
+      //         ),
+      //       ],
+      //     );
+      //   },
+      // );
       throw Exception('Une erreur est survenue : ${e.toString()}');
     }
   }
