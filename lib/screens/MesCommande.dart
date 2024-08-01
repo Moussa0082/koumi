@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -129,6 +131,32 @@ class _MesCommandeState extends State<MesCommande> {
     }
   }
 
+  Future<void> _getDetailCommande(
+      BuildContext context, Commande? commande) async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => DetailCommandeScreen(
+                  idCommande: commande!.idCommande,
+                  isProprietaire: acteur.idActeur == commande.acteur?.idActeur
+                      ? false
+                      : true,
+                )));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        fetchAllCommandes(acteur.idActeur!).then((combinedList) {
+          setState(() {
+            _liste = combinedList;
+            _filteredListe = combinedList;
+            isLoading = false;
+          });
+        });
+      });
+    }
+  }
+
   Future<List<Commande>> fetchAllCommandes(String idActeur) async {
     final commandesActeur = await getAllCommandeByActeur(idActeur);
     final commandesProprietaire =
@@ -161,6 +189,7 @@ class _MesCommandeState extends State<MesCommande> {
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
+           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           toolbarHeight: 100,
           title: Text(
             "Mes commandes",
@@ -175,41 +204,15 @@ class _MesCommandeState extends State<MesCommande> {
                 onPressed: () {
                   setState(() {
                     fetchAllCommandes(acteur.idActeur!).then((combinedList) {
-          setState(() {
-            _liste = combinedList;
-            _filteredListe = combinedList;
-            isLoading = false;
-          });
-        });
+                      setState(() {
+                        _liste = combinedList;
+                        _filteredListe = combinedList;
+                        isLoading = false;
+                      });
+                    });
                   });
                 },
                 icon: Icon(Icons.refresh)),
-            // Container(
-            //   width: 30,
-            //   height: 30,
-            //   decoration: BoxDecoration(
-            //     color: Colors.green, // Background color of the circle
-            //     shape: BoxShape.circle, // Shape of the container
-            //   ),
-            //   child: Center(
-            //     child: IconButton(
-            //       onPressed: () {
-            //         // Your onPressed function
-            //       },
-            //       icon: Icon(Icons.add),
-            //       color: Colors.white, // Icon color
-            //       iconSize: 16, // Adjust the icon size as needed
-            //     ),
-            //   ),
-            // ),
-            // IconButton(
-            //   onPressed: () {
-            //     // Your onPressed function
-            //   },
-            //   icon: Icon(Icons.refresh),
-            //   color: Colors.black, // Icon color
-            //   iconSize: 25,
-            // ),
           ],
         ),
         body: !isExist
@@ -445,21 +448,8 @@ class _MesCommandeState extends State<MesCommande> {
                                         padding: const EdgeInsets.all(8.0),
                                         child: GestureDetector(
                                           onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        DetailCommandeScreen(
-                                                          idCommande: commande
-                                                              .idCommande,
-                                                          isProprietaire: acteur
-                                                                      .idActeur ==
-                                                                  commande
-                                                                      .acteur
-                                                                      ?.idActeur
-                                                              ? false
-                                                              : true,
-                                                        )));
+                                            _getDetailCommande(
+                                                context, commande);
                                             if (acteur.idActeur ==
                                                 commande.acteur?.idActeur) {
                                               print("acteur qui a commande");
@@ -471,7 +461,8 @@ class _MesCommandeState extends State<MesCommande> {
                                             child: Text(commande.codeCommande!,
                                                 style: const TextStyle(
                                                     fontSize: 14,
-                                                    fontWeight: FontWeight.bold)),
+                                                    fontWeight:
+                                                        FontWeight.bold)),
                                           ),
                                         ),
                                       ),
@@ -483,21 +474,8 @@ class _MesCommandeState extends State<MesCommande> {
                                         padding: const EdgeInsets.all(8.0),
                                         child: GestureDetector(
                                           onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        DetailCommandeScreen(
-                                                          idCommande: commande
-                                                              .idCommande,
-                                                          isProprietaire: acteur
-                                                                      .idActeur ==
-                                                                  commande
-                                                                      .acteur
-                                                                      ?.idActeur
-                                                              ? false
-                                                              : true,
-                                                        )));
+                                            _getDetailCommande(
+                                                context, commande);
                                             if (acteur.idActeur ==
                                                 commande.acteur?.idActeur) {
                                               print("acteur qui a commande");
@@ -509,7 +487,8 @@ class _MesCommandeState extends State<MesCommande> {
                                             child: Text(commande.dateCommande!,
                                                 style: const TextStyle(
                                                     fontSize: 14,
-                                                    fontWeight: FontWeight.bold)),
+                                                    fontWeight:
+                                                        FontWeight.bold)),
                                           ),
                                         ),
                                       ),
@@ -579,7 +558,7 @@ class _MesCommandeState extends State<MesCommande> {
                                                                     .then(
                                                                         (value) =>
                                                                             {
-                                                                               ScaffoldMessenger.of(context).showSnackBar(
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
                                                                                 const SnackBar(
                                                                                   content: Row(
                                                                                     children: [
