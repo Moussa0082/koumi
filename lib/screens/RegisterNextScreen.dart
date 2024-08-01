@@ -553,9 +553,8 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                             return DropdownSearch<String>(
                               items: [],
                               popupProps: PopupProps.menu(
-                                  showSearchBox: true,
-                                
-                                          ),
+                                showSearchBox: true,
+                              ),
                               // dropdownButtonProps: DropdownButtonProps(color: Colors.blue),
                               dropdownDecoratorProps: DropDownDecoratorProps(
                                 textAlignVertical: TextAlignVertical.center,
@@ -589,8 +588,12 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                                   items: [],
                                   popupProps: PopupProps.menu(
                                       showSearchBox: true,
-                                    
-                                              ),
+                                      title: Text("Rechercher une localité",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600)),
+                                      searchFieldProps: TextFieldProps(
+                                        autocorrect: true,
+                                      )),
                                   dropdownButtonProps:
                                       DropdownButtonProps(color: Colors.orange),
                                   dropdownDecoratorProps:
@@ -626,9 +629,15 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
 
                                 popupProps: PopupProps.menu(
                                     showSearchBox: true,
+                                    title: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Text("Rechercher une localité",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600)),
+                                    ),
                                     searchFieldProps: TextFieldProps(
-                                        autocorrect: true,
-                                        enableSuggestions: true)),
+                                      autocorrect: true,
+                                    )),
                                 dropdownDecoratorProps: DropDownDecoratorProps(
                                     textAlignVertical: TextAlignVertical.center,
                                     dropdownSearchDecoration: InputDecoration(
@@ -736,37 +745,37 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                                     duration: Duration(seconds: 5),
                                   ),
                                 );
-                              }else{
-
-                              // Vérifier si au moins un type d'acteur est sélectionné
-                              if (selectedTypes.isNotEmpty) {
-                                // Naviguer vers l'écran suivant en passant les types d'acteurs sélectionnés
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => RegisterEndScreen(
-                                              nomActeur: widget.nomActeur,
-                                              email: emailController.text,
-                                              telephoneActeur: widget.telephone,
-                                              adresse: adresseController.text,
-                                              numeroWhatsApp:
-                                                  widget.whatsAppActeur,
-                                              localistaion: niveau3,
-                                              pays: widget.pays,
-                                              typeActeur:
-                                                  selectedTypes, // Passer les types d'acteurs sélectionnés ici
-                                              image1: image1,
-                                            )));
                               } else {
-                                // Afficher un message indiquant que l'utilisateur doit sélectionner au moins un type d'acteur
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text(
-                                      'Veuillez sélectionner au moins un type d\'acteur.'),
-                                ));
+                                // Vérifier si au moins un type d'acteur est sélectionné
+                                if (selectedTypes.isNotEmpty) {
+                                  // Naviguer vers l'écran suivant en passant les types d'acteurs sélectionnés
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              RegisterEndScreen(
+                                                nomActeur: widget.nomActeur,
+                                                email: emailController.text,
+                                                telephoneActeur:
+                                                    widget.telephone,
+                                                adresse: adresseController.text,
+                                                numeroWhatsApp:
+                                                    widget.whatsAppActeur,
+                                                localistaion: niveau3,
+                                                pays: widget.pays,
+                                                typeActeur:
+                                                    selectedTypes, // Passer les types d'acteurs sélectionnés ici
+                                                image1: image1,
+                                              )));
+                                } else {
+                                  // Afficher un message indiquant que l'utilisateur doit sélectionner au moins un type d'acteur
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                    content: Text(
+                                        'Veuillez sélectionner au moins un type d\'acteur.'),
+                                  ));
+                                }
                               }
-                              }
-
                             }
                           },
                           child: Text(

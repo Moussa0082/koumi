@@ -509,6 +509,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                           ),
                           searchEnabled: true,
                           searchLabel: 'Rechercher...',
+                           searchBackgroundColor: Colors.blueGrey[50],
                           chipConfig: const ChipConfig(wrapType: WrapType.wrap),
                           responseParser: (response) {
                             listeSpeculations =
