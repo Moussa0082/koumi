@@ -165,13 +165,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: Image.asset(
                   'assets/images/logo.png',
                   height: 150,
-                  width: 100,
+                  width: 150,
                 )),
                 Container(
                   height: 40,
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 240, 178, 107),
+                    color: Color.fromARGB(255, 248, 138, 11),
                   ),
                   child: Center(
                     child: Row(
