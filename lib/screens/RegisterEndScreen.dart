@@ -507,6 +507,8 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                             method: RequestMethod.get,
                             headers: {'Content-Type': 'application/json'},
                           ),
+                          searchEnabled: true,
+                          searchLabel: 'Rechercher...',
                           chipConfig: const ChipConfig(wrapType: WrapType.wrap),
                           responseParser: (response) {
                             listeSpeculations =
