@@ -43,22 +43,6 @@ class _MesCommandeState extends State<MesCommande> {
   bool isProprietaire = false;
   String? email = "";
 
-  //   void _filterCommandes(String search) {
-  //   setState(() {
-  //     _filteredListe = _liste.where((commande) {
-  //       final codeLower = commande.codeCommande!.toLowerCase();
-  //       final dateLower = commande.dateCommande!.toLowerCase();
-  //       final statutLower = commande.statutConfirmation == false ? 'en attente' : 'validée';
-
-  //       final searchLower = search.toLowerCase();
-
-  //       return codeLower.contains(searchLower) ||
-  //           dateLower.contains(searchLower) ||
-  //           statutLower.contains(searchLower);
-  //     }).toList();
-  //   });
-  // }
-
   void _filterCommandes(String query) {
     setState(() {
       if (query.isEmpty) {
@@ -189,7 +173,7 @@ class _MesCommandeState extends State<MesCommande> {
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           toolbarHeight: 100,
           title: Text(
             "Mes commandes",
@@ -438,183 +422,276 @@ class _MesCommandeState extends State<MesCommande> {
                             else
                               // Data rows
 
-                              ..._filteredListe.map(
-                                (commande) => TableRow(
-                                  children: [
-                                    TableCell(
-                                      verticalAlignment:
-                                          TableCellVerticalAlignment.middle,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            _getDetailCommande(
-                                                context, commande);
-                                            if (acteur.idActeur ==
-                                                commande.acteur?.idActeur) {
-                                              print("acteur qui a commande");
-                                            } else {
-                                              print("acteur proprietaire");
-                                            }
-                                          },
-                                          child: Center(
-                                            child: Text(commande.codeCommande!,
-                                                style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    TableCell(
-                                      verticalAlignment:
-                                          TableCellVerticalAlignment.middle,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            _getDetailCommande(
-                                                context, commande);
-                                            if (acteur.idActeur ==
-                                                commande.acteur?.idActeur) {
-                                              print("acteur qui a commande");
-                                            } else {
-                                              print("acteur proprietaire");
-                                            }
-                                          },
-                                          child: Center(
-                                            child: Text(commande.dateCommande!,
-                                                style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    TableCell(
-                                        verticalAlignment:
-                                            TableCellVerticalAlignment.middle,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: GestureDetector(
-                                            child: Center(
-                                              child: Container(
-                                                width: 80,
-                                                color:
-                                                    commande.statutConfirmation ==
-                                                            false
-                                                        ? Colors.red
-                                                        : Colors.green,
-                                                child: Center(
-                                                  child: Text(
-                                                    commande.statutConfirmation ==
-                                                            false
-                                                        ? "En attende"
-                                                        : "Valider",
+                              ..._filteredListe
+                                  .where(
+                                    (element) => element.statutCommande == true,
+                                  )
+                                  .map(
+                                    (commande) => TableRow(
+                                      children: [
+                                        TableCell(
+                                          verticalAlignment:
+                                              TableCellVerticalAlignment.middle,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                _getDetailCommande(
+                                                    context, commande);
+                                                if (acteur.idActeur ==
+                                                    commande.acteur?.idActeur) {
+                                                  print(
+                                                      "acteur qui a commande");
+                                                } else {
+                                                  print("acteur proprietaire");
+                                                }
+                                              },
+                                              child: Center(
+                                                child: Text(
+                                                    commande.codeCommande!,
                                                     style: const TextStyle(
                                                         fontSize: 14,
                                                         fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ),
+                                                            FontWeight.bold)),
                                               ),
                                             ),
-                                            onTap: () {
-                                              if (acteur.idActeur ==
-                                                  commande.acteur?.idActeur) {
-                                                print("acteur qui a commande");
-
-                                                showDialog(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return AlertDialog(
-                                                      title: const Text(
-                                                          'Annuler la commande'),
-                                                      content: const Text(
-                                                          'Êtes-vous sûr de vouloir annuler la commande ?'),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                          onPressed: () =>
-                                                              Navigator.pop(
-                                                                  context),
-                                                          child:
-                                                              const Text('Non'),
-                                                        ),
-                                                        TextButton(
-                                                          onPressed: () async {
-                                                            Navigator.pop(
-                                                                context);
-                                                            // Call the callback function for cancellation
-
-                                                            commande.statutConfirmation! ==
-                                                                    true
-                                                                ? await CommandeService()
-                                                                    .disableCommane(
-                                                                        commande
-                                                                            .idCommande!)
-                                                                    .then(
-                                                                        (value) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Désactié avec succèss"),
-                                                                                    ],
-                                                                                  ),
-                                                                                  duration: Duration(seconds: 5),
-                                                                                ),
-                                                                              ),
-                                                                              // Mettre à jour la liste des magasins après le changement d'état
-                                                                              Provider.of<CommandeService>(context, listen: false).applyChange(),
-                                                                              setState(() {
-                                                                                fetchAllCommandes(acteur.idActeur!).then((value) => {
-                                                                                      // _liste = value,
-                                                                                      _filteredListe = value
-                                                                                    });
-                                                                              }),
-                                                                              Navigator.of(context).pop(),
-                                                                            })
-                                                                    .catchError(
-                                                                        (onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Une erreur s'est produit"),
-                                                                                    ],
-                                                                                  ),
-                                                                                  duration: Duration(seconds: 5),
-                                                                                ),
-                                                                              ),
-                                                                              Navigator.of(context).pop(),
-                                                                            })
-                                                                : null;
-                                                          },
-                                                          child:
-                                                              const Text('Oui'),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
-                                                );
-                                              } else {
-                                                print("je suis propriétaire");
-                                                Snack.error(
-                                                    titre: "Alerte",
-                                                    message:
-                                                        "Vos produits ont été commandé donc uniquement l'acheteur peut annuler la commande");
-                                              }
-                                            },
                                           ),
-                                        ))
-                                  ],
-                                ),
-                              )
+                                        ),
+                                        TableCell(
+                                          verticalAlignment:
+                                              TableCellVerticalAlignment.middle,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                _getDetailCommande(
+                                                    context, commande);
+                                                if (acteur.idActeur ==
+                                                    commande.acteur?.idActeur) {
+                                                  print(
+                                                      "acteur qui a commande");
+                                                } else {
+                                                  print("acteur proprietaire");
+                                                }
+                                              },
+                                              child: Center(
+                                                child: Text(
+                                                    commande.dateCommande!,
+                                                    style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        TableCell(
+                                            verticalAlignment:
+                                                TableCellVerticalAlignment
+                                                    .middle,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: GestureDetector(
+                                                child: Center(
+                                                  child: Container(
+                                                    width: 80,
+                                                    color:
+                                                        commande.statutConfirmation ==
+                                                                false
+                                                            ? Colors.red
+                                                            : Colors.green,
+                                                    child: Center(
+                                                      child: Text(
+                                                        commande.statutConfirmation ==
+                                                                false
+                                                            ? "En attende"
+                                                            : "Valider",
+                                                        style: const TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                onTap: () {
+                                                  if (acteur.idActeur ==
+                                                      commande
+                                                          .acteur?.idActeur) {
+                                                    print(
+                                                        "acteur qui a commande");
+
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return AlertDialog(
+                                                          title: Text(commande
+                                                                      .statutConfirmation ==
+                                                                  true
+                                                              ? 'Suppression la commande'
+                                                              : 'Annulation la commande'),
+                                                          content: Text(commande
+                                                                      .statutConfirmation ==
+                                                                  true
+                                                              ? 'Êtes-vous sûr de vouloir supprimer la commande ?'
+                                                              : 'Êtes-vous sûr de vouloir annuler la commande ?'),
+                                                          actions: <Widget>[
+                                                            TextButton(
+                                                              onPressed: () =>
+                                                                  Navigator.pop(
+                                                                      context),
+                                                              child: const Text(
+                                                                  'Non',
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .green)),
+                                                            ),
+                                                            TextButton(
+                                                              onPressed:
+                                                                  () async {
+                                                                try {
+                                                                
+                                                                  // commande.statutConfirmation! ==
+                                                                  //     true
+                                                                  // ?
+                                                                  await CommandeService()
+                                                                      .disableCommane(
+                                                                          commande
+                                                                              .idCommande!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Navigator.of(context).pop(),
+                                                                                // Mettre à jour la liste
+                                                                                Provider.of<CommandeService>(context, listen: false).applyChange(),
+                                                                                fetchAllCommandes(acteur.idActeur!).then((combinedList) {
+                                                                                  setState(() {
+                                                                                    _liste = combinedList;
+                                                                                    _filteredListe = combinedList;
+                                                                                    isLoading = false;
+                                                                                  });
+                                                                                }),
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text(commande.statutConfirmation == true ? "Supprimer avec succèss" : "Commande annulé avec succèss"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
+                                                                                ),
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                print("onError : ${onError.toString()}"),
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
+                                                                                ),
+                                                                                Navigator.of(context).pop(),
+                                                                              });
+                                                                  // : null;
+                                                                } catch (e) {
+                                                                  print(
+                                                                      "catch : ${e.toString()}");
+                                                                }
+                                                              },
+                                                              child: const Text(
+                                                                'Oui',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .red),
+                                                              ),
+                                                            ),
+
+                                                            // TextButton(
+                                                            //   onPressed:
+                                                            //       () async {
+                                                            //     Navigator.pop(
+                                                            //         context);
+                                                            //     // Call the callback function for cancellation
+
+                                                            //     commande.statutCommande! ==
+                                                            //             true
+                                                            //         ? await CommandeService()
+                                                            //             .disableCommane(commande
+                                                            //                 .idCommande!)
+                                                            //             .then((value) =>
+                                                            //                 {
+                                                            //                   // Mettre à jour la liste
+                                                            //                   // Provider.of<CommandeService>(context, listen: false).applyChange(),
+                                                            //                   // // setState(() { }),
+                                                            //                   //   setState(() {
+
+                                                            //                   //     _filteredListe = _liste;
+
+                                                            //                   //   }),
+
+                                                            //                   Navigator.of(context).pop(),
+
+                                                            //                   ScaffoldMessenger.of(context).showSnackBar(
+                                                            //                     const SnackBar(
+                                                            //                       content: Row(
+                                                            //                         children: [
+                                                            //                           Text("Commande annulé avec succèss"),
+                                                            //                         ],
+                                                            //                       ),
+                                                            //                       duration: Duration(seconds: 5),
+                                                            //                     ),
+                                                            //                   ),
+                                                            //                 })
+                                                            //             .catchError(
+                                                            //                 (onError) =>
+                                                            //                     {
+                                                            //                       ScaffoldMessenger.of(context).showSnackBar(
+                                                            //                         const SnackBar(
+                                                            //                           content: Row(
+                                                            //                             children: [
+                                                            //                               Text("Une erreur s'est produit"),
+                                                            //                             ],
+                                                            //                           ),
+                                                            //                           duration: Duration(seconds: 5),
+                                                            //                         ),
+                                                            //                       ),
+                                                            //                       Navigator.of(context).pop(),
+                                                            //                     })
+                                                            //         : null;
+                                                            //   },
+                                                            //   child: const Text(
+                                                            //       'Oui',
+                                                            //       style: TextStyle(
+                                                            //           color: Colors
+                                                            //               .red)),
+                                                            // ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                  } else {
+                                                    print(
+                                                        "je suis propriétaire");
+                                                    Snack.error(
+                                                        titre: "Alerte",
+                                                        message:
+                                                            "Vos produits ont été commandé donc uniquement l'acheteur peut annuler la commande");
+                                                  }
+                                                },
+                                              ),
+                                            ))
+                                      ],
+                                    ),
+                                  )
                           ],
                         ))
                   ],

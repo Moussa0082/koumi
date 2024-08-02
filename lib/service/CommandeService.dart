@@ -291,19 +291,17 @@ Future<String> getDetailCountByCommandeId(String commandeId) async {
     }
   }
 
-  Future disableCommane(String id) async {
-    final response = await http.put(Uri.parse('$baseUrl/$id/disable'));
 
+ Future<void> disableCommane(String id) async {
+    final response = await http.put(Uri.parse("$baseUrl/disable/${id}"));
     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
       applyChange();
+
+      debugPrint(response.body.toString());
     } else {
-      // Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
-      // throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+      throw Exception(
+          "Erreur lors de la desactivation avec le code: ${response.statusCode}");
     }
   }
-
-
-
 
  }

@@ -13,6 +13,7 @@ import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
+import 'package:koumi_app/screens/PinLoginScreen.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CommandeService.dart';
 import 'package:koumi_app/widgets/CartListItem.dart';
@@ -228,14 +229,24 @@ class _PanierState extends State<Panier> {
                       SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                          Future.microtask(() {
+                          // Future.microtask(() {
+                          //   Provider.of<BottomNavigationService>(context,
+                          //           listen: false)
+                          //       .changeIndex(0);
+                          // });
+                          // Get.to(LoginScreen(),
+                          //     duration: Duration(seconds: 1),
+                          //     transition: Transition.leftToRight);
+                           Future.microtask(() {
                             Provider.of<BottomNavigationService>(context,
                                     listen: false)
                                 .changeIndex(0);
                           });
-                          Get.to(LoginScreen(),
-                              duration: Duration(seconds: 1),
-                              transition: Transition.leftToRight);
+                          Get.to(
+                            PinLoginScreen(),
+                            duration: Duration(seconds: 1),
+                            transition: Transition.leftToRight,
+                          );
                         },
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all<Color>(

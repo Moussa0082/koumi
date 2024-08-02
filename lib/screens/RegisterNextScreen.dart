@@ -5,6 +5,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multi_formatter/formatters/phone_input_formatter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
@@ -13,10 +14,13 @@ import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/screens/RegisterEndScreen.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
+import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:provider/provider.dart';
 
 class RegisterNextScreen extends StatefulWidget {
   String nomActeur, telephone, whatsAppActeur;
@@ -239,7 +243,22 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
         splashRadius: 20,
         padding: EdgeInsets.zero,
         constraints: BoxConstraints(minWidth: 40, minHeight: 40),
-      )),
+      ),
+       actions: [
+              TextButton(
+              onPressed: () {
+                Get.offAll(BottomNavigationPage(),
+                    transition: Transition.leftToRight);
+                Provider.of<BottomNavigationService>(context, listen: false)
+                    .changeIndex(0);
+              },
+              child: const Text(
+                'Fermer',
+                style: TextStyle(color: Colors.orange, fontSize: 17),
+              ),
+            )
+          ]
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),

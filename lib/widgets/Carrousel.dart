@@ -226,21 +226,35 @@ class _CarrouselState extends State<Carrousel> {
   }
 
   Future<void> getAddressFromLatLang(Position position) async {
-    List<Placemark> placemark =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark place = placemark[0];
-    debugPrint("Address ISO: $detectedC");
-    address.value =
-        'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
-    if (mounted)
-      setState(() {
-        detectedC = place.isoCountryCode;
-        detectedCountryCode = place.isoCountryCode!;
-        detectedCountry = place.country;
-      });
+       try {
+        List<Placemark> placemark = await placemarkFromCoordinates(
+            position.latitude, position.longitude);
+        if (placemark.isNotEmpty) {
+          Placemark place = placemark[0];
+          debugPrint("Address ISO: $detectedC");
+          address.value =
+              'Address : ${place.locality}, ${place.country}, ${place.isoCountryCode}';
 
-    debugPrint(
-        "Address:  carousel online ${place.locality},${place.country},${place.isoCountryCode}");
+          if (mounted) {
+            setState(() {
+              detectedC = place.isoCountryCode;
+              detectedCountryCode = place.isoCountryCode ?? "ML";
+              detectedCountry = place.country ?? "Mali";
+
+            });
+          }
+
+          debugPrint(
+              "Address: ${place.locality}, ${place.country}, ${place.isoCountryCode}");
+        } else {
+          debugPrint(
+              "Aucun emplacement trouvé dans admin accueil pour les coordonnées fournies.");
+        }
+      } catch (e) {
+        debugPrint(
+            "Une erreur est survenue lors de la récupération de l'adresse : $e");
+      }
+    // }
   }
 
   void verify() async {

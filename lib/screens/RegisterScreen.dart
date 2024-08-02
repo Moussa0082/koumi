@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/RegisterNextScreen.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
+import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:provider/provider.dart';
 
@@ -154,7 +157,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              icon: const Icon(Icons.arrow_back_ios))),
+              icon: const Icon(Icons.arrow_back_ios)
+              ),
+               actions: [
+              TextButton(
+              onPressed: () {
+                Get.offAll(BottomNavigationPage(),
+                    transition: Transition.leftToRight);
+                Provider.of<BottomNavigationService>(context, listen: false)
+                    .changeIndex(0);
+              },
+              child: const Text(
+                'Fermer',
+                style: TextStyle(color: Colors.orange, fontSize: 17),
+              ),
+            )
+          ]
+              ),
       body: SingleChildScrollView(
         child: Container(
           child: Padding(
