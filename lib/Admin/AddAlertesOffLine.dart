@@ -27,7 +27,7 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _AddAlertesOffLineScreenState extends State<AddAlertesOffLineScreen> {
 
-   
+  
     TextEditingController _titreController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   final recorder = FlutterSoundRecorder();

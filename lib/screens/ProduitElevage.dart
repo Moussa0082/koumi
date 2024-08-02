@@ -135,7 +135,7 @@ CategorieProduit? selectedCat;
    Future<List<Stock>> getAllStock() async {
     if (selectedCat != null) {
       stockListe = await StockService().fetchStockByCategorieAndFiliere(
-          selectedCat!.idCategorieProduit!, libelle , detectedCountry!);
+          selectedCat!.idCategorieProduit!, libelle , detectedCountry != null ? detectedCountry! : "mali");
     }
 
     return stockListe;
@@ -265,8 +265,11 @@ CategorieProduit? selectedCat;
      WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController1.addListener(_scrollListener1);
     });
-    detectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : detectedCountry = "Mali";
     verify();
     _catList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorieByLibelleFiliere/$libelle'));
     stockListeFuture1 = getAllStock();

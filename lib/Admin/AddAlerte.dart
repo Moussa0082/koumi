@@ -50,8 +50,8 @@ class _AddAlerteState extends State<AddAlerte> {
     });
   }
 
-  String selectedCountry = "";
-  String selectedCountryCode = "";
+  String? selectedCountry;
+  String? selectedCountryCode;
 
   Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -197,10 +197,17 @@ class _AddAlerteState extends State<AddAlerte> {
     super.initState();
     initRecoder();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    selectedCountryCode =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountryCode!;
-    selectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? selectedCountryCode =
+            Provider.of<DetectorPays>(context, listen: false)
+                .detectedCountryCode!
+        : selectedCountry = "ML";
+    paysProvider.hasLocation
+        ? selectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : selectedCountry = "Mali";
   }
 
   @override
@@ -537,8 +544,8 @@ class _AddAlerteState extends State<AddAlerte> {
                                           .creerAlertes(
                                               titreAlerte: titre,
                                               descriptionAlerte: description,
-                                              pays: selectedCountry,
-                                              codePays: selectedCountryCode,
+                                              pays: selectedCountry != null ? selectedCountry! : "Mali",
+                                              codePays: selectedCountryCode != null ? selectedCountryCode! : "ML",
                                               videoAlerte: _videoUploaded,
                                               audioAlerte: audiosUploaded,
                                               photoAlerte: photoUploaded)
@@ -594,8 +601,13 @@ class _AddAlerteState extends State<AddAlerte> {
                                           .creerAlertes(
                                             titreAlerte: titre,
                                             descriptionAlerte: description,
-                                            pays: selectedCountry,
-                                            codePays: selectedCountryCode,
+                                             pays: selectedCountry != null
+                                                ? selectedCountry!
+                                                : "Mali",
+                                            codePays:
+                                                selectedCountryCode != null
+                                                    ? selectedCountryCode!
+                                                    : "ML",
                                           )
                                           .then((value) => {
                                                 // FirebaseApi()

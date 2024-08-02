@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/RegisterNextScreen.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
+import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:provider/provider.dart';
 
@@ -25,13 +28,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       PhoneNumber(isoCode: Platform.localeName.split('_').last);
 
   String? typeValue;
-  String selectedCountry = "";
-  String detectedCountryCode = "";
+  String? selectedCountry = "";
+  String? detectedCountryCode = "";
   // late TypeActeur monTypeActeur;
   // late Future _mesTypeActeur;
   Position? _currentPosition;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
 
   String _errorMessage = "";
 
@@ -95,14 +97,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountryCode =
+            Provider.of<DetectorPays>(context, listen: false)
+                .detectedCountryCode!
+        : detectedCountryCode = "ML";
+    paysProvider.hasLocation
+        ? selectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : selectedCountry = "Mali";
 
-    detectedCountryCode =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountryCode!;
-    selectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
     print("pays code : ${detectedCountryCode}, ${selectedCountry}");
 
-   whatsAppController.addListener(() {
+    whatsAppController.addListener(() {
       if (isPhoneEditing) return;
       setState(() {
         processedNumberWA = removePlus(whatsAppController.text);
@@ -149,7 +157,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              icon: const Icon(Icons.arrow_back_ios))),
+              icon: const Icon(Icons.arrow_back_ios)
+              ),
+               actions: [
+              TextButton(
+              onPressed: () {
+                Get.offAll(BottomNavigationPage(),
+                    transition: Transition.leftToRight);
+                Provider.of<BottomNavigationService>(context, listen: false)
+                    .changeIndex(0);
+              },
+              child: const Text(
+                'Fermer',
+                style: TextStyle(color: Colors.orange, fontSize: 17),
+              ),
+            )
+          ]
+              ),
       body: SingleChildScrollView(
         child: Container(
           child: Padding(
@@ -160,13 +184,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: Image.asset(
                   'assets/images/logo.png',
                   height: 150,
-                  width: 100,
+                  width: 150,
                 )),
                 Container(
                   height: 40,
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 240, 178, 107),
+                    color: Color.fromARGB(255, 248, 138, 11),
                   ),
                   child: Center(
                     child: Row(
@@ -261,8 +285,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 4),
                         IntlPhoneField(
-                          initialCountryCode: detectedCountryCode,
+                          initialCountryCode: detectedCountryCode != null
+                              ? detectedCountryCode
+                              : "ML",
                           controller: whatsAppController,
+                          disableLengthCheck: true,
                           invalidNumberMessage: "Numéro invalide",
                           searchText: "Chercher un pays",
                           decoration: InputDecoration(
@@ -283,12 +310,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             setState(() {
                               selectedCountry = country.name.toString();
                               updateCountryCode(country.code.toString());
+                              processedNumberWA =
+                                  removePlus(whatsAppController.text);
                             });
+                            print("wa change country $processedNumberWA");
+
+                            // Obtenir le numéro actuel sans indicatif
+                            String currentNumber = whatsAppController.text
+                                .replaceAll(RegExp(r'^\+\d+\s'), '');
+
+                            // Ajouter l'indicatif du nouveau pays au numéro actuel
+                            String newCompleteNumber =
+                                '+${country.dialCode}$currentNumber';
+
+                            // Mettre à jour le controller avec le nouveau numéro complet
+                            // whatsAppController.text = newCompleteNumber;
+
+                            // Mettre à jour processedNumberWA avec le nouveau numéro complet sans le signe +
+                            setState(() {
+                              processedNumberWA = removePlus(newCompleteNumber);
+                            });
+
+                            print(
+                                "wa updated with country change $processedNumberWA");
 
                             print('Country changed to: ' + country.name);
                           },
                         ),
-
+                        SizedBox(height: 15),
                         Padding(
                           padding: const EdgeInsets.only(left: 10.0),
                           child: Text(
@@ -298,8 +347,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 5),
                         IntlPhoneField(
-                          initialCountryCode: detectedCountryCode,
+                          initialCountryCode: detectedCountryCode != null
+                              ? detectedCountryCode
+                              : "ML",
                           controller: phoneController,
+                          disableLengthCheck: true,
                           invalidNumberMessage: "Numéro invalide",
                           searchText: "Chercher un pays",
                           decoration: InputDecoration(
@@ -312,11 +364,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           languageCode: "fr",
                           onChanged: (phone) {
                             print(phone.completeNumber);
+
                             processedNumberTel =
                                 removePlus(phone.completeNumber.toString());
                             print("tel selected  $processedNumberTel");
                           },
                           onCountryChanged: (country) {
+                            setState(() {
+                              // selectedCountry = country.name.toString();
+                              // updateCountryCode(country.code.toString());
+                              processedNumberTel =
+                                  removePlus(phoneController.text);
+                            });
+                            print("wa change country $processedNumberWA");
+
+                            // Obtenir le numéro actuel sans indicatif
+                            String currentNumber = phoneController.text
+                                .replaceAll(RegExp(r'^\+\d+\s'), '');
+
+                            // Ajouter l'indicatif du nouveau pays au numéro actuel
+                            String newCompleteNumber =
+                                '+${country.dialCode}$currentNumber';
+
+                            // Mettre à jour le controller avec le nouveau numéro complet
+                            // whatsAppController.text = newCompleteNumber;
+
+                            // Mettre à jour processedNumberWA avec le nouveau numéro complet sans le signe +
+                            setState(() {
+                              processedNumberTel =
+                                  removePlus(newCompleteNumber);
+                            });
+
+                            print(
+                                "wa updated with country change $processedNumberTel");
+
                             print('Country changed to: ' + country.name);
                           },
                         ),
@@ -342,7 +423,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                                   nomActeurController.text,
                                               whatsAppActeur: processedNumberWA,
                                               telephone: processedNumberTel,
-                                              pays: selectedCountry,
+                                              pays: selectedCountry!,
                                             )));
                               }
                             },

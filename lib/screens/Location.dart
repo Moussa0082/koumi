@@ -78,7 +78,7 @@ class _LocationState extends State<Location> {
           page++;
         });
       debugPrint("yes - fetch all materiel by pays");
-      fetchMateriel(detectedCountry!).then((value) {
+      fetchMateriel(detectedCountry != null ? detectedCountry! : "mali").then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -100,7 +100,7 @@ class _LocationState extends State<Location> {
         page++;
       });
 
-      fetchMaterielByType(detectedCountry.toString().toLowerCase());
+      fetchMaterielByType(detectedCountry != null ? detectedCountry! : "mali");
     }
     debugPrint("no");
   }
@@ -241,7 +241,7 @@ class _LocationState extends State<Location> {
           .fetchMaterielByTypeAndPaysWithPagination(
               selectedType!.idTypeMateriel!);
     } else {
-      materielListe = await MaterielService().fetchMateriel(detectedCountry!);
+      materielListe = await MaterielService().fetchMateriel(detectedCountry != null ? detectedCountry! : "mali");
     }
     return materielListe;
   }
@@ -263,9 +263,11 @@ class _LocationState extends State<Location> {
     //   }
     // });
     verify();
-    detectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
-    // fetchPaysDataByActor();
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : detectedCountry = "Mali";
     detectedCountry != null
         ? debugPrint("pays fetch location materiel page ${detectedCountry!} ")
         : debugPrint("null pays non fetch location materiel page");
@@ -566,7 +568,10 @@ class _LocationState extends State<Location> {
                       selectedType == null
                           ? setState(() {
                               materielListeFuture = MaterielService()
-                                  .fetchMateriel(detectedCountry!,
+                                  .fetchMateriel(
+                                      detectedCountry != null
+                                          ? detectedCountry!
+                                          : "mali",
                                       refresh: true);
                             })
                           : setState(() {
@@ -1140,7 +1145,8 @@ class _LocationState extends State<Location> {
           }
           page = 0;
           hasMore = true;
-          fetchMaterielByType(detectedCountry!, refresh: true);
+          fetchMaterielByType(
+              detectedCountry != null ? detectedCountry! : "mali", refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
               scrollableController1.jumpTo(0.0);

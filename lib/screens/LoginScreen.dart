@@ -12,6 +12,7 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/ForgetPassScreen.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
@@ -175,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
           //   context,
           //   MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
           // );
-          Get.off(BottomNavBarAdmin(),
+          Get.offAll(BottomNavBarAdmin(),
               duration: Duration(seconds: 1),
               transition: Transition.leftToRight);
         } else {
@@ -184,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
           //   MaterialPageRoute(
           //       builder: (context) => const BottomNavigationPage()),
           // );
-          Get.off(BottomNavigationPage(),
+          Get.offAll(BottomNavigationPage(),
               duration: Duration(seconds: 1),
               transition: Transition.leftToRight);
         }
@@ -378,7 +379,7 @@ class _LoginScreenState extends State<LoginScreen> {
           //   context,
           //   MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
           // );
-          Get.off(BottomNavBarAdmin(),
+          Get.offAll(BottomNavBarAdmin(),
               duration: Duration(seconds: 1),
               transition: Transition.leftToRight);
         } else {
@@ -387,7 +388,7 @@ class _LoginScreenState extends State<LoginScreen> {
           //   MaterialPageRoute(
           //       builder: (context) => const BottomNavigationPage()),
           // );
-          Get.off(BottomNavigationPage(),
+          Get.offAll(BottomNavigationPage(),
               duration: Duration(seconds: 1),
               transition: Transition.leftToRight);
         }
@@ -460,7 +461,10 @@ class _LoginScreenState extends State<LoginScreen> {
         appBar: AppBar(
             leading: IconButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                 Get.offAll(BottomNavigationPage(),
+                    transition: Transition.leftToRight);
+                Provider.of<BottomNavigationService>(context, listen: false)
+                    .changeIndex(0);
                 },
                 icon: const Icon(Icons.arrow_back_ios))),
         backgroundColor: const Color(0xFFFFFFFF),
@@ -622,12 +626,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           GestureDetector(
                             onTap: () {
                               print("ho");
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => ForgetPassScreen(),
-                              //   ),
-                              // );
+                             
                               Get.to(ForgetPassScreen(),
                                   duration: Duration(seconds: 1),
                                   transition: Transition.leftToRight);

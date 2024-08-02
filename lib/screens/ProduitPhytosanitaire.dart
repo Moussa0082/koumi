@@ -161,7 +161,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
   Future<List<Intrant>> getAllIntrant() async {
     if (selectedCat != null) {
       intrantListe = await IntrantService().fetchIntrantByCategorieAndFilieres(
-          selectedCat!.idCategorieProduit!, libelle, detectedCountry!);
+          selectedCat!.idCategorieProduit!, libelle, detectedCountry != null ? detectedCountry! : "mali");
     }
 
     return intrantListe;
@@ -256,8 +256,11 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
   @override
   void initState() {
     super.initState();
-    detectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : detectedCountry = "Mali";
     _searchController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);

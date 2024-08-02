@@ -107,7 +107,7 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
   Future<List<Stock>> getAllStock() async {
     if (selectedCat != null) {
       stockListe = await StockService().fetchStockByCategorieAndFiliere(
-          selectedCat!.idCategorieProduit!, libelle, detectedCountry!);
+          selectedCat!.idCategorieProduit!, libelle, detectedCountry != null ? detectedCountry! : "Mali");
     }
 
     return stockListe;
@@ -254,8 +254,12 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
   @override
   void initState() {
     super.initState();
-    detectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : detectedCountry = "Mali";
+
     _searchController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);

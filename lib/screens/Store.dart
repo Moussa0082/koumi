@@ -39,7 +39,7 @@ class _StoreScreenState extends State<StoreScreen> {
   late Pays pays;
   String? paysValue;
   late Future _paysList;
-  String? detectedCountry;
+  // String? detectedCountry;
   List<Magasin> magasinListe = [];
   List<Magasin> magasinList = [];
   late Future<List<Magasin>> magasinListeFuture;
@@ -254,8 +254,8 @@ class _StoreScreenState extends State<StoreScreen> {
   void initState() {
     super.initState();
    
-    detectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+    // detectedCountry =
+    //     Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
     verify();
     _searchController = TextEditingController();
     _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));

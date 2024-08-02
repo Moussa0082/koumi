@@ -134,7 +134,7 @@ String? detectedCountry;
    Future<List<Stock>> getAllStock() async {
     if (selectedCat != null) {
       stockListe = await StockService().fetchStockByCategorieAndFiliere(
-          selectedCat!.idCategorieProduit!, libelle , detectedCountry!);
+          selectedCat!.idCategorieProduit!, libelle , detectedCountry != null ? detectedCountry! : "Mali");
     }
 
     return stockListe;
@@ -254,8 +254,12 @@ String? detectedCountry;
   @override
   void initState() {
     super.initState();
-    detectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+    
+  final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : detectedCountry = "Mali";
     verify();
     _searchController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {

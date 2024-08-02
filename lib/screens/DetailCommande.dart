@@ -40,8 +40,17 @@ class _DetailCommandeScreenState extends State<DetailCommandeScreen> {
       isLoading: isLoading,
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           title: Text("Detail Commande"),
           centerTitle: true,
+          toolbarHeight: 100,
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios,
+              )),
         ),
         body: Column(
           children: [

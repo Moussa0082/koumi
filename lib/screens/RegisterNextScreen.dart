@@ -5,6 +5,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multi_formatter/formatters/phone_input_formatter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
@@ -13,9 +14,13 @@ import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/screens/RegisterEndScreen.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
+import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:dropdown_search/dropdown_search.dart';
+import 'package:provider/provider.dart';
 
 class RegisterNextScreen extends StatefulWidget {
   String nomActeur, telephone, whatsAppActeur;
@@ -175,17 +180,39 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
   }
 
   List<TypeActeur> selectedTypes = [];
+  List<Niveau3Pays> filteredList = [];
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    _searchController.addListener(_onSearchChanged);
     _niveau3List = http.get(Uri.parse(
         '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${widget.pays}'));
 
     debugPrint(
+        '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${widget.pays}');
+    debugPrint(
         "Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone},  WA : ${widget.whatsAppActeur}, Pays : ${widget.pays} ");
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      // Filtrer la liste des localités
+      filteredList = filteredList
+          .where((element) => element.nomN3
+              .toLowerCase()
+              .contains(_searchController.text.toLowerCase()))
+          .toList();
+    });
   }
 
   @override
@@ -216,7 +243,22 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
         splashRadius: 20,
         padding: EdgeInsets.zero,
         constraints: BoxConstraints(minWidth: 40, minHeight: 40),
-      )),
+      ),
+       actions: [
+              TextButton(
+              onPressed: () {
+                Get.offAll(BottomNavigationPage(),
+                    transition: Transition.leftToRight);
+                Provider.of<BottomNavigationService>(context, listen: false)
+                    .changeIndex(0);
+              },
+              child: const Text(
+                'Fermer',
+                style: TextStyle(color: Colors.orange, fontSize: 17),
+              ),
+            )
+          ]
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -293,16 +335,15 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                             'Content-Type': 'application/json',
                           },
                         ),
+                        searchEnabled: true,
+                        searchLabel: 'Rechercher...',
+                        searchBackgroundColor: Colors.blueGrey[50],
                         chipConfig: const ChipConfig(wrapType: WrapType.wrap),
                         responseParser: (response) {
                           typeActeur = (response as List<dynamic>)
                               .where((data) =>
-                                      (data['libelle']).trim().toLowerCase() !=
-                                      'admin'
-                                  //     &&
-                                  // data['acteur'] != null && // Add null check here
-                                  // data['acteur']['statutActeur'] == true
-                                  )
+                                  (data['libelle']).trim().toLowerCase() !=
+                                  'admin')
                               .map((e) {
                             return TypeActeur(
                               idTypeActeur: e['idTypeActeur'] as String,
@@ -336,7 +377,7 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
 
                         controller: _controllerTypeActeur,
 
-                        dropdownHeight: 320,
+                        // dropdownHeight: 320,
                         hint: 'Sélectionner un type d\'acteur',
                         fieldBackgroundColor:
                             Color.fromARGB(255, 219, 219, 219),
@@ -416,28 +457,140 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                           style: TextStyle(color: (Colors.black), fontSize: 18),
                         ),
                       ),
+                      // FutureBuilder(
+                      //   future: _niveau3List,
+                      //   builder: (_, snapshot) {
+                      //     if (snapshot.connectionState ==
+                      //         ConnectionState.waiting) {
+                      //       return DropdownButtonFormField(
+                      //         items: [],
+                      //         onChanged: null,
+                      //         decoration: InputDecoration(
+                      //           labelText: 'Chargement...',
+                      //           contentPadding: const EdgeInsets.symmetric(
+                      //               vertical: 10, horizontal: 20),
+                      //           border: OutlineInputBorder(
+                      //             borderRadius: BorderRadius.circular(8),
+                      //           ),
+                      //         ),
+                      //       );
+                      //     }
+                      //     if (snapshot.hasData) {
+                      //       // dynamic responseData =
+                      //       //     json.decode(snapshot.data.body);
+                      //       dynamic jsonString =
+                      //           utf8.decode(snapshot.data.bodyBytes);
+                      //       dynamic responseData = json.decode(jsonString);
+                      //       if (responseData is List) {
+                      //         final reponse = responseData;
+                      //         final niveau3List = reponse
+                      //             .map((e) => Niveau3Pays.fromMap(e))
+                      //             .where((con) => con.statutN3 == true)
+                      //             .toList();
+                      //         if (niveau3List.isEmpty) {
+                      //           return DropdownButtonFormField(
+                      //             items: [],
+                      //             onChanged: null,
+                      //             decoration: InputDecoration(
+                      //               labelText: 'Aucun localité trouvé',
+                      //               contentPadding: const EdgeInsets.symmetric(
+                      //                   vertical: 10, horizontal: 20),
+                      //               border: OutlineInputBorder(
+                      //                 borderRadius: BorderRadius.circular(8),
+                      //               ),
+                      //             ),
+                      //           );
+                      //         }
+                      //         return DropdownButtonFormField<String>(
+                      //           isExpanded: true,
+                      //           items: niveau3List
+                      //               .map(
+                      //                 (e) => DropdownMenuItem(
+                      //                   value: e.idNiveau3Pays,
+                      //                   child: Text(e.nomN3),
+                      //                 ),
+                      //               )
+                      //               .toList(),
+                      //           value: n3Value,
+                      //           onChanged: (newValue) {
+                      //             setState(() {
+                      //               n3Value = newValue;
+                      //               if (newValue != null) {
+                      //                 Niveau3Pays selectedNiveau3 =
+                      //                     niveau3List.firstWhere(
+                      //                   (element) =>
+                      //                       element.idNiveau3Pays == newValue,
+                      //                 );
+                      //                 niveau3 = selectedNiveau3.nomN3;
+                      //                 print("niveau 3 : $niveau3");
+                      //               }
+                      //             });
+                      //           },
+                      //           decoration: InputDecoration(
+                      //             labelText: 'Selectionner une localité',
+                      //             contentPadding: const EdgeInsets.symmetric(
+                      //                 vertical: 10, horizontal: 20),
+                      //             border: OutlineInputBorder(
+                      //               borderRadius: BorderRadius.circular(8),
+                      //             ),
+                      //           ),
+                      //         );
+                      //       } else {
+                      //         return DropdownButtonFormField(
+                      //           items: [],
+                      //           onChanged: null,
+                      //           decoration: InputDecoration(
+                      //             labelText: 'Aucun localité trouvé',
+                      //             contentPadding: const EdgeInsets.symmetric(
+                      //                 vertical: 10, horizontal: 20),
+                      //             border: OutlineInputBorder(
+                      //               borderRadius: BorderRadius.circular(8),
+                      //             ),
+                      //           ),
+                      //         );
+                      //       }
+                      //     }
+                      //     return DropdownButtonFormField(
+                      //       items: [],
+                      //       onChanged: null,
+                      //       decoration: InputDecoration(
+                      //         labelText: 'Aucun localité trouvé',
+                      //         contentPadding: const EdgeInsets.symmetric(
+                      //             vertical: 10, horizontal: 20),
+                      //         border: OutlineInputBorder(
+                      //           borderRadius: BorderRadius.circular(8),
+                      //         ),
+                      //       ),
+                      //     );
+                      //   },
+                      // ),
                       FutureBuilder(
                         future: _niveau3List,
                         builder: (_, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return DropdownButtonFormField(
+                            return DropdownSearch<String>(
                               items: [],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                labelText: 'Chargement...',
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                              popupProps: PopupProps.menu(
+                                showSearchBox: true,
+                              ),
+                              // dropdownButtonProps: DropdownButtonProps(color: Colors.blue),
+                              dropdownDecoratorProps: DropDownDecoratorProps(
+                                textAlignVertical: TextAlignVertical.center,
+                                dropdownSearchDecoration: InputDecoration(
+                                  labelText: 'Chargement...',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
                               ),
+                              onChanged: null,
                             );
                           }
 
                           if (snapshot.hasData) {
-                            // dynamic responseData =
-                            //     json.decode(snapshot.data.body);
                             dynamic jsonString =
                                 utf8.decode(snapshot.data.bodyBytes);
                             dynamic responseData = json.decode(jsonString);
@@ -450,84 +603,116 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                                   .toList();
 
                               if (niveau3List.isEmpty) {
-                                return DropdownButtonFormField(
+                                return DropdownSearch<String>(
                                   items: [],
+                                  popupProps: PopupProps.menu(
+                                      showSearchBox: true,
+                                      title: Text("Rechercher une localité",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600)),
+                                      searchFieldProps: TextFieldProps(
+                                        autocorrect: true,
+                                      )),
+                                  dropdownButtonProps:
+                                      DropdownButtonProps(color: Colors.orange),
+                                  dropdownDecoratorProps:
+                                      DropDownDecoratorProps(
+                                    textAlignVertical: TextAlignVertical.center,
+                                    dropdownSearchDecoration: InputDecoration(
+                                      labelText: 'Chargement...',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
                                   onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Aucun localité trouvé',
+                                );
+                              }
+
+                              return DropdownSearch<String>(
+                                items: niveau3List.map((e) => e.nomN3).toList(),
+
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    n3Value = niveau3List
+                                        .firstWhere((element) =>
+                                            element.nomN3 == newValue)
+                                        .idNiveau3Pays;
+                                    niveau3 = newValue!;
+                                    print("niveau 3 : $niveau3");
+                                  });
+                                },
+
+                                popupProps: PopupProps.menu(
+                                    showSearchBox: true,
+                                    title: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Text("Rechercher une localité",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600)),
+                                    ),
+                                    searchFieldProps: TextFieldProps(
+                                      autocorrect: true,
+                                    )),
+                                dropdownDecoratorProps: DropDownDecoratorProps(
+                                    textAlignVertical: TextAlignVertical.center,
+                                    dropdownSearchDecoration: InputDecoration(
+                                      hintText: 'Selectionner une localité',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    )),
+
+                                // selectedItem: niveau3,
+                              );
+                            } else {
+                              return DropdownSearch<String>(
+                                items: [],
+                                popupProps: PopupProps.menu(
+                                  showSearchBox: true,
+                                ),
+                                dropdownDecoratorProps: DropDownDecoratorProps(
+                                  textAlignVertical: TextAlignVertical.center,
+                                  dropdownSearchDecoration: InputDecoration(
+                                    labelText: 'Aucune localité trouvée',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                );
-                              }
-
-                              return DropdownButtonFormField<String>(
-                                isExpanded: true,
-                                items: niveau3List
-                                    .map(
-                                      (e) => DropdownMenuItem(
-                                        value: e.idNiveau3Pays,
-                                        child: Text(e.nomN3),
-                                      ),
-                                    )
-                                    .toList(),
-                                value: n3Value,
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    n3Value = newValue;
-                                    if (newValue != null) {
-                                      Niveau3Pays selectedNiveau3 =
-                                          niveau3List.firstWhere(
-                                        (element) =>
-                                            element.idNiveau3Pays == newValue,
-                                      );
-                                      niveau3 = selectedNiveau3.nomN3;
-                                      print("niveau 3 : $niveau3");
-                                    }
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  labelText: 'Selectionner une localité',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
                                 ),
-                              );
-                            } else {
-                              return DropdownButtonFormField(
-                                items: [],
                                 onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Aucun localité trouvé',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
                               );
                             }
                           }
-                          return DropdownButtonFormField(
+
+                          return DropdownSearch<String>(
                             items: [],
-                            onChanged: null,
-                            decoration: InputDecoration(
-                              labelText: 'Aucun localité trouvé',
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+                            popupProps: PopupProps.menu(
+                              showSearchBox: true,
+                            ),
+                            dropdownDecoratorProps: DropDownDecoratorProps(
+                              textAlignVertical: TextAlignVertical.center,
+                              dropdownSearchDecoration: InputDecoration(
+                                labelText: 'Aucune localité trouvée',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                               ),
                             ),
+                            onChanged: null,
                           );
                         },
                       ),
-
                       const SizedBox(
                         height: 10,
                       ),
@@ -571,41 +756,44 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                           onPressed: () {
                             // Handle button press action here
                             if (_formKey.currentState!.validate()) {
-                              // Navigator.push(context, MaterialPageRoute(builder: (context)=>  RegisterEndScreen(
-                              //   nomActeur: widget.nomActeur, email: emailController.text,
-                              //   telephoneActeur: widget.telephone,
-                              //    adresse:adresseController.text,
-                              //   numeroWhatsApp: widget.whatsAppActeur, localistaion: localisationController.text,
-                              //    pays: widget.pays, typeActeur: typeActeur,
-                              //    image1: image1,
-                              //   )));
-
-                              // Vérifier si au moins un type d'acteur est sélectionné
-                              if (selectedTypes.isNotEmpty) {
-                                // Naviguer vers l'écran suivant en passant les types d'acteurs sélectionnés
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => RegisterEndScreen(
-                                              nomActeur: widget.nomActeur,
-                                              email: emailController.text,
-                                              telephoneActeur: widget.telephone,
-                                              adresse: adresseController.text,
-                                              numeroWhatsApp:
-                                                  widget.whatsAppActeur,
-                                              localistaion: niveau3,
-                                              pays: widget.pays,
-                                              typeActeur:
-                                                  selectedTypes, // Passer les types d'acteurs sélectionnés ici
-                                              image1: image1,
-                                            )));
+                              if (niveau3.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        "Veuillez sélectionner une localité"),
+                                    duration: Duration(seconds: 5),
+                                  ),
+                                );
                               } else {
-                                // Afficher un message indiquant que l'utilisateur doit sélectionner au moins un type d'acteur
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text(
-                                      'Veuillez sélectionner au moins un type d\'acteur.'),
-                                ));
+                                // Vérifier si au moins un type d'acteur est sélectionné
+                                if (selectedTypes.isNotEmpty) {
+                                  // Naviguer vers l'écran suivant en passant les types d'acteurs sélectionnés
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              RegisterEndScreen(
+                                                nomActeur: widget.nomActeur,
+                                                email: emailController.text,
+                                                telephoneActeur:
+                                                    widget.telephone,
+                                                adresse: adresseController.text,
+                                                numeroWhatsApp:
+                                                    widget.whatsAppActeur,
+                                                localistaion: niveau3,
+                                                pays: widget.pays,
+                                                typeActeur:
+                                                    selectedTypes, // Passer les types d'acteurs sélectionnés ici
+                                                image1: image1,
+                                              )));
+                                } else {
+                                  // Afficher un message indiquant que l'utilisateur doit sélectionner au moins un type d'acteur
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                    content: Text(
+                                        'Veuillez sélectionner au moins un type d\'acteur.'),
+                                  ));
+                                }
                               }
                             }
                           },

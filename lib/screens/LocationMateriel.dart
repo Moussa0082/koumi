@@ -220,8 +220,13 @@ class _LocationMaterielState extends State<LocationMateriel> {
 
   @override
   void initState() {
-    detectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+    
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : detectedCountry = "Mali";
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //write or call your logic
       //code will run when widget rendering complete

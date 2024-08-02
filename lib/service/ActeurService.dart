@@ -32,8 +32,6 @@ class ActeurService extends ChangeNotifier {
     required String password,
   }) async {
     try {
-      //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
-      // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
       if (photoSiegeActeur != null) {
@@ -85,98 +83,22 @@ class ActeurService extends ChangeNotifier {
         throw Exception(' ${errorMessage}');
       }
     } catch (e) {
-      throw Exception(
-          'Une erreur s\'est produite lors de l\'ajout de acteur : $e ');
+      String errorMessage =
+          'Une erreur s\'est produite lors de l\'ajout de acteur';
+      if (e is Exception) {
+        final exception = e;
+        if (exception.toString().contains(
+            'Un compte avec le même numéro de téléphone existe déjà')) {
+          errorMessage =
+              'Un compte avec le même numéro de téléphone existe déjà';
+        } else {
+          errorMessage = 'Un compte avec le même email existe déjà';
+        }
+        print(errorMessage);
+        throw Exception(errorMessage);
+      }
     }
   }
-
-// Future<void> updateActeur({
-//   required String idActeur,
-//   required String nomActeur,
-//   required String adresseActeur,
-//   required String telephoneActeur,
-//   required String whatsAppActeur,
-//   String? niveau3PaysActeur,
-//   required String localiteActeur,
-//   String? emailActeur,
-//   List<TypeActeur>? typeActeur,
-//   List<Speculation>? speculations,
-//   File? photoSiegeActeur,
-//   File? logoActeur,
-//   required String password,
-// }) async {
-//   try {
-//     var requete = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/${idActeur}'));
-
-//     if (photoSiegeActeur != null) {
-//       requete.files.add(http.MultipartFile(
-//           'image1',
-//           photoSiegeActeur.readAsBytes().asStream(),
-//           photoSiegeActeur.lengthSync(),
-//           filename: basename(photoSiegeActeur.path)));
-//     }
-
-//     if (logoActeur != null) {
-//       requete.files.add(http.MultipartFile('image2',
-//           logoActeur.readAsBytes().asStream(), logoActeur.lengthSync(),
-//           filename: basename(logoActeur.path)));
-//     }
-
-//     // Imprimer chaque partie de speculations
-//     if (speculations != null) {
-//       for (var speculation in speculations) {
-//         print("Speculation: ${jsonEncode(speculation)}");
-//       }
-//     }
-
-//     // Acteur JSON
-//     final acteurJson = jsonEncode({
-//       'idActeur': idActeur,
-//       'nomActeur': nomActeur,
-//       'adresseActeur': adresseActeur,
-//       'telephoneActeur': telephoneActeur,
-//       'whatsAppActeur': whatsAppActeur,
-//       'localiteActeur': localiteActeur,
-//       'typeActeur': typeActeur ?? [],
-//       'speculations': speculations ?? [],
-//       'password': password,
-//       'logoActeur': "",
-//       'photoSiegeActeur': "",
-//       if (niveau3PaysActeur != null) 'niveau3PaysActeur': niveau3PaysActeur,
-//       if (emailActeur != null) 'emailActeur': emailActeur,
-//     });
-
-//     // Imprimer le JSON avant de l'envoyer
-//     print("JSON acteur : $acteurJson");
-
-//     requete.fields['acteur'] = acteurJson;
-
-//     var response = await requete.send();
-//     var responsed = await http.Response.fromStream(response);
-
-//     // Imprimer la réponse brute du serveur
-//     print("Response status: ${response.statusCode}");
-//     print("Response body: ${responsed.body}");
-
-//     if (response.statusCode == 200 || responsed.statusCode == 201 || responsed.statusCode == 202) {
-//       final donneesResponse = json.decode(utf8.decode(responsed.bodyBytes));
-//       SharedPreferences prefs = await SharedPreferences.getInstance();
-//       final codeActeur = donneesResponse['codeActeur'];
-//       await prefs.setString('codeActeur', codeActeur);
-
-//       debugPrint('acteur service ${donneesResponse.toString()}');
-//     } else {
-//       print("et code ${response.statusCode}");
-//       final errorMessage = json.decode(utf8.decode(responsed.bodyBytes))['message'];
-//       throw Exception(' ${errorMessage.toString()}');
-//     }
-//   } catch (e) {
-//     print("Erreur try : ${e.toString()}");
-//     throw Exception(
-//         'Une erreur s\'est produite lors de l\'ajout de acteur : $e ');
-//   }
-// }
-// Remplacez par votre URL
 
   Future<http.Response> updateActeur({
     required String idActeur,
@@ -235,361 +157,7 @@ class ActeurService extends ChangeNotifier {
     }
   }
 
-  // Future<http.Response> updateActeur({
-  //   required String idActeur,
-  //   required String nomActeur,
-  //   required String adresseActeur,
-  //   required String telephoneActeur,
-  //   required String whatsAppActeur,
-  //   required String localiteActeur,
-  //   required String emailActeur,
-  //   required String niveau3PaysActeur,
-  //   required List<TypeActeur> typeActeur,
-  //   required List<Speculation> speculation,
-  //   required String password,
-  //   File? photo,
-  // }) async {
-  //   var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idActeur'));
-
-  //   if (photo != null) {
-  //     request.files.add(
-  //       http.MultipartFile(
-  //         'image1',
-  //         photo.readAsBytes().asStream(),
-  //         photo.lengthSync(),
-  //         filename: photo.path.split('/').last,
-  //       ),
-  //     );
-  //   }
-
-  //   Map<String, dynamic> acteurData = {
-  //     'idActeur': idActeur,
-  //     'nomActeur': nomActeur,
-  //     'adresseActeur': adresseActeur,
-  //     'telephoneActeur': telephoneActeur,
-  //     'whatsAppActeur': whatsAppActeur,
-  //     'localiteActeur': localiteActeur,
-  //     'emailActeur': emailActeur,
-  //     'niveau3PaysActeur': niveau3PaysActeur,
-  //     'typeActeur': typeActeur.map((type) => type.toMap()).toList(),
-  //     'speculation': speculation.map((spec) => spec.toMap()).toList(),
-  //     'password': password,
-  //   };
-
-  //   request.fields['acteur'] = jsonEncode(acteurData);
-
-  //   try {
-  //     var response = await request.send();
-  //     var responseBody = await http.Response.fromStream(response);
-
-  //     print('Response body: ${responseBody.body}');
-  //     print('Response status code: ${responseBody.statusCode}');
-
-  //     return responseBody;
-  //   } catch (e) {
-  //     print('Erreur lors de la requête HTTP : $e');
-  //     rethrow;
-  //   }
-  // }
-
-//  Future<void> updateActeur({
-//   required String idActeur,
-//   required String nomActeur,
-//   required String adresseActeur,
-//   required String telephoneActeur,
-//   required String whatsAppActeur,
-//   String? niveau3PaysActeur,
-//   required String localiteActeur,
-//   String? password,
-//   String? emailActeur,
-//   List<TypeActeur>? typeActeur,
-//   List<Speculation>? speculations,
-//   File? photoSiegeActeur,
-//   File? logoActeur,
-// }) async {
-//   try {
-//     var requete = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idActeur'));
-
-//     if (photoSiegeActeur != null) {
-//       requete.files.add(
-//         http.MultipartFile(
-//           'image1',
-//           photoSiegeActeur.readAsBytes().asStream(),
-//           photoSiegeActeur.lengthSync(),
-//           filename: basename(photoSiegeActeur.path),
-//         ),
-//       );
-//     }
-
-//     if (logoActeur != null) {
-//       requete.files.add(
-//         http.MultipartFile(
-//           'image2',
-//           logoActeur.readAsBytes().asStream(),
-//           logoActeur.lengthSync(),
-//           filename: basename(logoActeur.path),
-//         ),
-//       );
-//     }
-
-//     // Acteur
-//     Map<String, dynamic> acteurData = {
-//       'idActeur': idActeur,
-//       'nomActeur': nomActeur,
-//       'adresseActeur': adresseActeur,
-//       'telephoneActeur': telephoneActeur,
-//       'whatsAppActeur': whatsAppActeur,
-//       'localiteActeur': localiteActeur,
-//       'typeActeur': typeActeur ?? [],
-//       'speculations': speculations ?? [],
-//       if (password != null) 'password': password,
-//       if (niveau3PaysActeur != null) 'niveau3PaysActeur': niveau3PaysActeur,
-//       if (emailActeur != null) 'emailActeur': emailActeur,
-//     };
-
-//     requete.fields['acteur'] = jsonEncode(acteurData);
-//     print('acteurData ${acteurData}');
-
-//     var response = await requete.send();
-//     var responsed = await http.Response.fromStream(response);
-
-//     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
-//       final donneesResponse = json.decode(utf8.decode(responsed.bodyBytes));
-//       SharedPreferences prefs = await SharedPreferences.getInstance();
-//       final codeActeur = donneesResponse['codeActeur'];
-//       await prefs.setString('codeActeur', codeActeur);
-
-//       debugPrint('acteur update service ${donneesResponse.toString()}');
-//     } else {
-//       final errorMessage = json.decode(utf8.decode(responsed.bodyBytes))['message'];
-//       throw Exception('Error de la modif : ${response.statusCode}: $errorMessage');
-//     }
-//   } catch (e) {
-//     throw Exception('Une erreur s\'est produite lors de la modif acteur: $e');
-//   }
-// }
-
-//  Future<void> updateActeur({
-//     required String idActeur,
-//     required String nomActeur,
-//     required String adresseActeur,
-//     required String telephoneActeur,
-//     required String whatsAppActeur,
-//     String? niveau3PaysActeur,
-//     required String localiteActeur,
-//     required String emailActeur,
-//     List<TypeActeur>? typeActeur,
-//     List<Speculation>? speculations,
-//     File? photoSiegeActeur,
-//     File? logoActeur,
-//     // required String password,
-//   }) async {
-//     try {
-//       //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
-//       // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
-//       var requete = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/${idActeur}'));
-
-//       if (photoSiegeActeur != null) {
-//         requete.files.add(http.MultipartFile(
-//             'image1',
-//             photoSiegeActeur.readAsBytes().asStream(),
-//             photoSiegeActeur.lengthSync(),
-//             filename: basename(photoSiegeActeur.path)));
-//       }
-
-//       if (logoActeur != null) {
-//         requete.files.add(http.MultipartFile('image2',
-//             logoActeur.readAsBytes().asStream(), logoActeur.lengthSync(),
-//             filename: basename(logoActeur.path)));
-//       }
-
-//       //acteur
-//       requete.fields['acteur'] = jsonEncode({
-//         'idActeur': idActeur,
-//         'nomActeur': nomActeur,
-//         'adresseActeur': adresseActeur,
-//         'telephoneActeur': telephoneActeur,
-//         'whatsAppActeur': whatsAppActeur,
-//         'niveau3PaysActeur': niveau3PaysActeur,
-//         'localiteActeur': localiteActeur,
-//         'emailActeur': emailActeur,
-//         'speculations': speculations,
-//         'typeActeur': typeActeur, // Convertir chaque objet TypeActeur en map
-//         'photoSiegeActeur': "",
-//         'logoActeur': "",
-//         // 'password': password,
-//       });
-
-//       var response = await requete.send();
-//       var responsed = await http.Response.fromStream(response);
-
-//       if (response.statusCode == 200 || responsed.statusCode == 201 ||
-//           responsed.statusCode == 202) {
-//         final donneesResponse = json.decode(utf8.decode(responsed.bodyBytes));
-//         SharedPreferences prefs = await SharedPreferences.getInstance();
-//         final codeActeur = donneesResponse['codeActeur'];
-//         await prefs.setString('codeActeur', codeActeur);
-
-//         debugPrint('acteur service ${donneesResponse.toString()}');
-//       } else {
-//         print("et code ${response.statusCode}");
-//         final errorMessage =
-//             json.decode(utf8.decode(responsed.bodyBytes))['message'];
-//         throw Exception(' ${errorMessage}');
-//       }
-//     } catch (e) {
-//       throw Exception(
-//           'Une erreur s\'est produite lors de l\'ajout de acteur : $e ');
-//     }
-//   }
-
-  // Future<void> updateActeur({
-  //   required String idActeur,
-  //   required String nomActeur,
-  //   required String adresseActeur,
-  //   required String telephoneActeur,
-  //   required String whatsAppActeur,
-  //   String? niveau3PaysActeur,
-  //   required String localiteActeur,
-  //   String? emailActeur,
-  //   List<TypeActeur>? typeActeur,
-  //   List<Speculation>? speculations,
-  //   File? photoSiegeActeur,
-  //   File? logoActeur,
-  //   required String password,
-  // }) async {
-  //   try {
-  //     var requete = http.MultipartRequest(
-  //         'PUT', Uri.parse('$baseUrl/update/${idActeur}'));
-
-  //     if (photoSiegeActeur != null) {
-  //       requete.files.add(http.MultipartFile(
-  //           'image1',
-  //           photoSiegeActeur.readAsBytes().asStream(),
-  //           photoSiegeActeur.lengthSync(),
-  //           filename: basename(photoSiegeActeur.path)));
-  //     }
-
-  //     if (logoActeur != null) {
-  //       requete.files.add(http.MultipartFile('image2',
-  //           logoActeur.readAsBytes().asStream(), logoActeur.lengthSync(),
-  //           filename: basename(logoActeur.path)));
-  //     }
-
-  //     // Acteur JSON
-  //     final acteurJson = jsonEncode({
-  //       'idActeur': idActeur,
-  //       'nomActeur': nomActeur,
-  //       'adresseActeur': adresseActeur,
-  //       'telephoneActeur': telephoneActeur,
-  //       'whatsAppActeur': whatsAppActeur,
-  //       'localiteActeur': localiteActeur,
-  //       'typeActeur': typeActeur,
-  //       'speculations': speculations,
-  //       'password': password,
-  //       'logoActeur': "",
-  //       'photoSiegeActeur': "",
-  //       if (niveau3PaysActeur != null) 'niveau3PaysActeur': niveau3PaysActeur,
-  //       if (emailActeur != null) 'emailActeur': emailActeur,
-  //     });
-
-  //     // Imprimer le JSON avant de l'envoyer
-  //     print("JSON acteur : $acteurJson");
-
-  //     requete.fields['acteur'] = acteurJson;
-
-  //     var response = await requete.send();
-  //     var responsed = await http.Response.fromStream(response);
-
-  //     if (response.statusCode == 200 ||
-  //         responsed.statusCode == 201 ||
-  //         responsed.statusCode == 202) {
-  //       final donneesResponse = json.decode(utf8.decode(responsed.bodyBytes));
-  //       SharedPreferences prefs = await SharedPreferences.getInstance();
-  //       final codeActeur = donneesResponse['codeActeur'];
-  //       await prefs.setString('codeActeur', codeActeur);
-
-  //       debugPrint('acteur service ${donneesResponse.toString()}');
-  //     } else {
-  //       print("et code ${response.statusCode}");
-  //       final errorMessage =
-  //           json.decode(utf8.decode(responsed.bodyBytes))['message'];
-  //       throw Exception(' ${errorMessage.toString()}');
-  //     }
-  //   } catch (e) {
-  //     throw Exception(
-  //         'Une erreur s\'est produite lors de l\'ajout de acteur : $e ');
-  //   }
-  // }
-
-  // Future<void> updateActeur({
-  //   required String idActeur,
-  //   required String nomActeur,
-  //   required String adresseActeur,
-  //   required String telephoneActeur,
-  //   required String whatsAppActeur,
-  //   String? latitude,
-  //   String? longitude,
-  //   String? niveau3PaysActeur,
-  //   required String localiteActeur,
-  //   required String emailActeur,
-  //   List<TypeActeur>? typeActeur,
-  //   List<Speculation>? speculations,
-  //   File? photoSiegeActeur,
-  //   File? logoActeur,
-  //   // required String password,
-  // }) async {
-  //   try {
-  //     var requete =
-  //         http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idActeur'));
-
-  //     if (photoSiegeActeur != null) {
-  //       requete.files.add(http.MultipartFile(
-  //           'image1',
-  //           photoSiegeActeur.readAsBytes().asStream(),
-  //           photoSiegeActeur.lengthSync(),
-  //           filename: basename(photoSiegeActeur.path)));
-  //     }
-
-  //     if (logoActeur != null) {
-  //       requete.files.add(http.MultipartFile('image2',
-  //           logoActeur.readAsBytes().asStream(), logoActeur.lengthSync(),
-  //           filename: basename(logoActeur.path)));
-  //     }
-
-  //     requete.fields['acteur'] = jsonEncode({
-  //       'nomActeur': nomActeur,
-  //       'adresseActeur': adresseActeur,
-  //       'telephoneActeur': telephoneActeur,
-  //       'whatsAppActeur': whatsAppActeur,
-  //       'latitude': latitude,
-  //       'longitude': longitude,
-  //       'niveau3PaysActeur': niveau3PaysActeur,
-  //       'localiteActeur': localiteActeur,
-  //       'emailActeur': emailActeur,
-  //       'speculations': speculations,
-  //       'typeActeur': typeActeur,
-  //       'photoSiegeActeur': "",
-  //       'logoActeur': "",
-  //       //  'password': password,
-  //     });
-
-  //     var response = await requete.send();
-  //     var responsed = await http.Response.fromStream(response);
-
-  //     if (response.statusCode == 200 || responsed.statusCode == 201) {
-  //       final donneesResponse = json.decode(responsed.body);
-  //       debugPrint('acteur service ${donneesResponse.toString()}');
-  //     } else {
-  //       throw Exception(
-  //           'Échec de la requête acteur avec le code d\'état : ${responsed.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     throw Exception(
-  //         'Une erreur s\'est produite lors de la modification de acteur : ${e.toString()}');
-  //   }
-  // }
-
+  
   static Future<String> sendOtpCodeEmail(
       String emailActeur, BuildContext context) async {
     final url = Uri.parse('$baseUrl/sendOtpCodeEmail?emailActeur=$emailActeur');
@@ -600,30 +168,34 @@ class ActeurService extends ChangeNotifier {
           response.statusCode == 201 ||
           response.statusCode == 202) {
         // Si la réponse est réussie, renvoyer le message de réussite
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Succès'),
-              content: Text("Code envoyé avec succès"),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        // showDialog(
+        //   context: context,
+        //   builder: (BuildContext context) {
+        //     return AlertDialog(
+        //       title: Text('Succès'),
+        //       content: Text("Code envoyé avec succès"),
+        //       actions: <Widget>[
+        //         TextButton(
+        //           onPressed: () {
+        //             Navigator.of(context).pop();
+        //           },
+        //           child: Text('OK'),
+        //         ),
+        //       ],
+        //     );
+        //   },
+        // );
         debugPrint("Code envoyé par mail : ${response.body} ");
         return response.body;
       } else {
+        String errorMessage = '';
         // Si la réponse n'est pas réussie, lancer une exception avec le message d'erreur
         final Map<String, dynamic> body = json.decode(response.body);
-        final String errorMessage = body['message'] ?? 'Code non envoyé.';
+        errorMessage = body['message'] ?? 'Code non envoyé.';
         // Afficher une alerte d'erreur avec le message spécifique
+        if (errorMessage.contains('https://api.greenapi.com/waInstance')) {
+          errorMessage = 'Code non envoyé. Vérifie votre email saisi';
+        }
         debugPrint(
             "Non envoyé : ${response.statusCode}  message : $errorMessage");
         showDialog(
@@ -684,30 +256,34 @@ class ActeurService extends ChangeNotifier {
         // Si la réponse est réussie, renvoyer le message de réussite
 
         // Afficher une alerte d'erreur avec le message spécifique
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Succès'),
-              content: Text("Code envoyé avec succès"),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        // showDialog(
+        //   context: context,
+        //   builder: (BuildContext context) {
+        //     return AlertDialog(
+        //       title: Text('Succès'),
+        //       content: Text("Code envoyé avec succès"),
+        //       actions: <Widget>[
+        //         TextButton(
+        //           onPressed: () {
+        //             Navigator.of(context).pop();
+        //           },
+        //           child: Text('OK'),
+        //         ),
+        //       ],
+        //     );
+        //   },
+        // );
 
         return response.body;
       } else {
+        String errorMessage = '';
         // Si la réponse n'est pas réussie, lancer une exception avec le message d'erreur
         final Map<String, dynamic> body = json.decode(response.body);
-        final String errorMessage = body['message'] ?? 'Code non envoyé.';
+        errorMessage = body['message'] ?? 'Code non envoyé.';
         // Afficher une alerte d'erreur avec le message spécifique
+        if (errorMessage.contains('https://api.greenapi.com/waInstance')) {
+          errorMessage = 'Code non envoyé.Vérifie le numéro saisi';
+        }
         debugPrint(
             "Non envoyé : ${response.statusCode}  message : ${errorMessage}");
         showDialog(
@@ -755,75 +331,19 @@ class ActeurService extends ChangeNotifier {
     }
   }
 
-  static Future<void> verifyOtpCodeWhatsApp(
-      String whatsAppActeur, String resetToken, BuildContext context) async {
+  Future<void> verifyOtpCodeWhatsApp(
+      String whatsAppActeur, String code, BuildContext context) async {
     final Uri url = Uri.parse(
-        '$baseUrl/verifierOtpCodeWhatsApp?whatsAppActeur=$whatsAppActeur&resetToken=$resetToken');
+        '$baseUrl/verifierOtpCodeWhatsApp?whatsAppActeur=${Uri.encodeComponent(whatsAppActeur)}&code=${Uri.encodeComponent(code)}');
 
     try {
       final response = await http.get(url);
-      if (response.statusCode == 200) {
-        // Afficher une alerte de succès
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Succès'),
-              content: Text('Le code a été vérifié avec succès.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      } else if (response.statusCode == 400 || response.statusCode == 500) {
-        // Extraire le message d'erreur du corps de la réponse
-        final Map<String, dynamic> body = json.decode(response.body);
-        final String errorMessage = body['message'] ?? 'Le code est incorrect.';
-
-        // Afficher une alerte d'erreur avec le message spécifique
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Erreur'),
-              content: Text(errorMessage),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 202) {
       } else {
-        // Afficher une alerte pour d'autres erreurs
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Erreur'),
-              content: Text(
-                  'Une erreur est survenue lors de la vérification du code.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        throw Exception(
+            'Une erreur est survenue lors de la vérification : ${response.statusCode}');
       }
     } catch (e) {
       // Afficher une alerte pour les erreurs de connexion
@@ -831,8 +351,8 @@ class ActeurService extends ChangeNotifier {
       //   context: context,
       //   builder: (BuildContext context) {
       //     return AlertDialog(
-      //       title: Text('Erreur de connexion'),
-      //       content: Text('Une erreur est survenue lors de la connexion .'),
+      //       title: Text('Erreur de vérification '),
+      //       content: Text('Le code saisi est incorrect.'),
       //       actions: <Widget>[
       //         TextButton(
       //           onPressed: () {
@@ -844,8 +364,91 @@ class ActeurService extends ChangeNotifier {
       //     );
       //   },
       // );
+      throw Exception('Une erreur est survenue : ${e.toString()}');
     }
   }
+
+  Future<void> verifyOtpCodeEmail(
+      String emailActeur, String resetToken, BuildContext context) async {
+    final Uri url = Uri.parse(
+        '$baseUrl/verifierOtpCodeEmail?emailActeur=${Uri.encodeComponent(emailActeur)}&resetToken=${Uri.encodeComponent(resetToken)}');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        // Code vérifié avec succès
+        // Traitez la réponse ici si nécessaire
+      } else {
+        // Code incorrect
+        throw Exception(
+            'Une erreur est survenue lors de la vérification : ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Une erreur est survenue : $e');
+    }
+  }
+
+  // Future<void> verifyOtpCodeWhatsApp(
+  //     String whatsAppActeur, String resetToken, BuildContext context) async {
+  //   final Uri url = Uri.parse(
+  //       '$baseUrl/verifierOtpCodeWhatsAppActeur?whatsAppActeur=$whatsAppActeur&resetToken=$resetToken');
+
+  //   try {
+  //     final response = await http.get(url);
+  //     if (response.statusCode == 200 || response.statusCode == 201) {}
+  //   } catch (e) {
+  //     // Afficher une alerte pour les erreurs de connexion
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           title: Text('Erreur de vérification'),
+  //           content: Text('Le code saisi est incorrect .'),
+  //           actions: <Widget>[
+  //             TextButton(
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //               child: Text('OK'),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //     throw Exception('Une erreur est survenue : $e');
+  //   }
+  // }
+
+  // Future<void> verifyOtpCodeEmail(
+  //     String emailActeur, String resetToken, BuildContext context) async {
+  //   final Uri url = Uri.parse(
+  //       '$baseUrl/verifierOtpCodeEmail?emailActeur=$emailActeur&resetToken=$resetToken');
+
+  //   try {
+  //     final response = await http.get(url);
+  //     if (response.statusCode == 200) {}
+  //   } catch (e) {
+  //     // Afficher une alerte pour les erreurs de connexion
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           title: Text('Erreur de vérification'),
+  //           content: Text('Code incorrect'),
+  //           actions: <Widget>[
+  //             TextButton(
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //               child: Text('OK'),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //     throw Exception('Une erreur est survenue : $e');
+  //   }
+  // }
 
   Future<void> updatePassword({
     required String id,
@@ -893,98 +496,6 @@ class ActeurService extends ChangeNotifier {
     } catch (e) {
       debugPrint('Impossible de verifier le  password: $e');
       throw Exception('Impossible de verifier le  password: $e');
-    }
-  }
-
-  static Future<void> verifyOtpCodeEmail(
-      String emailActeur, String resetToken, BuildContext context) async {
-    final Uri url = Uri.parse(
-        '$baseUrl/verifierOtpCodeEmail?emailActeur=$emailActeur&resetToken=$resetToken');
-
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        // Afficher une alerte de succès
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Succès'),
-              content: Text('Le code a été vérifié avec succès.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      } else if (response.statusCode == 400 || response.statusCode == 500) {
-        // Extraire le message d'erreur du corps de la réponse
-        final Map<String, dynamic> body = json.decode(response.body);
-        final String errorMessage = body['message'] ?? 'Le code est incorrect.';
-
-        // Afficher une alerte d'erreur avec le message spécifique
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Erreur'),
-              content: Text(errorMessage),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        // Afficher une alerte pour d'autres erreurs
-        // showDialog(
-        //   context: context,
-        //   builder: (BuildContext context) {
-        //     return AlertDialog(
-        //       title: Text('Erreur'),
-        //       content: Text(
-        //           'Une erreur est survenue lors de la vérification du code.'),
-        //       actions: <Widget>[
-        //         TextButton(
-        //           onPressed: () {
-        //             Navigator.of(context).pop();
-        //           },
-        //           child: Text('OK'),
-        //         ),
-        //       ],
-        //     );
-        //   },
-        // );
-      }
-    } catch (e) {
-      // Afficher une alerte pour les erreurs de connexion
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erreur de connexion'),
-            content: Text('Une erreur est survenue lors de la connexion .'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
     }
   }
 

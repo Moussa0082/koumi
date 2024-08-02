@@ -60,8 +60,7 @@ class ActeurProvider with ChangeNotifier {
           adresseActeur,
           whatsAppActeur,
           niveau3PaysActeur,
-          localiteActeur
-          );
+          localiteActeur);
       notifyListeners();
     }
   }
@@ -78,29 +77,58 @@ class ActeurProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Future<void> logout() async {
+  //   // Supprimer les données utilisateur
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? emailActeur = prefs.getString('emailActeur');
+  //   String? codeActeur = prefs.getString('codeActeur');
+
+  //   _acteur = null;
+
+  //   await prefs.clear();
+  //   if (emailActeur == null || emailActeur.isEmpty) {
+
+  //     debugPrint("Email shared : $emailActeur");
+  //   } else {
+  //     debugPrint("Email shared isExist : $emailActeur");
+  //   }
+
+  //   // Réenregistrer le codeActeur dans SharedPreferences
+  //   if (codeActeur != null) {
+  //     String savedCodeActeur = codeActeur;
+  //     prefs.setString('codeActeur', savedCodeActeur);
+  //   }
+  //   // Mettre à jour l'état de la connexion
+  //   isLogged = false;
+  //   notifyListeners();
+  // }
   Future<void> logout() async {
-    // Supprimer les données utilisateur
+    // Récupérer les données utilisateur avant de les effacer
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? emailActeur = prefs.getString('emailActeur');
     String? codeActeur = prefs.getString('codeActeur');
 
+    // Effacer toutes les préférences
+     // Réinitialiser l'acteur local
     _acteur = null;
 
-// Vérifier si le codeActeur est présent dans SharedPreferences
     await prefs.clear();
     if (emailActeur == null || emailActeur.isEmpty) {
-      // Nettoyer toutes les données de SharedPreferences
-      // await prefs.clear();
       debugPrint("Email shared : $emailActeur");
     } else {
       debugPrint("Email shared isExist : $emailActeur");
     }
+    // Réenregistrer les valeurs nécessaires
+    // if (emailActeur != null && emailActeur.isNotEmpty) {
+    //   prefs.setString('emailActeur', emailActeur);
+    //   print("email acteur apres logout : $emailActeur");
+    // }
 
-    // Réenregistrer le codeActeur dans SharedPreferences
     if (codeActeur != null) {
-      String savedCodeActeur = codeActeur;
-      prefs.setString('codeActeur', savedCodeActeur);
+      prefs.setString('codeActeur', codeActeur);
+      print("code acteur apres logout : $codeActeur");
     }
+
     // Mettre à jour l'état de la connexion
     isLogged = false;
     notifyListeners();

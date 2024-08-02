@@ -8,10 +8,13 @@ import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/screens/LoginSuccessScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
+import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterEndScreen extends StatefulWidget {
@@ -311,7 +314,8 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                       ],
                     );
                   },
-                ));
+                ))
+            .catchError((error) => {print("CatchError : ${error.toString()}")});
       } else {
         await acteurService
             .creerActeur(
@@ -348,21 +352,35 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                       ],
                     );
                   },
-                ));
+                ))
+            .catchError((error) => {print("CatchError : ${error.toString()}")});
       }
       // print("Demande envoyée avec succès: ${updatedDemande.toString()}");
       debugPrint("yes ");
       // Navigate to the next page if necessary
     } catch (error) {
-      // Handle any exceptions that might occur during the request
-      final String errorMessage = error.toString();
+      String errorMessage = "";
+      if (error is Exception) {
+        final exception = error;
+        if (exception.toString().contains(
+            'Un compte avec le même numéro de téléphone existe déjà')) {
+          errorMessage =
+              'Un compte avec le même numéro de téléphone existe déjà';
+        } else {
+          errorMessage = 'Un compte avec le même email existe déjà';
+        }
+        print(errorMessage);
+      }
+
       debugPrint("no " + errorMessage);
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: Text("Erreur lors de l'inscription"),
-          content:
-              Text("Une erreur s'est produite veuillez réessayer plus tard"),
+          content: Text(errorMessage,
+              style: TextStyle(
+                color: Colors.black87,
+              )),
           actions: [
             TextButton(
               child: Text("OK"),
@@ -398,22 +416,35 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 250, 250, 250),
         appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              // Fonction de retour
-              Navigator.pop(context);
-            },
-            icon: Icon(
-              Icons.arrow_back,
-              color: Colors.black,
-              size: 30,
+            leading: IconButton(
+              onPressed: () {
+                // Fonction de retour
+                Navigator.pop(context);
+              },
+              icon: Icon(
+                Icons.arrow_back,
+                color: Colors.black,
+                size: 30,
+              ),
+              iconSize: 30,
+              splashRadius: 20,
+              padding: EdgeInsets.zero,
+              constraints: BoxConstraints(minWidth: 40, minHeight: 40),
             ),
-            iconSize: 30,
-            splashRadius: 20,
-            padding: EdgeInsets.zero,
-            constraints: BoxConstraints(minWidth: 40, minHeight: 40),
-          ),
-        ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Get.offAll(BottomNavigationPage(),
+                      transition: Transition.leftToRight);
+                  Provider.of<BottomNavigationService>(context, listen: false)
+                      .changeIndex(0);
+                },
+                child: const Text(
+                  'Fermer',
+                  style: TextStyle(color: Colors.orange, fontSize: 17),
+                ),
+              )
+            ]),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
@@ -487,15 +518,16 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                         const SizedBox(height: 5),
                         MultiSelectDropDown.network(
                           networkConfig: NetworkConfig(
-                          
                             url:
                                 '$apiOnlineUrl/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
                             method: RequestMethod.get,
                             headers: {'Content-Type': 'application/json'},
                           ),
+                          searchEnabled: true,
+                          searchLabel: 'Rechercher...',
+                          searchBackgroundColor: Colors.blueGrey[50],
                           chipConfig: const ChipConfig(wrapType: WrapType.wrap),
                           responseParser: (response) {
-                           
                             listeSpeculations =
                                 (response as List<dynamic>).map((e) {
                               return Speculation(
@@ -503,7 +535,6 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                                 nomSpeculation: e['nomSpeculation'] as String,
                                 statutSpeculation:
                                     e['statutSpeculation'] as bool,
-                               
                               );
                             }).toList();
 
@@ -603,7 +634,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                             if (val.length < 6) {
                               return 'Le mot de passe doit contenir au moins 6 caractères';
                             } else if (val.length > 6) {
-                              return 'Le mot de passe ne doit pas 6 caractères';
+                              return 'Le mot de passe ne doit pas dépassé 6 caractères';
                             } else {
                               return null;
                             }
@@ -661,7 +692,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                             if (val.length < 6) {
                               return 'Le mot de passe doit contenir au moins 6 caractères';
                             } else if (val.length > 6) {
-                              return 'Le mot de passe ne doit pas 6 caractères';
+                              return 'Le mot de passe ne doit pas dépassé 6 caractères';
                             } else {
                               return null;
                             }

@@ -9,6 +9,7 @@ import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
+import 'package:koumi_app/screens/PinLoginScreen.dart';
 import 'package:koumi_app/screens/ResetPassword.dart';
 import 'package:koumi_app/screens/Surface.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
@@ -109,14 +110,24 @@ class _ProfilState extends State<Profil> {
                         SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () {
+                            // Future.microtask(() {
+                            //   Provider.of<BottomNavigationService>(context,
+                            //           listen: false)
+                            //       .changeIndex(0);
+                            // });
+                            // Get.to(LoginScreen(),
+                            //     duration: Duration(seconds: 1),
+                            //     transition: Transition.leftToRight);
                             Future.microtask(() {
                               Provider.of<BottomNavigationService>(context,
                                       listen: false)
                                   .changeIndex(0);
                             });
-                            Get.to(LoginScreen(),
-                                duration: Duration(seconds: 1),
-                                transition: Transition.leftToRight);
+                            Get.to(
+                              PinLoginScreen(),
+                              duration: Duration(seconds: 1),
+                              transition: Transition.leftToRight,
+                            );
                           },
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all<Color>(

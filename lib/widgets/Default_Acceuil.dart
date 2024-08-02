@@ -214,8 +214,7 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         crossAxisCount: 2,
-        mainAxisSpacing: 2,
-        crossAxisSpacing: 5,
+        crossAxisSpacing: 4,
         childAspectRatio: 2,
         children: _buildCards(),
       ),
@@ -307,7 +306,7 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
 
   Widget _buildAccueilCard(String titre, String imgLocation, int index) {
     return Padding(
-      padding: const EdgeInsets.all(5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       child: InkWell(
         onTap: () {
           if (index == 16) {
@@ -325,70 +324,42 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const MesCommande()));
           } else if (index == 13) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        SemenceAndPlant()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => SemenceAndPlant()));
           } else if (index == 12) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => ProduitPhytosanitaire()));
           } else if (index == 11) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        EngraisAndApport()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => EngraisAndApport()));
           } else if (index == 10) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        FruitAndLegumes()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => FruitAndLegumes()));
           } else if (index == 9) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ProductsScreen()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProductsScreen()));
           } else if (index == 8) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ProduitTransforme()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProduitTransforme()));
           } else if (index == 7) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ProduitElevage()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProduitElevage()));
           } else if (index == 6) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        StoreScreen()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => StoreScreen()));
           } else if (index == 5) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ComplementAlimentaire(
-                        )));
+                    builder: (context) => ComplementAlimentaire()));
           } else if (index == 4) {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                         l.Location()));
+                context, MaterialPageRoute(builder: (context) => l.Location()));
           } else if (index == 3) {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        Transport()));
+                context, MaterialPageRoute(builder: (context) => Transport()));
           } else if (index == 2) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => WeatherScreen()));
@@ -405,29 +376,35 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
             boxShadow: const [
               BoxShadow(
                 blurRadius: 5.0,
-                color: Color.fromRGBO(0, 0, 0, 0.25), // Opacité de 10%
+                color: Color.fromRGBO(0, 0, 0, 0.20), // Opacité de 10%
               ),
             ],
           ),
           child: Row(
             children: [
               Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Image.asset(
-                  "assets/images/$imgLocation",
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
                   width: 36,
                   height: 36,
-                  fit: BoxFit.contain,
+                  child: Image.asset(
+                    "assets/images/$imgLocation",
+                    fit: BoxFit.contain,
+                    scale: 1,
+                  ),
                 ),
               ),
+              // SizedBox(
+              //   width: 10,
+              // ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(5.0),
                   child: Text(
                     titre,
-                    maxLines: 2,
+                    maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.left,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,

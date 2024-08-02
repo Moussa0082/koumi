@@ -252,8 +252,11 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
 
   @override
   void initState() {
-    detectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : detectedCountry = "Mali";
     _searchController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //code will run when widget rendering complete

@@ -164,7 +164,7 @@ class _EditProfilState extends State<EditProfil> {
 
       print("speculation acteur: ${selectedSpec.toString()}");
     }
-
+    print("niveau 3 : ${acteur.niveau3PaysActeur!}");
     typeActeur = acteur.typeActeur!;
     typeLibelle = typeActeur.map((e) => e.libelle!).toList();
     selectedTypes = typeActeur;
@@ -172,6 +172,13 @@ class _EditProfilState extends State<EditProfil> {
     print("type acteur : ${typeActeur.toString()}");
 
     print("type libelle : ${typeLibelle}");
+  }
+
+  @override
+  void dispose() {
+    _controllerTypeActeur.dispose();
+    _controllerSpeculation.dispose();
+    super.dispose();
   }
 
   @override

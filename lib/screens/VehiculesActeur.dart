@@ -183,6 +183,16 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                   fontSize: 20),
             ),
             actions: [
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      page = 0;
+                      // Rafraîchir les données ici
+                      _liste = VehiculeService()
+                          .fetchVehiculeByActeur(acteur.idActeur!);
+                    });
+                  },
+                  icon: const Icon(Icons.refresh, color: d_colorGreen)),
               PopupMenuButton<String>(
                 padding: EdgeInsets.zero,
                 itemBuilder: (context) => <PopupMenuEntry<String>>[
@@ -246,7 +256,6 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                 _searchController.text = selectedItem.searchKey;
                                 // setState(() {});
                               },
-                            
                               suggestionItemBuilder:
                                   (context, searchFieldItem) {
                                 return Padding(

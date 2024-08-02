@@ -59,7 +59,6 @@ class _CategoriPageState extends State<CategoriPage> {
     _liste = getCat();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _filiereList = http.get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
-
     _searchController = TextEditingController();
   }
 

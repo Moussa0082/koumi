@@ -128,59 +128,31 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
       final whatsAppActeur = processedNumberWA;
 
       if (isVisible) {
-        await ActeurService.sendOtpCodeEmail(emailActeur, context);
+        await ActeurService.sendOtpCodeEmail(emailActeur, context).then(
+          (value) => {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CodeConfirmScreen(
+                        isVisible: isVisible,
+                        emailActeur: emailController.text,
+                        whatsAppActeur: processedNumberWA)))
+          },
+        );
         debugPrint("Code envoyé par mail");
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Succès'),
-              content: const Text("Code envoyé par  email avec succès"),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CodeConfirmScreen(
-                                isVisible: isVisible,
-                                emailActeur: emailController.text,
-                                whatsAppActeur: processedNumberWA)));
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
       } else {
-        await ActeurService.sendOtpCodeWhatsApp(whatsAppActeur, context);
-        debugPrint("Code envoyé par whatsApp");
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Succès'),
-              content: const Text("Code envoyé par whatsApp avec succès"),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CodeConfirmScreen(
-                                isVisible: isVisible,
-                                emailActeur: emailController.text,
-                                whatsAppActeur: processedNumberWA)));
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
+        await ActeurService.sendOtpCodeWhatsApp(whatsAppActeur, context).then(
+          (value) => {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CodeConfirmScreen(
+                        isVisible: isVisible,
+                        emailActeur: emailController.text,
+                        whatsAppActeur: processedNumberWA)))
           },
         );
+        debugPrint("Code envoyé par whatsApp");
       }
 
       // Fermez la boîte de dialogue de chargement après l'envoi du code
@@ -226,10 +198,18 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
         processedNumberWA = removePlus(whatsAppController.text);
       });
     });
-    detectedCountryCode =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountryCode!;
-    selectedCountry =
-        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    paysProvider.hasLocation
+        ? detectedCountryCode =
+            Provider.of<DetectorPays>(context, listen: false)
+                .detectedCountryCode!
+        : detectedCountryCode = "ML";
+    paysProvider.hasLocation
+        ? selectedCountry =
+            Provider.of<DetectorPays>(context, listen: false).detectedCountry!
+        : selectedCountry = "Mali";
+
     isVisible = !isVisible;
     super.initState();
   }
@@ -367,6 +347,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                       child: IntlPhoneField(
                         initialCountryCode: detectedCountryCode,
                         controller: whatsAppController,
+                        disableLengthCheck: true,
                         invalidNumberMessage: "Numéro invalide",
                         searchText: "Chercher un pays",
                         decoration: InputDecoration(
@@ -378,12 +359,39 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                         ),
                         languageCode: "fr",
                         onChanged: (phone) {
+                          setState(() {
+                            processedNumberWA =
+                                removePlus(phone.completeNumber.toString());
+                          });
                           print("num complet ${phone.completeNumber}");
-                          processedNumberWA =
-                              removePlus(phone.completeNumber.toString());
-                          print("wa selected  $processedNumberWA");
+                          print("wa selected $processedNumberWA");
                         },
-                        onCountryChanged: (country) {},
+                        onCountryChanged: (country) {
+                          setState(() {
+                            processedNumberWA =
+                                removePlus(whatsAppController.text);
+                          });
+                          print("wa change country $processedNumberWA");
+
+                          // Obtenir le numéro actuel sans indicatif
+                          String currentNumber = whatsAppController.text
+                              .replaceAll(RegExp(r'^\+\d+\s'), '');
+
+                          // Ajouter l'indicatif du nouveau pays au numéro actuel
+                          String newCompleteNumber =
+                              '+${country.dialCode}$currentNumber';
+
+                          // Mettre à jour le controller avec le nouveau numéro complet
+                          // whatsAppController.text = newCompleteNumber;
+
+                          // Mettre à jour processedNumberWA avec le nouveau numéro complet sans le signe +
+                          setState(() {
+                            processedNumberWA = removePlus(newCompleteNumber);
+                          });
+
+                          print(
+                              "wa updated with country change $processedNumberWA");
+                        },
                       ),
                     ),
                   ],
