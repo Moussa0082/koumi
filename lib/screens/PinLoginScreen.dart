@@ -12,6 +12,7 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/ForgetPassScreen.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
@@ -226,8 +227,6 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
     }
   }
 
-
-
   /// this widget will be use for each digit
   Widget numButton(int number) {
     return Padding(
@@ -267,7 +266,41 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                icon: const Icon(Icons.arrow_back_ios))),
+                icon: const Icon(Icons.arrow_back_ios)),
+            actions: [
+              PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                itemBuilder: (context) {
+                  return <PopupMenuEntry<String>>[
+                    PopupMenuItem<String>(
+                      child: ListTile(
+                        leading: const Icon(
+                          Icons.login,
+                        ),
+                        title: const Text(
+                          "S'authentifier",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onTap: () async {
+                          Navigator.of(context).pop();
+                          Future.microtask(() {
+                            Provider.of<BottomNavigationService>(context,
+                                    listen: false)
+                                .changeIndex(0);
+                          });
+                          Get.to(LoginScreen(),
+                              duration: Duration(seconds: 1),
+                              transition: Transition.leftToRight);
+                        },
+                      ),
+                    ),
+                  ];
+                },
+              )
+            ]),
         backgroundColor: const Color(0xFFFFFFFF),
         body: SafeArea(
           minimum: EdgeInsets.only(top: 10),

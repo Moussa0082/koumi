@@ -304,4 +304,16 @@ Future<String> getDetailCountByCommandeId(String commandeId) async {
     }
   }
 
+ Future<void> disableCommandeWithNotif(String id) async {
+    final response = await http.put(Uri.parse("$baseUrl/disableWithNotif/${id}"));
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+      applyChange();
+
+      debugPrint(response.body.toString());
+    } else {
+      throw Exception(
+          "Erreur lors de la desactivation avec le code: ${response.statusCode}");
+    }
+  }
+
  }

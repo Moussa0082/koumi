@@ -530,12 +530,12 @@ class _MesCommandeState extends State<MesCommande> {
                                                         return AlertDialog(
                                                           title: Text(commande
                                                                       .statutConfirmation ==
-                                                                  true
+                                                                  false
                                                               ? 'Suppression la commande'
                                                               : 'Annulation la commande'),
                                                           content: Text(commande
                                                                       .statutConfirmation ==
-                                                                  true
+                                                                  false
                                                               ? 'Êtes-vous sûr de vouloir supprimer la commande ?'
                                                               : 'Êtes-vous sûr de vouloir annuler la commande ?'),
                                                           actions: <Widget>[
@@ -554,9 +554,9 @@ class _MesCommandeState extends State<MesCommande> {
                                                                   () async {
                                                                 try {
                                                                 
-                                                                  // commande.statutConfirmation! ==
-                                                                  //     true
-                                                                  // ?
+                                                                  commande.statutConfirmation! ==
+                                                                      false
+                                                                  ?
                                                                   await CommandeService()
                                                                       .disableCommane(
                                                                           commande
@@ -578,7 +578,7 @@ class _MesCommandeState extends State<MesCommande> {
                                                                                   SnackBar(
                                                                                     content: Row(
                                                                                       children: [
-                                                                                        Text(commande.statutConfirmation == true ? "Supprimer avec succèss" : "Commande annulé avec succèss"),
+                                                                                        Text("Supprimer avec succèss"),
                                                                                       ],
                                                                                     ),
                                                                                     duration: Duration(seconds: 5),
@@ -600,8 +600,51 @@ class _MesCommandeState extends State<MesCommande> {
                                                                                   ),
                                                                                 ),
                                                                                 Navigator.of(context).pop(),
-                                                                              });
-                                                                  // : null;
+                                                                              })
+                                                                   : await CommandeService()
+                                                                      .disableCommandeWithNotif(
+                                                                          commande
+                                                                              .idCommande!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Navigator.of(context).pop(),
+                                                                                // Mettre à jour la liste
+                                                                                Provider.of<CommandeService>(context, listen: false).applyChange(),
+                                                                                fetchAllCommandes(acteur.idActeur!).then((combinedList) {
+                                                                                  setState(() {
+                                                                                    _liste = combinedList;
+                                                                                    _filteredListe = combinedList;
+                                                                                    isLoading = false;
+                                                                                  });
+                                                                                }),
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Commande annulé avec succèss"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
+                                                                                ),
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                print("onError : ${onError.toString()}"),
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
+                                                                                ),
+                                                                                Navigator.of(context).pop(),
+                                                                              });;
                                                                 } catch (e) {
                                                                   print(
                                                                       "catch : ${e.toString()}");

@@ -315,22 +315,33 @@ class _MyProductScreenState extends State<MyProductScreen> {
             ),
             actions: !isExist
                 ? [
-                    IconButton(
-                        onPressed: () {
-                          selectedCat != null
-                              ? stockListeFuture1 = fetchAllStock()
-                              : stockListeFuture = fetchAllStock();
-                        },
-                        icon: const Icon(Icons.refresh, color: d_colorGreen))
-                  ]
-                : [
-                    IconButton(
-                        onPressed: () {
-                          selectedCat != null
-                              ? stockListeFuture1 = fetchAllStock()
-                              : stockListeFuture = fetchAllStock();
-                        },
-                        icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                    (typeActeurData
+                                .map((e) => e.libelle!.toLowerCase())
+                                .contains("commercant") ||
+                            typeActeurData
+                                .map((e) => e.libelle!.toLowerCase())
+                                .contains("commerçant") ||
+                            typeActeurData
+                                .map((e) => e.libelle!.toLowerCase())
+                                .contains("admin") ||
+                            typeActeurData
+                                .map((e) => e.libelle!.toLowerCase())
+                                .contains("producteur") ||
+                            typeActeurData
+                                .map((e) => e.libelle!.toLowerCase())
+                                .contains("partenaires de développement") ||
+                            typeActeurData
+                                .map((e) => e.libelle!.toLowerCase())
+                                .contains("partenaire de developpement"))
+                        ? IconButton(
+                            onPressed: () {
+                              selectedCat != null
+                                  ? stockListeFuture1 = fetchAllStock()
+                                  : stockListeFuture = fetchAllStock();
+                            },
+                            icon:
+                                const Icon(Icons.refresh, color: d_colorGreen))
+                        : Container(),
                     (typeActeurData
                                 .map((e) => e.libelle!.toLowerCase())
                                 .contains("commercant") ||
@@ -376,7 +387,8 @@ class _MyProductScreenState extends State<MyProductScreen> {
                             },
                           )
                         : Container()
-                  ]),
+                  ]
+                : null),
         body: !isExist
             ? Center(
                 child: Container(

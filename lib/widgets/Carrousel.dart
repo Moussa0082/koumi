@@ -138,7 +138,7 @@ class _CarrouselState extends State<Carrousel> {
 
   @override
   void dispose() {
-    streamSubscription.cancel();
+    streamSubscription!.cancel();
     super.dispose();
   }
 
@@ -183,7 +183,7 @@ class _CarrouselState extends State<Carrousel> {
   var latitude = 'Getting Latitude..'.obs;
   var longitude = 'Getting Longitude..'.obs;
   var address = 'Getting Address..'.obs;
-  late StreamSubscription<Position> streamSubscription;
+  StreamSubscription<Position>? streamSubscription;
 
   getLocation() async {
     bool serviceEnabled;

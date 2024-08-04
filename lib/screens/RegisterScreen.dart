@@ -157,10 +157,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              icon: const Icon(Icons.arrow_back_ios)
-              ),
-               actions: [
-              TextButton(
+              icon: const Icon(Icons.arrow_back_ios)),
+          actions: [
+            TextButton(
               onPressed: () {
                 Get.offAll(BottomNavigationPage(),
                     transition: Transition.leftToRight);
@@ -172,8 +171,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 style: TextStyle(color: Colors.orange, fontSize: 17),
               ),
             )
-          ]
-              ),
+          ]),
       body: SingleChildScrollView(
         child: Container(
           child: Padding(
@@ -308,7 +306,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                           onCountryChanged: (country) {
                             setState(() {
-                              selectedCountry = country.name.toString();
+                              selectedCountry =
+                                  country.name.toString().contains("Chad")
+                                      ? "Tchad"
+                                      : country.name.toString();
+
                               updateCountryCode(country.code.toString());
                               processedNumberWA =
                                   removePlus(whatsAppController.text);

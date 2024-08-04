@@ -43,7 +43,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
   // await AwesomeNotifications().initialize(
-  //    'resource://@drawable/launcher_icon',
+  //    'resource://@drawable/launc her_icon',
   //   [
   //   Not
   //       channelGroupKey: "basic_channel_group",
