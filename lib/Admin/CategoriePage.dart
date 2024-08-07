@@ -33,7 +33,8 @@ class _CategoriPageState extends State<CategoriPage> {
 
   List<CategorieProduit> categorieList = [];
   List<Speculation> speculationList = [];
-  bool isSearchMode = true;
+  bool isSearchMode = false;
+  bool isFilterMode = false;
   late Acteur acteur;
   final formkey = GlobalKey<FormState>();
   ScrollController scrollableController = ScrollController();
@@ -43,6 +44,8 @@ class _CategoriPageState extends State<CategoriPage> {
   late Future _filiereList;
   late Filiere filiere = Filiere();
   String? catValue;
+  late List<CategorieProduit> _categorieProduitList;
+  late Future<List<CategorieProduit>> _categorieProduitListe;
 
   Filiere? selectedType;
   late Future<List<CategorieProduit>> _liste;
@@ -53,43 +56,50 @@ class _CategoriPageState extends State<CategoriPage> {
     return await CategorieService().fetchCategorie();
   }
 
+  Future<List<CategorieProduit>> getAllCatBySearch() async {
+    _categorieProduitList = await CategorieService().fetchSearchItems();
+    return _categorieProduitList;
+  }
+
   @override
   void initState() {
     super.initState();
     _liste = getCat();
+    _categorieProduitListe = getAllCatBySearch();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _filiereList = http.get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
     _searchController = TextEditingController();
   }
 
-  void _updateMode(int index) {
-    if (mounted) {
-      setState(() {
-        isSearchMode = index == 0;
-        if (!isSearchMode) {
-          _searchController.clear();
-          _searchController.dispose();
-          _searchController = TextEditingController();
-        }
-      });
-    }
-  }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
     if (isSearchMode) {
       _searchController = TextEditingController();
     } else {
       _searchController.dispose();
     }
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
     scrollableController.dispose();
     super.dispose();
+  }
+
+  void _selectMode(String mode) {
+    setState(() {
+      if (mode == 'Rechercher') {
+        isSearchMode = true;
+        isFilterMode = false;
+      } else if (mode == 'Filtrer') {
+        isSearchMode = false;
+        isFilterMode = true;
+      } else if (mode == 'Fermer') {
+        isSearchMode = false;
+        isFilterMode = false;
+      }
+    });
   }
 
   @override
@@ -167,33 +177,97 @@ class _CategoriPageState extends State<CategoriPage> {
             return <Widget>[
               SliverToBoxAdapter(
                   child: Column(children: [
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ToggleButtons(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text('Rechercher'),
+                if (!isSearchMode)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          isSearchMode = true;
+                          isFilterMode = true;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.search,
+                        color: d_colorGreen,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text('Filtrer'),
+                      label: Text(
+                        'Rechercher',
+                        style: TextStyle(color: d_colorGreen, fontSize: 17),
                       ),
-                    ],
-                    isSelected: [isSearchMode, !isSearchMode],
-                     onPressed: _updateMode,
+                    ),
                   ),
-                ),
                 if (isSearchMode)
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
+                  Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            isSearchMode = false;
+                            isFilterMode = false;
+                          });
+                        },
+                        icon: Icon(
+                          Icons.close,
+                          color: Colors.red,
+                        ),
+                        label: Text(
+                          'Fermer',
+                          style: TextStyle(color: Colors.red, fontSize: 17),
+                        ),
+                      )),
+                Visibility(
+                    visible: isSearchMode,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 3, horizontal: 10),
+                      child: FutureBuilder(
+                        future: _filiereList,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return buildLoadingDropdown();
+                          }
+
+                          if (snapshot.hasData) {
+                            dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
+
+                            if (responseData is List) {
+                              final reponse = responseData;
+                              final typeList = reponse
+                                  .map((e) => Filiere.fromMap(e))
+                                  .where((con) => con.statutFiliere == true)
+                                  .toList();
+
+                              if (typeList.isEmpty) {
+                                return buildEmptyDropdown();
+                              }
+
+                              return buildDropdown(typeList);
+                            } else {
+                              return buildEmptyDropdown();
+                            }
+                          }
+
+                          return buildEmptyDropdown();
+                        },
+                      ),
+                    )),
+                Visibility(
+                  visible: isSearchMode,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                        color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                        borderRadius: BorderRadius.circular(25),
+                        color: Colors.transparent,
+                        border: Border.all(color: Colors.black45),
+                        borderRadius: BorderRadius.circular(22),
                       ),
-                      child: Row(
+                      child: Row( 
                         children: [
                           Icon(Icons.search,
                               color:
@@ -220,104 +294,82 @@ class _CategoriPageState extends State<CategoriPage> {
                       ),
                     ),
                   ),
-                  // Padding(
-                  //   padding: const EdgeInsets.all(10.0),
-                  //   child: FutureBuilder<List<CategorieProduit>>(
-                  //     future: _liste,
-                  //     builder: (context, snapshot) {
-                  //       if (snapshot.connectionState ==
-                  //           ConnectionState.waiting) {
-                  //         return SearchFieldAutoComplete<String>(
-                  //         controller: _searchController,
-                  //           placeholder: 'Rechercher...',
-                  //           suggestions: [],
-                  //         );
-                  //       } else {
-                  //         return SearchFieldAutoComplete<String>(
-                  //           // itemHeight: 20,
-                  //           controller: _searchController,
-                  //           itemHeight: 30,
-                  //           placeholder: 'Rechercher...',
-                  //           placeholderStyle:
-                  //               TextStyle(fontStyle: FontStyle.italic),
-                  //           suggestions: snapshot.data!
-                  //               .map((item) =>
-                  //                   SearchFieldAutoCompleteItem<String>(
-                  //                     searchKey: item.libelleCategorie!,
-                  //                     value: item.libelleCategorie!,
-                  //                   ))
-                  //               .toList(),
-                  //           suggestionsDecoration: SuggestionDecoration(
-                  //             marginSuggestions: const EdgeInsets.all(8.0),
-                  //             color: const Color.fromARGB(255, 236, 234, 234),
-                  //             borderRadius: BorderRadius.circular(16.0),
-                  //           ),
-                  //           onSuggestionSelected: (selectedItem) {
-                              
-                  //               _searchController.text = selectedItem.searchKey;
-                  //           },
-                  //           suggestionItemBuilder: (context, searchFieldItem) {
-                  //             return Padding(
-                  //               padding: const EdgeInsets.all(8.0),
-                  //               child: Text(
-                  //                 searchFieldItem.searchKey,
-                  //                 style: TextStyle(color: Colors.black),
-                  //               ),
-                  //             );
-                  //           },
-                  //         );
-                  //       }
-                  //     },
-                  //   ),
-                  // ),
-                if (!isSearchMode)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    child: FutureBuilder(
-                      future: _filiereList,
-                      builder: (_, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return buildLoadingDropdown();
-                        }
+                ),
 
-                        if (snapshot.hasData) {
-                          dynamic jsonString =
-                              utf8.decode(snapshot.data.bodyBytes);
-                          dynamic responseData = json.decode(jsonString);
+                // Visibility(
+                //     visible: isSearchMode,
+                //     child: Padding(
+                //       padding:
+                //           EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+                //       child: FutureBuilder<List<CategorieProduit>>(
+                //         future: _categorieProduitListe,
+                //         builder: (context, snapshot) {
+                //           if (snapshot.connectionState ==
+                //               ConnectionState.waiting) {
+                //             return SearchFieldAutoComplete<String>(
+                //               placeholder: 'Rechercher...',
+                //               suggestions: [],
+                //             );
+                //           } else {
+                //             return SearchFieldAutoComplete<String>(
+                //               controller: _searchController,
+                //               placeholder: 'Rechercher...',
+                //               placeholderStyle:
+                //                   TextStyle(fontStyle: FontStyle.italic),
+                //               suggestions: snapshot.data!
+                //                   .map((item) =>
+                //                       SearchFieldAutoCompleteItem<String>(
+                //                         searchKey: item.libelleCategorie!,
+                //                         value: item.libelleCategorie!,
+                //                       ))
+                //                   .toList(),
+                //               suggestionsDecoration: SuggestionDecoration(
+                //                 marginSuggestions: const EdgeInsets.all(8.0),
+                //                 color: const Color.fromARGB(255, 236, 234, 234),
+                //                 borderRadius: BorderRadius.circular(16.0),
+                //               ),
+                //               onSuggestionSelected: (selectedItem) {
+                //                 if (mounted) {
+                //                   _searchController.text =
+                //                       selectedItem.searchKey;
+                //                   print(_searchController.text);
+                //                 }
+                //               },
+                //               suggestionItemBuilder:
+                //                   (context, searchFieldItem) {
+                //                 return Padding(
+                //                   padding: const EdgeInsets.all(8.0),
+                //                   child: Text(
+                //                     searchFieldItem.searchKey,
+                //                     style: TextStyle(color: Colors.black),
+                //                   ),
+                //                 );
+                //               },
+                //             );
+                //           }
+                //         },
+                //       ),
+                //     )),
 
-                          if (responseData is List) {
-                            final reponse = responseData;
-                            final typeList = reponse
-                                .map((e) => Filiere.fromMap(e))
-                                .where((con) => con.statutFiliere == true)
-                                .toList();
-
-                            if (typeList.isEmpty) {
-                              return buildEmptyDropdown();
-                            }
-
-                            return buildDropdown(typeList);
-                          } else {
-                            return buildEmptyDropdown();
-                          }
-                        }
-
-                        return buildEmptyDropdown();
-                      },
-                    ),
-                  ),
-              ])),
-            ];
-          },
-          body: SingleChildScrollView(
-            controller: scrollableController,
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
                 // Padding(
-
+                //   padding: const EdgeInsets.all(10.0),
+                //   child: ToggleButtons(
+                //     children: [
+                //       Padding(
+                //         padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                //         child: Text('Rechercher'),
+                //       ),
+                //       Padding(
+                //         padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                //         child: Text('Filtrer'),
+                //       ),
+                //     ],
+                //     isSelected: [isSearchMode, !isSearchMode],
+                //      onPressed: _updateMode,
+                //   ),
+                // ),
+                // if (isSearchMode)
+                // Padding(
                 //   padding: const EdgeInsets.all(10.0),
                 //   child: Container(
                 //     padding: EdgeInsets.symmetric(horizontal: 10),
@@ -328,7 +380,8 @@ class _CategoriPageState extends State<CategoriPage> {
                 //     child: Row(
                 //       children: [
                 //         Icon(Icons.search,
-                //             color: Colors.blueGrey[400]), // Couleur de l'icône
+                //             color:
+                //                 Colors.blueGrey[400]), // Couleur de l'icône
                 //         SizedBox(
                 //             width:
                 //                 10), // Espacement entre l'icône et le champ de recherche
@@ -342,8 +395,8 @@ class _CategoriPageState extends State<CategoriPage> {
                 //               hintText: 'Rechercher',
                 //               border: InputBorder.none,
                 //               hintStyle: TextStyle(
-                //                   color: Colors
-                //                       .blueGrey[400]), // Couleur du texte d'aide
+                //                   color: Colors.blueGrey[
+                //                       400]), // Couleur du texte d'aide
                 //             ),
                 //           ),
                 //         ),
@@ -352,8 +405,51 @@ class _CategoriPageState extends State<CategoriPage> {
                 //   ),
                 // ),
 
-                // const SizedBox(height: 10),
-                const SizedBox(height: 10),
+                // if (!isSearchMode)
+                //   Padding(
+                //     padding: const EdgeInsets.symmetric(
+                //         vertical: 3, horizontal: 10),
+                //     child: FutureBuilder(
+                //       future: _filiereList,
+                //       builder: (_, snapshot) {
+                //         if (snapshot.connectionState ==
+                //             ConnectionState.waiting) {
+                //           return buildLoadingDropdown();
+                //         }
+
+                //         if (snapshot.hasData) {
+                //           dynamic jsonString =
+                //               utf8.decode(snapshot.data.bodyBytes);
+                //           dynamic responseData = json.decode(jsonString);
+
+                //           if (responseData is List) {
+                //             final reponse = responseData;
+                //             final typeList = reponse
+                //                 .map((e) => Filiere.fromMap(e))
+                //                 .where((con) => con.statutFiliere == true)
+                //                 .toList();
+
+                //             if (typeList.isEmpty) {
+                //               return buildEmptyDropdown();
+                //             }
+
+                //             return buildDropdown(typeList);
+                //           } else {
+                //             return buildEmptyDropdown();
+                //           }
+                //         }
+
+                //         return buildEmptyDropdown();
+                //       },
+                //     ),
+                //   ),
+              ])),
+            ];
+          },
+          body: SingleChildScrollView(
+            controller: scrollableController,
+            child: Column(
+              children: [
                 Consumer<CategorieService>(
                   builder: (context, categorieService, child) {
                     return FutureBuilder(
@@ -394,15 +490,16 @@ class _CategoriPageState extends State<CategoriPage> {
                           } else {
                             categorieList = snapshot.data!;
                             String searchText = "";
-                            List<CategorieProduit> filteredCatSearch =
+                            List<CategorieProduit> filteredSearch =
                                 categorieList.where((cate) {
                               String nomCat =
                                   cate.libelleCategorie!.toLowerCase();
                               searchText = _searchController.text.toLowerCase();
                               return nomCat.contains(searchText);
                             }).toList();
+
                             return Column(
-                                children: filteredCatSearch.isEmpty
+                                children: filteredSearch.isEmpty
                                     ? [
                                         Padding(
                                           padding: EdgeInsets.all(10),
@@ -426,7 +523,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                           ),
                                         )
                                       ]
-                                    : filteredCatSearch
+                                    : filteredSearch
                                         .map((e) => Padding(
                                               padding:
                                                   const EdgeInsets.symmetric(
@@ -1273,10 +1370,9 @@ class _CategoriPageState extends State<CategoriPage> {
         });
       },
       decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1288,10 +1384,9 @@ class _CategoriPageState extends State<CategoriPage> {
       onChanged: null,
       decoration: InputDecoration(
         labelText: '-- Aucune filière trouvé --',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1303,10 +1398,9 @@ class _CategoriPageState extends State<CategoriPage> {
       onChanged: null,
       decoration: InputDecoration(
         labelText: 'Chargement...',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );

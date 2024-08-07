@@ -22,7 +22,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProduitTransforme extends StatefulWidget {
-  
   ProduitTransforme({super.key});
 
   @override
@@ -38,7 +37,7 @@ class _ProduitTransformeState extends State<ProduitTransforme> {
   List<Stock> stockList = [];
   late Future<List<Stock>> stockListeFuture;
   late Future<List<Stock>> stockListeFuture1;
-String? detectedCountry;
+  String? detectedCountry;
   ScrollController scrollableController = ScrollController();
   ScrollController scrollableController1 = ScrollController();
 
@@ -69,8 +68,7 @@ String? detectedCountry;
         page++;
       });
 
-      fetchStock(
-              detectedCountry != null ? detectedCountry! : "Mali")
+      fetchStock(detectedCountry != null ? detectedCountry! : "Mali")
           .then((value) {
         setState(() {
           // Rafraîchir les données ici
@@ -138,7 +136,8 @@ String? detectedCountry;
     return stockListe;
   }
 
- bool isSearchMode = true;
+  bool isSearchMode = false;
+  bool isFilterMode = false;
   void _scrollListener1() {
     if (scrollableController1.position.pixels >=
             scrollableController1.position.maxScrollExtent - 200 &&
@@ -154,8 +153,7 @@ String? detectedCountry;
           page++;
         });
 
-      fetchStockByCategorie(
-              detectedCountry != null ? detectedCountry! : "Mali")
+      fetchStockByCategorie(detectedCountry != null ? detectedCountry! : "Mali")
           .then((value) {
         setState(() {
           // Rafraîchir les données ici
@@ -166,10 +164,12 @@ String? detectedCountry;
     debugPrint("no");
   }
 
-   Future<List<Stock>> getAllStock() async {
+  Future<List<Stock>> getAllStock() async {
     if (selectedCat != null) {
       stockListe = await StockService().fetchStockByCategorieAndFiliere(
-          selectedCat!.idCategorieProduit!, libelle , detectedCountry != null ? detectedCountry! : "mali");
+          selectedCat!.idCategorieProduit!,
+          libelle,
+          detectedCountry != null ? detectedCountry! : "mali");
     }
 
     return stockListe;
@@ -230,7 +230,7 @@ String? detectedCountry;
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString('emailActeur');
+    email = prefs.getString('whatsAppActeur');
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -250,7 +250,7 @@ String? detectedCountry;
   @override
   void initState() {
     super.initState();
-   final paysProvider = Provider.of<DetectorPays>(context, listen: false);
+    final paysProvider = Provider.of<DetectorPays>(context, listen: false);
     paysProvider.hasLocation
         ? detectedCountry =
             Provider.of<DetectorPays>(context, listen: false).detectedCountry!
@@ -263,14 +263,15 @@ String? detectedCountry;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener1);
     });
-    _catList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorieByLibelleFiliere/$libelle'));
+    _catList = http.get(Uri.parse(
+        '$apiOnlineUrl/Categorie/allCategorieByLibelleFiliere/$libelle'));
     stockListeFuture1 = getAllStock();
-    stockListeFuture = fetchStock(
-        detectedCountry != null ? detectedCountry! : "Mali");
+    stockListeFuture =
+        fetchStock(detectedCountry != null ? detectedCountry! : "Mali");
     verify();
   }
 
-   void _updateMode(int index) {
+  void _updateMode(int index) {
     if (mounted) {
       setState(() {
         isSearchMode = index == 0;
@@ -286,18 +287,30 @@ String? detectedCountry;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+  }
+
+  void _selectMode(String mode) {
+    setState(() {
+      if (mode == 'Rechercher') {
+        isSearchMode = true;
+        isFilterMode = false;
+      } else if (mode == 'Filtrer') {
+        isSearchMode = false;
+        isFilterMode = true;
+      } else if (mode == 'Fermer') {
+        isSearchMode = false;
+        isFilterMode = false;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
     if (isSearchMode) {
       _searchController = TextEditingController();
     } else {
       _searchController.dispose();
     }
-  }
-
-  @override
-  void dispose() {
-    _searchController
-        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
-    scrollableController.dispose();
     scrollableController1.dispose();
     super.dispose();
   }
@@ -313,8 +326,8 @@ String? detectedCountry;
     if (result == true) {
       print("Rafraichissement en cours");
       setState(() {
-        stockListeFuture = fetchStock(
-            detectedCountry != null ? detectedCountry! : "Mali");
+        stockListeFuture =
+            fetchStock(detectedCountry != null ? detectedCountry! : "Mali");
       });
     }
   }
@@ -343,20 +356,18 @@ String? detectedCountry;
               ? [
                   IconButton(
                       onPressed: () {
-                        stockListeFuture = fetchStock(
-                            detectedCountry != null
-                                ? detectedCountry!
-                                : "Mali");
+                        stockListeFuture = fetchStock(detectedCountry != null
+                            ? detectedCountry!
+                            : "Mali");
                       },
                       icon: const Icon(Icons.refresh, color: d_colorGreen)),
                 ]
               : [
                   IconButton(
                       onPressed: () {
-                        stockListeFuture = fetchStock(
-                            detectedCountry != null
-                                ? detectedCountry!
-                                : "Mali");
+                        stockListeFuture = fetchStock(detectedCountry != null
+                            ? detectedCountry!
+                            : "Mali");
                       },
                       icon: const Icon(Icons.refresh, color: d_colorGreen)),
                   (typeActeurData
@@ -407,60 +418,51 @@ String? detectedCountry;
                   return <Widget>[
                     SliverToBoxAdapter(
                         child: Column(children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ToggleButtons(
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Text('Rechercher'),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Text('Filtrer'),
-                            ),
-                          ],
-                          isSelected: [isSearchMode, !isSearchMode],
-                           onPressed: _updateMode,
-                        ),
-                      ),
-                      if (isSearchMode)
-                         Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: SearchFieldAutoComplete<String>(
-                            controller: _searchController,
-                             itemHeight: 25,
-                            placeholder: 'Rechercher...',
-                            placeholderStyle:
-                                TextStyle(fontStyle: FontStyle.italic),
-                            suggestions: AutoComplet.getTransformer,
-                            suggestionsDecoration: SuggestionDecoration(
-                              marginSuggestions: const EdgeInsets.all(8.0),
-                              color: const Color.fromARGB(255, 236, 234, 234),
-                              borderRadius: BorderRadius.circular(16.0),
-                            ),
-                           onSuggestionSelected: (selectedItem) {
-                              if (mounted) {
-                                _searchController.text = selectedItem.searchKey;
-                              }
-                            },
-                            suggestionItemBuilder: (context, searchFieldItem) {
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  searchFieldItem.searchKey,
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
                       if (!isSearchMode)
-                        Padding(
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          isSearchMode = true;
+                          isFilterMode = true;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.search,
+                        color: d_colorGreen,
+                      ),
+                      label: Text(
+                        'Rechercher',
+                        style: TextStyle(color: d_colorGreen, fontSize: 17),
+                      ),
+                    ),
+                  ),
+                      if (isSearchMode)
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  isSearchMode = false;
+                                  isFilterMode = false;
+                                });
+                              },
+                              icon: Icon(
+                                Icons.close,
+                                color: Colors.red,
+                              ),
+                              label: Text(
+                                'Fermer',
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 17),
+                              ),
+                            )),
+                      Visibility(
+                        visible: isSearchMode,
+                        child: Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
+                              vertical: 3, horizontal: 10),
                           child: FutureBuilder(
                             future: _catList,
                             builder: (_, snapshot) {
@@ -475,8 +477,8 @@ String? detectedCountry;
                                 dynamic responseData = json.decode(jsonString);
 
                                 if (responseData is List) {
-                                  final reponse = responseData;
-                                  final typeList = reponse
+                                  final response = responseData;
+                                  final typeList = response
                                       .map((e) => CategorieProduit.fromMap(e))
                                       .where(
                                           (con) => con.statutCategorie == true)
@@ -496,6 +498,40 @@ String? detectedCountry;
                             },
                           ),
                         ),
+                      ),
+                      Visibility(
+                        visible: isSearchMode,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 3, horizontal: 10),
+                          child: SearchFieldAutoComplete<String>(
+                            controller: _searchController,
+                            placeholder: 'Rechercher...',
+                            placeholderStyle:
+                                TextStyle(fontStyle: FontStyle.italic),
+                            suggestions: AutoComplet.getAgriculturalProducts,
+                            suggestionsDecoration: SuggestionDecoration(
+                              marginSuggestions: const EdgeInsets.all(8.0),
+                              color: const Color.fromARGB(255, 236, 234, 234),
+                              borderRadius: BorderRadius.circular(16.0),
+                            ),
+                            onSuggestionSelected: (selectedItem) {
+                              if (mounted) {
+                                _searchController.text = selectedItem.searchKey;
+                              }
+                            },
+                            suggestionItemBuilder: (context, searchFieldItem) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  searchFieldItem.searchKey,
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 10),
                     ])),
                   ];
@@ -507,8 +543,8 @@ String? detectedCountry;
                         // Rafraîchir les données ici
                       });
                       debugPrint("refresh page ${page}");
-                     
-                       selectedCat != null
+
+                      selectedCat != null
                           ? setState(() {
                               stockListeFuture1 = StockService()
                                   .fetchStockByCategorieAndFiliere(
@@ -519,211 +555,227 @@ String? detectedCountry;
                                           : "Mali");
                             })
                           : setState(() {
-                        stockListeFuture = fetchStock(
-                            detectedCountry != null
-                                ? detectedCountry!
-                                : "Mali");
-                      });
+                              stockListeFuture = fetchStock(
+                                  detectedCountry != null
+                                      ? detectedCountry!
+                                      : "Mali");
+                            });
                       debugPrint("refresh page ${page}");
                     },
-                    child: selectedCat == null ?
-                     SingleChildScrollView(
-                      controller: scrollableController,
-                      child: Consumer<StockService>(
-                          builder: (context, intrantService, child) {
-                        return FutureBuilder(
-                            future: stockListeFuture,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return _buildShimmerEffect();
-                              }
+                    child: selectedCat == null
+                        ? SingleChildScrollView(
+                            controller: scrollableController,
+                            child: Consumer<StockService>(
+                                builder: (context, intrantService, child) {
+                              return FutureBuilder(
+                                  future: stockListeFuture,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return _buildShimmerEffect();
+                                    }
 
-                              if (!snapshot.hasData) {
-                                return const Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child:
-                                      Center(child: Text("Aucun donné trouvé")),
-                                );
-                              } else {
-                                stockList = snapshot.data!;
-                                String searchText = "";
-                                List<Stock> filteredSearch =
-                                    stockList.where((cate) {
-                                  String nomCat =
-                                      cate.nomProduit!.toLowerCase();
-                                  searchText =
-                                      _searchController.text.toLowerCase();
-                                  return nomCat.contains(searchText);
-                                }).toList();
-                                return filteredSearch
-                                            // .where((element) => element.statutIntrant == true)
-                                            .isEmpty &&
-                                        isLoading == false
-                                    ? SingleChildScrollView(
-                                        child: Padding(
-                                          padding: EdgeInsets.all(10),
-                                          child: Center(
-                                            child: Column(
-                                              children: [
-                                                Image.asset(
-                                                    'assets/images/notif.jpg'),
-                                                SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Text(
-                                                  'Aucun produit trouvé',
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 17,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                    if (!snapshot.hasData) {
+                                      return const Padding(
+                                        padding: EdgeInsets.all(10),
+                                        child: Center(
+                                            child: Text("Aucun donné trouvé")),
+                                      );
+                                    } else {
+                                      stockList = snapshot.data!;
+                                      String searchText = "";
+                                      List<Stock> filteredSearch =
+                                          stockList.where((cate) {
+                                        String nomCat =
+                                            cate.nomProduit!.toLowerCase();
+                                        searchText = _searchController.text
+                                            .toLowerCase();
+                                        return nomCat.contains(searchText);
+                                      }).toList();
+                                      return filteredSearch
+                                                  // .where((element) => element.statutIntrant == true)
+                                                  .isEmpty &&
+                                              isLoading == false
+                                          ? SingleChildScrollView(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(10),
+                                                child: Center(
+                                                  child: Column(
+                                                    children: [
+                                                      Image.asset(
+                                                          'assets/images/notif.jpg'),
+                                                      SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Text(
+                                                        'Aucun produit trouvé',
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 17,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    : GridView.builder(
-                                        shrinkWrap: true,
-                                        physics: NeverScrollableScrollPhysics(),
-                                        gridDelegate:
-                                            SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 2,
-                                          mainAxisSpacing: 10,
-                                          crossAxisSpacing: 10,
-                                          childAspectRatio: 0.8,
-                                        ),
-                                        itemCount: filteredSearch.length + 1,
-                                        itemBuilder: (context, index) {
-                                          if (index < filteredSearch.length) {
-                                            return GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        DetailProduits(
-                                                      stock:
-                                                          filteredSearch[index],
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              child: Card(
-                                                margin: EdgeInsets.all(8),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .stretch,
-                                                  children: [
-                                                    ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8.0),
-                                                      child: SizedBox(
-                                                        height: 85,
-                                                        child: filteredSearch[
-                                                                            index]
-                                                                        .photo ==
-                                                                    null ||
-                                                                filteredSearch[
-                                                                        index]
-                                                                    .photo!
-                                                                    .isEmpty
-                                                            ? Image.asset(
-                                                                "assets/images/default_image.png",
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                              )
-                                                            : CachedNetworkImage(
-                                                                imageUrl:
-                                                                    "https://koumi.ml/api-koumi/Stock/${filteredSearch[index].idStock}/image",
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                                placeholder: (context,
-                                                                        url) =>
-                                                                    const Center(
-                                                                        child:
-                                                                            CircularProgressIndicator()),
-                                                                errorWidget: (context,
-                                                                        url,
-                                                                        error) =>
-                                                                    Image.asset(
-                                                                  'assets/images/default_image.png',
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                ),
-                                                              ),
-                                                      ),
-                                                    ),
-                                                    // SizedBox(height: 8),
-                                                    ListTile(
-                                                      title: Text(
-                                                        filteredSearch[index]
-                                                            .nomProduit!,
-                                                        style: TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.black87,
-                                                        ),
-                                                        maxLines: 2,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      subtitle: Text(
-                                                        "${filteredSearch[index].quantiteStock.toString()} ${filteredSearch[index].unite!.sigleUnite}",
-                                                        style: TextStyle(
-                                                          fontSize: 15,
-                                                          color: Colors.black87,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 15),
-                                                      child: Text(
-                                                        filteredSearch[index]
-                                                                    .monnaie !=
-                                                                null
-                                                            ? "${filteredSearch[index].prix.toString()} ${filteredSearch[index].monnaie!.libelle}"
-                                                            : "${filteredSearch[index].prix.toString()} FCFA ",
-                                                        style: TextStyle(
-                                                          fontSize: 15,
-                                                          color: Colors.black87,
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ],
                                                 ),
                                               ),
-                                            );
-                                          } else {
-                                            return isLoading == true
-                                                ? Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 32),
-                                                    child: Center(
-                                                        child: const Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        color: Colors.orange,
+                                            )
+                                          : GridView.builder(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              gridDelegate:
+                                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: 2,
+                                                mainAxisSpacing: 10,
+                                                crossAxisSpacing: 10,
+                                                childAspectRatio: 0.8,
+                                              ),
+                                              itemCount:
+                                                  filteredSearch.length + 1,
+                                              itemBuilder: (context, index) {
+                                                if (index <
+                                                    filteredSearch.length) {
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              DetailProduits(
+                                                            stock:
+                                                                filteredSearch[
+                                                                    index],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: Card(
+                                                      margin: EdgeInsets.all(8),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .stretch,
+                                                        children: [
+                                                          ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8.0),
+                                                            child: SizedBox(
+                                                              height: 85,
+                                                              child: filteredSearch[index]
+                                                                              .photo ==
+                                                                          null ||
+                                                                      filteredSearch[
+                                                                              index]
+                                                                          .photo!
+                                                                          .isEmpty
+                                                                  ? Image.asset(
+                                                                      "assets/images/default_image.png",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    )
+                                                                  : CachedNetworkImage(
+                                                                      imageUrl:
+                                                                          "https://koumi.ml/api-koumi/Stock/${filteredSearch[index].idStock}/image",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      placeholder: (context,
+                                                                              url) =>
+                                                                          const Center(
+                                                                              child: CircularProgressIndicator()),
+                                                                      errorWidget: (context,
+                                                                              url,
+                                                                              error) =>
+                                                                          Image
+                                                                              .asset(
+                                                                        'assets/images/default_image.png',
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      ),
+                                                                    ),
+                                                            ),
+                                                          ),
+                                                          // SizedBox(height: 8),
+                                                          ListTile(
+                                                            title: Text(
+                                                              filteredSearch[
+                                                                      index]
+                                                                  .nomProduit!,
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                              maxLines: 2,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                            ),
+                                                            subtitle: Text(
+                                                              "${filteredSearch[index].quantiteStock.toString()} ${filteredSearch[index].unite!.sigleUnite}",
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        15),
+                                                            child: Text(
+                                                              filteredSearch[index]
+                                                                          .monnaie !=
+                                                                      null
+                                                                  ? "${filteredSearch[index].prix.toString()} ${filteredSearch[index].monnaie!.libelle}"
+                                                                  : "${filteredSearch[index].prix.toString()} FCFA ",
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
                                                       ),
-                                                    )),
-                                                  )
-                                                : Container();
-                                          }
-                                        },
-                                      );
-                              }
-                            });
-                      }),
-                    )
-                    : SingleChildScrollView(
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return isLoading == true
+                                                      ? Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      32),
+                                                          child: Center(
+                                                              child:
+                                                                  const Center(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              color:
+                                                                  Colors.orange,
+                                                            ),
+                                                          )),
+                                                        )
+                                                      : Container();
+                                                }
+                                              },
+                                            );
+                                    }
+                                  });
+                            }),
+                          )
+                        : SingleChildScrollView(
                             controller: scrollableController1,
                             child: Consumer<StockService>(
                                 builder: (context, intrantService, child) {
@@ -934,8 +986,7 @@ String? detectedCountry;
                                     }
                                   });
                             }),
-                          )
-                    ))));
+                          )))));
   }
 
   Widget _buildShimmerEffect() {
@@ -1039,10 +1090,9 @@ String? detectedCountry;
         });
       },
       decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1054,10 +1104,9 @@ String? detectedCountry;
       onChanged: null,
       decoration: InputDecoration(
         labelText: '-- Aucun catégorie trouvé --',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1069,10 +1118,9 @@ String? detectedCountry;
       onChanged: null,
       decoration: InputDecoration(
         labelText: 'Chargement...',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );

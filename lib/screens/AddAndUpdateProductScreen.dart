@@ -230,7 +230,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                           ),
                         ),
                       ),
-                       Padding(
+                      Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 20),
                         child: TextFormField(
@@ -430,7 +430,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Probleme de connexion',
+                                    labelText: 'Aucune forme de produit trouvé',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(

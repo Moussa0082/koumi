@@ -46,7 +46,7 @@ class _CommandeScreenState extends State<CommandeScreen> {
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString('emailActeur');
+    email = prefs.getString('whatsAppActeur');
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;

@@ -22,8 +22,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SemenceAndPlant extends StatefulWidget {
-
-
   SemenceAndPlant({super.key});
 
   @override
@@ -52,14 +50,13 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
   List<Intrant> intrantList = [];
   String? catValue;
   late Future _typeList;
-  bool isSearchMode = true;
+  bool isSearchMode = false;
+  bool isFilterMode = false;
   CategorieProduit? selectedCat;
   // CategorieProduit? selectedType;
   ScrollController scrollableController1 = ScrollController();
 
   String libelle = "Semences et plants";
-
-  
 
   void _scrollListener() {
     debugPrint("Scroll position: ${scrollableController.position.pixels}");
@@ -141,7 +138,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     return intrantListe;
   }
 
-   void _scrollListener1() {
+  void _scrollListener1() {
     if (scrollableController1.position.pixels >=
             scrollableController1.position.maxScrollExtent - 200 &&
         hasMore &&
@@ -226,9 +223,10 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     }
     return intrantListe;
   }
+
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString('emailActeur');
+    email = prefs.getString('whatsAppActeur');
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -244,10 +242,12 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     }
   }
 
- Future<List<Intrant>> getAllIntrant() async {
+  Future<List<Intrant>> getAllIntrant() async {
     if (selectedCat != null) {
       intrantListe = await IntrantService().fetchIntrantByCategorieAndFilieres(
-          selectedCat!.idCategorieProduit!, libelle,  detectedCountry != null ? detectedCountry! : "Mali");
+          selectedCat!.idCategorieProduit!,
+          libelle,
+          detectedCountry != null ? detectedCountry! : "Mali");
     }
 
     return intrantListe;
@@ -289,7 +289,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     }
   }
 
- void _updateMode(int index) {
+  void _updateMode(int index) {
     if (mounted) {
       setState(() {
         isSearchMode = index == 0;
@@ -302,23 +302,36 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     }
   }
 
-  
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
     if (isSearchMode) {
       _searchController = TextEditingController();
     } else {
       _searchController.dispose();
     }
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
     scrollableController.dispose();
     scrollableController1.dispose();
     super.dispose();
+  }
+
+  void _selectMode(String mode) {
+    setState(() {
+      if (mode == 'Rechercher') {
+        isSearchMode = true;
+        isFilterMode = false;
+      } else if (mode == 'Filtrer') {
+        isSearchMode = false;
+        isFilterMode = true;
+      } else if (mode == 'Fermer') {
+        isSearchMode = false;
+        isFilterMode = false;
+      }
+    });
   }
 
   @override
@@ -437,60 +450,51 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                   return <Widget>[
                     SliverToBoxAdapter(
                         child: Column(children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ToggleButtons(
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Text('Rechercher'),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Text('Filtrer'),
-                            ),
-                          ],
-                          isSelected: [isSearchMode, !isSearchMode],
-                         onPressed: _updateMode,
-                        ),
-                      ),
-                      if (isSearchMode)
-                          Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: SearchFieldAutoComplete<String>(
-                            controller: _searchController,
-                            placeholder: 'Rechercher...',
-                             itemHeight: 25,
-                            placeholderStyle:
-                                TextStyle(fontStyle: FontStyle.italic),
-                            suggestions: AutoComplet.getAgriculturalInputs,
-                            suggestionsDecoration: SuggestionDecoration(
-                              marginSuggestions: const EdgeInsets.all(8.0),
-                              color: const Color.fromARGB(255, 236, 234, 234),
-                              borderRadius: BorderRadius.circular(16.0),
-                            ),
-                            onSuggestionSelected: (selectedItem) {
-                              if (mounted) {
-                                _searchController.text = selectedItem.searchKey;
-                              }
-                            },
-                            suggestionItemBuilder: (context, searchFieldItem) {
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  searchFieldItem.searchKey,
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
                       if (!isSearchMode)
-                        Padding(
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          isSearchMode = true;
+                          isFilterMode = true;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.search,
+                        color: d_colorGreen,
+                      ),
+                      label: Text(
+                        'Rechercher',
+                        style: TextStyle(color: d_colorGreen, fontSize: 17),
+                      ),
+                    ),
+                  ),
+                      if (isSearchMode)
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  isSearchMode = false;
+                                  isFilterMode = false;
+                                });
+                              },
+                              icon: Icon(
+                                Icons.close,
+                                color: Colors.red,
+                              ),
+                              label: Text(
+                                'Fermer',
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 17),
+                              ),
+                            )),
+                      Visibility(
+                        visible: isSearchMode,
+                        child: Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
+                              vertical: 3, horizontal: 10),
                           child: FutureBuilder(
                             future: _typeList,
                             builder: (_, snapshot) {
@@ -527,6 +531,40 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                             },
                           ),
                         ),
+                      ),
+                      Visibility(
+                        visible: isSearchMode,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 3, horizontal: 10),
+                          child: SearchFieldAutoComplete<String>(
+                            controller: _searchController,
+                            placeholder: 'Rechercher...',
+                            placeholderStyle:
+                                TextStyle(fontStyle: FontStyle.italic),
+                            suggestions: AutoComplet.getAgriculturalInputs,
+                            suggestionsDecoration: SuggestionDecoration(
+                              marginSuggestions: const EdgeInsets.all(8.0),
+                              color: const Color.fromARGB(255, 236, 234, 234),
+                              borderRadius: BorderRadius.circular(16.0),
+                            ),
+                            onSuggestionSelected: (selectedItem) {
+                              if (mounted) {
+                                _searchController.text = selectedItem.searchKey;
+                              }
+                            },
+                            suggestionItemBuilder: (context, searchFieldItem) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  searchFieldItem.searchKey,
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 10),
                     ])),
                   ];
@@ -544,7 +582,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                                   .fetchIntrantByCategorieAndFilieres(
                                       selectedCat!.idCategorieProduit!,
                                       libelle,
-                                       detectedCountry != null
+                                      detectedCountry != null
                                           ? detectedCountry!
                                           : "Mali");
                             })
@@ -1101,9 +1139,9 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
 
           page = 0;
           hasMore = true;
-          fetchIntrantByCategorieAndFiliere(detectedCountry != null
-              ? detectedCountry!
-              : "Mali",refresh: true);
+          fetchIntrantByCategorieAndFiliere(
+              detectedCountry != null ? detectedCountry! : "Mali",
+              refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
               scrollableController1.jumpTo(0.0);
@@ -1112,10 +1150,9 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
         });
       },
       decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1127,10 +1164,9 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
       onChanged: null,
       decoration: InputDecoration(
         labelText: '-- Aucune catégorie trouvé --',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1142,10 +1178,9 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
       onChanged: null,
       decoration: InputDecoration(
         labelText: 'Chargement...',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );

@@ -51,7 +51,8 @@ class _StoreScreenState extends State<StoreScreen> {
   late Future<List<Magasin>> _magasinList;
   bool isExist = false;
   String? email = "";
-  bool isSearchMode = true;
+  bool isSearchMode = false;
+  bool isFilterMode = false;
 
   ScrollController scrollableController = ScrollController();
   ScrollController scrollableController1 = ScrollController();
@@ -189,7 +190,7 @@ class _StoreScreenState extends State<StoreScreen> {
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString('emailActeur');
+    email = prefs.getString('whatsAppActeur');
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -253,7 +254,7 @@ class _StoreScreenState extends State<StoreScreen> {
   @override
   void initState() {
     super.initState();
-   
+
     // detectedCountry =
     //     Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
     verify();
@@ -285,22 +286,20 @@ class _StoreScreenState extends State<StoreScreen> {
     }
   }
 
-  
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (isSearchMode) {
-      _searchController = TextEditingController();
-    } else {
-      _searchController.dispose();
-    }
   }
 
   @override
   void dispose() {
     scrollableController.dispose();
     scrollableController1.dispose();
-    _searchController.dispose();
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
+    }
     super.dispose();
   }
 
@@ -314,6 +313,21 @@ class _StoreScreenState extends State<StoreScreen> {
         magasinListeFuture = MagasinService().fetchAllMagasin();
       });
     }
+  }
+
+  void _selectMode(String mode) {
+    setState(() {
+      if (mode == 'Rechercher') {
+        isSearchMode = true;
+        isFilterMode = false;
+      } else if (mode == 'Filtrer') {
+        isSearchMode = false;
+        isFilterMode = true;
+      } else if (mode == 'Fermer') {
+        isSearchMode = false;
+        isFilterMode = false;
+      }
+    });
   }
 
   Future<void> _getResultFromNextScreen2(BuildContext context) async {
@@ -379,25 +393,25 @@ class _StoreScreenState extends State<StoreScreen> {
                           padding: EdgeInsets.zero,
                           itemBuilder: (context) {
                             return <PopupMenuEntry<String>>[
-                              PopupMenuItem<String>(
-                                child: ListTile(
-                                  leading: const Icon(
-                                    Icons.add,
-                                    color: Colors.green,
-                                  ),
-                                  title: const Text(
-                                    "Ajouter magasin",
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  onTap: () async {
-                                    Navigator.of(context).pop();
-                                    _getResultFromNextScreen2(context);
-                                  },
-                                ),
-                              ),
+                              // PopupMenuItem<String>(
+                              //   child: ListTile(
+                              //     leading: const Icon(
+                              //       Icons.add,
+                              //       color: Colors.green,
+                              //     ),
+                              //     title: const Text(
+                              //       "Ajouter magasin",
+                              //       style: TextStyle(
+                              //         color: Colors.green,
+                              //         fontWeight: FontWeight.bold,
+                              //       ),
+                              //     ),
+                              //     onTap: () async {
+                              //       Navigator.of(context).pop();
+                              //       _getResultFromNextScreen2(context);
+                              //     },
+                              //   ),
+                              // ),
                               PopupMenuItem<String>(
                                 child: ListTile(
                                   leading: const Icon(
@@ -421,37 +435,6 @@ class _StoreScreenState extends State<StoreScreen> {
                           },
                         )
                       : Container()
-                  // PopupMenuButton<String>(
-                  //     padding: EdgeInsets.zero,
-                  //     itemBuilder: (context) {
-                  //       return <PopupMenuEntry<String>>[
-                  //         PopupMenuItem<String>(
-                  //           child: ListTile(
-                  //             leading: const Icon(
-                  //               Icons.remove_red_eye,
-                  //               color: Colors.green,
-                  //             ),
-                  //             title: const Text(
-                  //               "Mes boutiques",
-                  //               style: TextStyle(
-                  //                 color: Colors.green,
-                  //                 fontWeight: FontWeight.bold,
-                  //               ),
-                  //             ),
-                  //             onTap: () async {
-                  //               Navigator.of(context).pop();
-                  //               Navigator.push(
-                  //                 context,
-                  //                 MaterialPageRoute(
-                  //                   builder: (context) => MyStoresScreen(),
-                  //                 ),
-                  //               );
-                  //             },
-                  //           ),
-                  //         ),
-                  //       ];
-                  //     },
-                  //   ),
                 ],
         ),
         body: Container(
@@ -462,262 +445,267 @@ class _StoreScreenState extends State<StoreScreen> {
                     SliverToBoxAdapter(
                         child: Column(children: [
                       const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ToggleButtons(
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Text('Rechercher'),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Text('Filtrer'),
-                            ),
-                          ],
-                          isSelected: [isSearchMode, !isSearchMode],
-                         onPressed: _updateMode,
-                        ),
-                      ),
-                      if (isSearchMode)
-                        // Padding(
-                        //   padding: const EdgeInsets.all(10.0),
-                        //   child: Container(
-                        //     padding: EdgeInsets.symmetric(horizontal: 10),
-                        //     decoration: BoxDecoration(
-                        //       color: Colors.blueGrey[50],
-                        //       borderRadius: BorderRadius.circular(25),
-                        //     ),
-                        //     child: Row(
-                        //       children: [
-                        //         Icon(Icons.search, color: Colors.blueGrey[400]),
-                        //         SizedBox(width: 10),
-                        //         Expanded(
-                        //           child: TextField(
-                        //             controller: _searchController,
-                        //             onChanged: (value) {
-                        //               setState(() {});
-                        //             },
-                        //             decoration: InputDecoration(
-                        //               hintText: 'Rechercher',
-                        //               border: InputBorder.none,
-                        //               hintStyle: TextStyle(
-                        //                   color: Colors.blueGrey[400]),
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: FutureBuilder<List<Magasin>>(
-                            future: _magasinList,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return SearchFieldAutoComplete<String>(
-                                  placeholder: 'Rechercher...',
-                                  
-                                  suggestions: [],
-                                );
-                              } else {
-                                return SearchFieldAutoComplete<String>(
-                                  controller: _searchController,
-                                  placeholder: 'Rechercher...',
-                                   placeholderStyle:
-                                      TextStyle(fontStyle: FontStyle.italic),
-                                  suggestions: snapshot.data!
-                                      .map((item) =>
-                                          SearchFieldAutoCompleteItem<String>(
-                                            searchKey: item.nomMagasin!,
-                                            value: item.nomMagasin!,
-                                          ))
-                                      .toList(),
-                                  suggestionsDecoration: SuggestionDecoration(
-                                    marginSuggestions:
-                                        const EdgeInsets.all(8.0),
-                                    color: const Color.fromARGB(
-                                        255, 236, 234, 234),
-                                    borderRadius: BorderRadius.circular(16.0),
-                                  ),
-                                  onSuggestionSelected: (selectedItem) {
-                                    if (mounted) {
-                                      _searchController.text =
-                                          selectedItem.searchKey;
-                                    }
-                                  },
-                                  suggestionItemBuilder:
-                                      (context, searchFieldItem) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        searchFieldItem.searchKey,
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                    );
-                                  },
-                                );
-                              }
-                            },
-                          ),
-                        ),
                       if (!isSearchMode)
-                        Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              child: FutureBuilder(
-                                future: _paysList,
-                                builder: (_, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return DropdownButtonFormField(
-                                      items: [],
-                                      onChanged: null,
-                                      decoration: InputDecoration(
-                                        labelText: 'Chargement...',
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 10, horizontal: 20),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                    );
-                                  }
-
-                                  if (snapshot.hasData) {
-                                    dynamic jsonString =
-                                        utf8.decode(snapshot.data.bodyBytes);
-                                    dynamic responseData =
-                                        json.decode(jsonString);
-
-                                    // final reponse = json.decode(snapshot.data.body);
-                                    if (responseData is List) {
-                                      final paysList = responseData
-                                          .map((e) => Pays.fromMap(e))
-                                          .where(
-                                              (con) => con.statutPays == true)
-                                          .toList();
-                                      if (paysList.isEmpty) {
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          isSearchMode = true;
+                          isFilterMode = true;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.search,
+                        color: d_colorGreen,
+                      ),
+                      label: Text(
+                        'Rechercher',
+                        style: TextStyle(color: d_colorGreen, fontSize: 17),
+                      ),
+                    ),
+                  ),
+                      if (isSearchMode)
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  isSearchMode = false;
+                                  isFilterMode = false;
+                                });
+                              },
+                              icon: Icon(
+                                Icons.close,
+                                color: Colors.red,
+                              ),
+                              label: Text(
+                                'Fermer',
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 17),
+                              ),
+                            )),
+                      Visibility(
+                          visible: isSearchMode,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: FutureBuilder(
+                                    future: _paysList,
+                                    builder: (_, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
                                         return DropdownButtonFormField(
                                           items: [],
+                                          isExpanded: true,
                                           onChanged: null,
                                           decoration: InputDecoration(
-                                            labelText: 'Aucun pays trouvé',
+                                            labelText: 'Chargement...',
                                             contentPadding:
                                                 const EdgeInsets.symmetric(
-                                                    vertical: 10,
-                                                    horizontal: 20),
+                                                    vertical: 5,
+                                                    horizontal: 22),
                                             border: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(8),
+                                                  BorderRadius.circular(22),
                                             ),
                                           ),
                                         );
                                       }
 
-                                      return DropdownButtonFormField<String>(
-                                        isExpanded: true,
-                                        items: paysList
-                                            .map(
-                                              (e) => DropdownMenuItem(
-                                                value: e.idPays,
-                                                child: Text(e.nomPays!),
+                                      if (snapshot.hasData) {
+                                        dynamic jsonString = utf8
+                                            .decode(snapshot.data.bodyBytes);
+                                        dynamic responseData =
+                                            json.decode(jsonString);
+
+                                        // final reponse = json.decode(snapshot.data.body);
+                                        if (responseData is List) {
+                                          final paysList = responseData
+                                              .map((e) => Pays.fromMap(e))
+                                              .where((con) =>
+                                                  con.statutPays == true)
+                                              .toList();
+                                          if (paysList.isEmpty) {
+                                            return DropdownButtonFormField(
+                                              items: [],
+                                              isExpanded: true,
+                                              onChanged: null,
+                                              decoration: InputDecoration(
+                                                labelText: 'Aucun pays trouvé',
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 5,
+                                                        horizontal: 22),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(22),
+                                                ),
                                               ),
-                                            )
-                                            .toList(),
-                                        value: paysValue,
-                                        onChanged: (newValue) {
-                                          setState(() {
-                                            typeValue = null;
-                                            paysValue = newValue;
-                                            if (newValue != null) {
-                                              pays = paysList.firstWhere(
-                                                  (element) =>
-                                                      element.idPays ==
-                                                      newValue);
-                                              _niveau1PaysList = http.get(Uri.parse(
-                                                  '$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByIdPays/${newValue}'));
-                                            }
-                                          });
-                                        },
+                                            );
+                                          }
+
+                                          return DropdownButtonFormField<
+                                              String>(
+                                            isExpanded: true,
+                                            items: paysList
+                                                .map(
+                                                  (e) => DropdownMenuItem(
+                                                    value: e.idPays,
+                                                    child: Text(e.nomPays!),
+                                                  ),
+                                                )
+                                                .toList(),
+                                            value: paysValue,
+                                            onChanged: (newValue) {
+                                              setState(() {
+                                                typeValue = null;
+                                                paysValue = newValue;
+                                                if (newValue != null) {
+                                                  pays = paysList.firstWhere(
+                                                      (element) =>
+                                                          element.idPays ==
+                                                          newValue);
+                                                  _niveau1PaysList = http.get(
+                                                      Uri.parse(
+                                                          '$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByIdPays/${newValue}'));
+                                                }
+                                              });
+                                            },
+                                            decoration: InputDecoration(
+                                              labelText: '--Filtre par pays--',
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 5,
+                                                      horizontal: 22),
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(22),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                      return DropdownButtonFormField(
+                                        items: [],
+                                        isExpanded: true,
+                                        onChanged: null,
                                         decoration: InputDecoration(
-                                          labelText: 'Sélectionner un pays',
+                                          labelText: 'Aucun pays trouvé',
                                           contentPadding:
                                               const EdgeInsets.symmetric(
-                                                  vertical: 10, horizontal: 20),
+                                                  vertical: 5, horizontal: 22),
                                           border: OutlineInputBorder(
                                             borderRadius:
-                                                BorderRadius.circular(8),
+                                                BorderRadius.circular(22),
                                           ),
                                         ),
                                       );
-                                    }
-                                  }
-                                  return DropdownButtonFormField(
-                                    items: [],
-                                    onChanged: null,
-                                    decoration: InputDecoration(
-                                      labelText: 'Aucun pays trouvé',
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              child: FutureBuilder(
-                                future: _niveau1PaysList,
-                                builder: (_, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return buildLoadingDropdown();
-                                  }
-
-                                  if (snapshot.hasData) {
-                                    dynamic jsonString =
-                                        utf8.decode(snapshot.data.bodyBytes);
-                                    dynamic responseData =
-                                        json.decode(jsonString);
-                                    //
-                                    // }
-                                    if (responseData is List) {
-                                      final reponse = responseData;
-                                      final niveau1PaysList = reponse
-                                          .map((e) => Niveau1Pays.fromMap(e))
-                                          .where((con) => con.statutN1 == true)
-                                          .toList();
-
-                                      if (niveau1PaysList.isEmpty) {
-                                        return buildEmptyDropdown();
+                                    },
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Expanded(
+                                  child: FutureBuilder(
+                                    future: _niveau1PaysList,
+                                    builder: (_, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return buildLoadingDropdown();
                                       }
 
-                                      return buildDropdown(niveau1PaysList);
-                                    } else {
-                                      return buildEmptyDropdown();
-                                    }
-                                  }
+                                      if (snapshot.hasData) {
+                                        dynamic jsonString = utf8
+                                            .decode(snapshot.data.bodyBytes);
+                                        dynamic responseData =
+                                            json.decode(jsonString);
+                                        //
+                                        // }
+                                        if (responseData is List) {
+                                          final reponse = responseData;
+                                          final niveau1PaysList = reponse
+                                              .map(
+                                                  (e) => Niveau1Pays.fromMap(e))
+                                              .where(
+                                                  (con) => con.statutN1 == true)
+                                              .toList();
 
-                                  return buildEmptyDropdown();
-                                },
-                              ),
+                                          if (niveau1PaysList.isEmpty) {
+                                            return buildEmptyDropdown();
+                                          }
+
+                                          return buildDropdown(niveau1PaysList);
+                                        } else {
+                                          return buildEmptyDropdown();
+                                        }
+                                      }
+
+                                      return buildEmptyDropdown();
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          )),
+                      Visibility(
+                          visible: isSearchMode,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 3, horizontal: 10),
+                            child: FutureBuilder<List<Magasin>>(
+                              future: _magasinList,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return SearchFieldAutoComplete<String>(
+                                    placeholder: 'Rechercher...',
+                                    suggestions: [],
+                                  );
+                                } else {
+                                  return SearchFieldAutoComplete<String>(
+                                    controller: _searchController,
+                                    placeholder: 'Rechercher...',
+                                    placeholderStyle:
+                                        TextStyle(fontStyle: FontStyle.italic),
+                                    suggestions: snapshot.data!
+                                        .map((item) =>
+                                            SearchFieldAutoCompleteItem<String>(
+                                              searchKey: item.nomMagasin!,
+                                              value: item.nomMagasin!,
+                                            ))
+                                        .toList(),
+                                    suggestionsDecoration: SuggestionDecoration(
+                                      marginSuggestions:
+                                          const EdgeInsets.all(8.0),
+                                      color: const Color.fromARGB(
+                                          255, 236, 234, 234),
+                                      borderRadius: BorderRadius.circular(16.0),
+                                    ),
+                                    onSuggestionSelected: (selectedItem) {
+                                      if (mounted) {
+                                        _searchController.text =
+                                            selectedItem.searchKey;
+                                      }
+                                    },
+                                    suggestionItemBuilder:
+                                        (context, searchFieldItem) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          searchFieldItem.searchKey,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }
+                              },
+                            ),
+                          )),
                       const SizedBox(height: 10),
                     ])),
                   ];
@@ -918,7 +906,6 @@ class _StoreScreenState extends State<StoreScreen> {
                                                               filteredSearch[
                                                                       index]
                                                                   .contactMagasin!)
-                                                         
                                                         ],
                                                       ),
                                                     ),
@@ -1042,7 +1029,6 @@ class _StoreScreenState extends State<StoreScreen> {
                                                   ),
                                                   itemCount:
                                                       filteredSearch.length + 1,
-                                                
                                                   itemBuilder:
                                                       (context, index) {
                                                     if (index <
@@ -1283,7 +1269,7 @@ class _StoreScreenState extends State<StoreScreen> {
                 child: Text(e.nomN1!),
               ))
           .toList(),
-      hint: Text("-- Filtre par région --"),
+      hint: Text("--Filtrer par région--"),
       value: typeValue,
       onChanged: (newValue) {
         setState(() {
@@ -1306,10 +1292,9 @@ class _StoreScreenState extends State<StoreScreen> {
         });
       },
       decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1318,13 +1303,13 @@ class _StoreScreenState extends State<StoreScreen> {
   DropdownButtonFormField buildEmptyDropdown() {
     return DropdownButtonFormField(
       items: [],
+      isExpanded: true,
       onChanged: null,
       decoration: InputDecoration(
         labelText: '-- Aucune région trouvé --',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1333,13 +1318,13 @@ class _StoreScreenState extends State<StoreScreen> {
   DropdownButtonFormField buildLoadingDropdown() {
     return DropdownButtonFormField(
       items: [],
+      isExpanded: true,
       onChanged: null,
       decoration: InputDecoration(
         labelText: 'Chargement...',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );

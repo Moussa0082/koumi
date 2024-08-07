@@ -29,7 +29,7 @@ class _AddZoneState extends State<AddZone> {
   TextEditingController latitudeController = TextEditingController();
   TextEditingController longitudeController = TextEditingController();
   String? imageSrc;
-  late ValueNotifier<bool> isDialOpenNotifier;
+  // late ValueNotifier<bool> isDialOpenNotifier;
   bool _isLoading = false;
 
   File? photo;
@@ -109,13 +109,15 @@ class _AddZoneState extends State<AddZone> {
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    isDialOpenNotifier = ValueNotifier<bool>(false);
+    // isDialOpenNotifier = ValueNotifier<bool>(false);
+    _getCurrentPosition();
+    latitudeController.text = _currentPosition?.latitude.toString() ?? "";
+    longitudeController.text = _currentPosition?.longitude.toString() ?? "";
     super.initState();
   }
 
   @override
   void dispose() {
-    isDialOpenNotifier.dispose();
     latitudeController.dispose();
     longitudeController.dispose();
     super.dispose();
@@ -204,299 +206,299 @@ class _AddZoneState extends State<AddZone> {
     return LoadingOverlay(
       isLoading: _isLoading,
       child: Scaffold(
-          backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-          appBar: AppBar(
-            centerTitle: true,
-            toolbarHeight: 100,
-            leading: IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-            title: const Text(
-              "Ajouter d'une Zone",
-              style: TextStyle(
-                  color: d_colorGreen,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  overflow: TextOverflow.ellipsis),
-            ),
+        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+        appBar: AppBar(
+          centerTitle: true,
+          toolbarHeight: 100,
+          leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          title: const Text(
+            "Ajouter d'une Zone",
+            style: TextStyle(
+                color: d_colorGreen,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                overflow: TextOverflow.ellipsis),
           ),
-          body: SingleChildScrollView(
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-              Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: photo != null
-                      ? Image.file(
-                          photo!,
-                          fit: BoxFit.fitWidth,
-                          height: 130,
-                          width: 300,
-                        )
-                      : Container()),
-              const SizedBox(height: 10),
-              Form(
-                  key: formkey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 10.0),
-                        child: Text(
-                          "Nom de la zone",
-                          style: TextStyle(color: (Colors.black), fontSize: 18),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        child: TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Veuillez remplir les champs";
-                            }
-                            return null;
-                          },
-                          controller: nomController,
-                          decoration: InputDecoration(
-                            hintText: "Nom de la zone",
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-                      // const SizedBox(height: 10),
-                      const Text(
-                        "Latitude",
+        ),
+        body: SingleChildScrollView(
+          child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+            Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: photo != null
+                    ? Image.file(
+                        photo!,
+                        fit: BoxFit.fitWidth,
+                        height: 130,
+                        width: 300,
+                      )
+                    : Container()),
+            const SizedBox(height: 10),
+            Form(
+                key: formkey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10.0),
+                      child: Text(
+                        "Nom de la zone",
                         style: TextStyle(color: (Colors.black), fontSize: 18),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        child: TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Veuillez remplir les champs";
-                            }
-                            return null;
-                          },
-                          controller: latitudeController,
-                          decoration: InputDecoration(
-                            hintText: "Latitude",
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir les champs";
+                          }
+                          return null;
+                        },
+                        controller: nomController,
+                        decoration: InputDecoration(
+                          hintText: "Nom de la zone",
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
-                      // const SizedBox(height: 10),
-                      const Text(
-                        "Longitude",
-                        style: TextStyle(color: (Colors.black), fontSize: 18),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        child: TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Veuillez remplir les champs";
-                            }
-                            return null;
-                          },
-                          controller: longitudeController,
-                          decoration: InputDecoration(
-                            hintText: "Longitude",
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
+                    ),
+                    // const SizedBox(height: 10),
+                    // const Text(
+                    //   "Latitude",
+                    //   style: TextStyle(color: (Colors.black), fontSize: 18),
+                    // ),
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(
+                    //       vertical: 10, horizontal: 20),
+                    //   child: TextFormField(
+                    //     validator: (value) {
+                    //       if (value == null || value.isEmpty) {
+                    //         return "Veuillez remplir les champs";
+                    //       }
+                    //       return null;
+                    //     },
+                    //     controller: latitudeController,
+                    //     decoration: InputDecoration(
+                    //       hintText: "Latitude",
+                    //       contentPadding: const EdgeInsets.symmetric(
+                    //           vertical: 10, horizontal: 20),
+                    //       border: OutlineInputBorder(
+                    //         borderRadius: BorderRadius.circular(8),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 10),
+                    // const Text(
+                    //   "Longitude",
+                    //   style: TextStyle(color: (Colors.black), fontSize: 18),
+                    // ),
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(
+                    //       vertical: 10, horizontal: 20),
+                    //   child: TextFormField(
+                    //     validator: (value) {
+                    //       if (value == null || value.isEmpty) {
+                    //         return "Veuillez remplir les champs";
+                    //       }
+                    //       return null;
+                    //     },
+                    //     controller: longitudeController,
+                    //     decoration: InputDecoration(
+                    //       hintText: "Longitude",
+                    //       contentPadding: const EdgeInsets.symmetric(
+                    //           vertical: 10, horizontal: 20),
+                    //       border: OutlineInputBorder(
+                    //         borderRadius: BorderRadius.circular(8),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 60,
+                      child: IconButton(
+                        onPressed: _showImageSourceDialog,
+                        icon: const Icon(
+                          Icons.add_a_photo_rounded,
+                          size: 60,
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        height: 60,
-                        child: IconButton(
-                          onPressed:  _showImageSourceDialog,
-                          icon: const Icon(
-                            Icons.add_a_photo_rounded,
-                            size: 60,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton.icon(
-                          onPressed: () async {
-                            final String nom = nomController.text;
-                            final String latitude = latitudeController.text;
-                            final String longitude = longitudeController.text;
-                            print("acteur : ${acteur.toString()}");
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                        onPressed: () async {
+                          final String nom = nomController.text;
+                          final String latitude = latitudeController.text;
+                          final String longitude = longitudeController.text;
+                          print("acteur : ${acteur.toString()}");
 
-                            try {
-                              setState(() {
-                                _isLoading = true;
-                              });
-                              if (photo == null) {
-                                await ZoneProductionService()
-                                    .addZone(
-                                        nomZoneProduction: nom,
-                                        latitude: latitude,
-                                        longitude: longitude,
-                                        acteur: acteur)
-                                    .then((value) => {
-                                          Provider.of<ZoneProductionService>(
-                                                  context,
-                                                  listen: false)
-                                              .applyChange(),
-                                          setState(() {
-                                            _isLoading = false;
-                                          }),
-                                          nomController.clear(),
-                                          latitudeController.clear(),
-                                          longitudeController.clear(),
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text("Ajouter avec succèss"),
-                                                ],
-                                              ),
-                                              // duration: const Duration(seconds: 5),
+                          try {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            if (photo == null) {
+                              await ZoneProductionService()
+                                  .addZone(
+                                      nomZoneProduction: nom,
+                                      latitude: latitude,
+                                      longitude: longitude,
+                                      acteur: acteur)
+                                  .then((value) => {
+                                        Provider.of<ZoneProductionService>(
+                                                context,
+                                                listen: false)
+                                            .applyChange(),
+                                        setState(() {
+                                          _isLoading = false;
+                                        }),
+                                        nomController.clear(),
+                                        latitudeController.clear(),
+                                        longitudeController.clear(),
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Row(
+                                              children: [
+                                                Text("Ajouter avec succèss"),
+                                              ],
                                             ),
+                                            // duration: const Duration(seconds: 5),
                                           ),
-                                          Navigator.of(context).pop(),
-                                        })
-                                    .catchError((onError) {
-                                  print(onError.message);
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
+                                        ),
+                                        Navigator.of(context).pop(),
+                                      })
+                                  .catchError((onError) {
+                                print(onError.message);
+                                setState(() {
+                                  _isLoading = false;
                                 });
-                              } else {
-                                await ZoneProductionService()
-                                    .addZone(
-                                        nomZoneProduction: nom,
-                                        latitude: latitude,
-                                        longitude: longitude,
-                                        photoZone: photo,
-                                        acteur: acteur)
-                                    .then((value) => {
-                                          Provider.of<ZoneProductionService>(
-                                                  context,
-                                                  listen: false)
-                                              .applyChange(),
-                                          setState(() {
-                                            _isLoading = false;
-                                          }),
-                                          nomController.clear(),
-                                          latitudeController.clear(),
-                                          longitudeController.clear(),
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text("Ajouter avec succèss"),
-                                                ],
-                                              ),
-                                              // duration: const Duration(seconds: 5),
-                                            ),
-                                          ),
-                                           Navigator.of(context).pop(),
-                                        })
-                                    .catchError((onError) {
-                                  print(
-                                    onError.toString(),
-                                  );
-                                });
-                              }
-                            } catch (e) {
-                              setState(() {
-                                _isLoading = false;
                               });
-                              print(e.toString());
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("Une erreur est survenu"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              );
+                            } else {
+                              await ZoneProductionService()
+                                  .addZone(
+                                      nomZoneProduction: nom,
+                                      latitude: latitude,
+                                      longitude: longitude,
+                                      photoZone: photo,
+                                      acteur: acteur)
+                                  .then((value) => {
+                                        Provider.of<ZoneProductionService>(
+                                                context,
+                                                listen: false)
+                                            .applyChange(),
+                                        setState(() {
+                                          _isLoading = false;
+                                        }),
+                                        nomController.clear(),
+                                        latitudeController.clear(),
+                                        longitudeController.clear(),
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Row(
+                                              children: [
+                                                Text("Ajouter avec succèss"),
+                                              ],
+                                            ),
+                                            // duration: const Duration(seconds: 5),
+                                          ),
+                                        ),
+                                        Navigator.of(context).pop(),
+                                      })
+                                  .catchError((onError) {
+                                print(
+                                  onError.toString(),
+                                );
+                              });
                             }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: d_colorOr, // Orange color code
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            minimumSize: const Size(290, 45),
+                          } catch (e) {
+                            setState(() {
+                              _isLoading = false;
+                            });
+                            print(e.toString());
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Row(
+                                  children: [
+                                    Text("Une erreur est survenu"),
+                                  ],
+                                ),
+                                duration: Duration(seconds: 5),
+                              ),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: d_colorOr, // Orange color code
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
                           ),
-                          icon: const Icon(Icons.add, color: Colors.white),
-                          label: const Text(
-                            "Ajouter",
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ))
-                    ],
-                  )),
-              const SizedBox(height: 32)
-            ]),
-          ),
-          floatingActionButton: SpeedDial(
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
-            overlayColor: Colors.black,
-            overlayOpacity: 0.4,
-            spacing: 12,
-            icon: Icons.location_searching,
-            openCloseDial: isDialOpenNotifier,
-            onPress: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text("Confirmation"),
-                    content: Text(
-                        "Voulez-vous vraiment récupérer la position actuelle ?"),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text("Annuler"),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          _getCurrentPosition();
-                          latitudeController.text =
-                              _currentPosition?.latitude.toString() ?? "";
-                          longitudeController.text =
-                              _currentPosition?.longitude.toString() ?? "";
-                        },
-                        child: Text("Confirmer"),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-          )),
+                          minimumSize: const Size(290, 45),
+                        ),
+                        icon: const Icon(Icons.add, color: Colors.white),
+                        label: const Text(
+                          "Ajouter",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ))
+                  ],
+                )),
+            const SizedBox(height: 32)
+          ]),
+        ),
+        // floatingActionButton: SpeedDial(
+        //   backgroundColor: Colors.green,
+        //   foregroundColor: Colors.white,
+        //   overlayColor: Colors.black,
+        //   overlayOpacity: 0.4,
+        //   spacing: 12,
+        //   icon: Icons.location_searching,
+        //   openCloseDial: isDialOpenNotifier,
+        //   onPress: () {
+        //     showDialog(
+        //       context: context,
+        //       builder: (BuildContext context) {
+        //         return AlertDialog(
+        //           title: Text("Confirmation"),
+        //           content: Text(
+        //               "Voulez-vous vraiment récupérer la position actuelle ?"),
+        //           actions: <Widget>[
+        //             TextButton(
+        //               onPressed: () {
+        //                 Navigator.of(context).pop();
+        //               },
+        //               child: Text("Annuler"),
+        //             ),
+        //             TextButton(
+        //               onPressed: () {
+        //                 Navigator.of(context).pop();
+        //                 _getCurrentPosition();
+        //                 latitudeController.text =
+        //                     _currentPosition?.latitude.toString() ?? "";
+        //                 longitudeController.text =
+        //                     _currentPosition?.longitude.toString() ?? "";
+        //               },
+        //               child: Text("Confirmer"),
+        //             ),
+        //           ],
+        //         );
+        //       },
+        //     );
+        //   },
+        // )
+      ),
     );
   }
 }

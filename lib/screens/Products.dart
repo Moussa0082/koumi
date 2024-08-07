@@ -42,7 +42,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
   String? detectedCountry;
   late List<TypeActeur> typeActeurData = [];
   late String type;
-  bool isSearchMode = true;
+  bool isSearchMode = false;
+  bool isFilterMode = false;
   late TextEditingController _searchController;
   List<Stock> stockListe = [];
   late Future<List<Stock>> stockListeFuture;
@@ -66,7 +67,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString('emailActeur');
+    email = prefs.getString('whatsAppActeur');
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -85,7 +86,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Future<List<Stock>> getAllStock() async {
     if (selectedCat != null) {
       stockListe = await StockService().fetchStockByCategorie(
-          selectedCat!.idCategorieProduit!, detectedCountry != null ? detectedCountry! : "mali");
+          selectedCat!.idCategorieProduit!,
+          detectedCountry != null ? detectedCountry! : "mali");
     }
 
     return stockListe;
@@ -280,7 +282,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         ? detectedCountry =
             Provider.of<DetectorPays>(context, listen: false).detectedCountry!
         : detectedCountry = "Mali";
-        
+
     verify();
     _searchController = TextEditingController();
     _catList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
@@ -293,8 +295,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   @override
   void dispose() {
-    _searchController
-        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
+    }
     scrollableController.dispose();
     scrollableController1.dispose();
     super.dispose();
@@ -316,7 +321,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
   }
 
- void _updateMode(int index) {
+  void _updateMode(int index) {
     if (mounted) {
       setState(() {
         isSearchMode = index == 0;
@@ -329,17 +334,25 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
   }
 
-  
+  void _selectMode(String mode) {
+    setState(() {
+      if (mode == 'Rechercher') {
+        isSearchMode = true;
+        isFilterMode = false;
+      } else if (mode == 'Filtrer') {
+        isSearchMode = false;
+        isFilterMode = true;
+      } else if (mode == 'Fermer') {
+        isSearchMode = false;
+        isFilterMode = false;
+      }
+    });
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (isSearchMode) {
-      _searchController = TextEditingController();
-    } else {
-      _searchController.dispose();
-    }
   }
-
 
   Future<void> _getResultFromNextScreen2(BuildContext context) async {
     final result = await Navigator.push(
@@ -456,26 +469,90 @@ class _ProductsScreenState extends State<ProductsScreen> {
               SliverToBoxAdapter(
                   child: Column(children: [
                 const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ToggleButtons(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text('Rechercher'),
+                if (!isSearchMode)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          isSearchMode = true;
+                          isFilterMode = true;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.search,
+                        color: d_colorGreen,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text('Filtrer'),
+                      label: Text(
+                        'Rechercher',
+                        style: TextStyle(color: d_colorGreen, fontSize: 17),
                       ),
-                    ],
-                    isSelected: [isSearchMode, !isSearchMode],
-                     onPressed: _updateMode,
+                    ),
+                  ),
+                if (isSearchMode)
+                  Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            isSearchMode = false;
+                            isFilterMode = false;
+                          });
+                        },
+                        icon: Icon(
+                          Icons.close,
+                          color: Colors.red,
+                        ),
+                        label: Text(
+                          'Fermer',
+                          style: TextStyle(color: Colors.red, fontSize: 17),
+                        ),
+                      )),
+                Visibility(
+                  visible: isSearchMode,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+                    child: FutureBuilder(
+                      future: _catList,
+                      builder: (_, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return buildLoadingDropdown();
+                        }
+
+                        if (snapshot.hasData) {
+                          dynamic jsonString =
+                              utf8.decode(snapshot.data.bodyBytes);
+                          dynamic responseData = json.decode(jsonString);
+
+                          if (responseData is List) {
+                            final response = responseData;
+                            final typeList = response
+                                .map((e) => CategorieProduit.fromMap(e))
+                                .where((con) => con.statutCategorie == true)
+                                .toList();
+
+                            if (typeList.isEmpty) {
+                              return buildEmptyDropdown();
+                            }
+
+                            return buildDropdown(typeList);
+                          } else {
+                            return buildEmptyDropdown();
+                          }
+                        }
+
+                        return buildEmptyDropdown();
+                      },
+                    ),
                   ),
                 ),
-                if (isSearchMode)
-                 Padding(
-                    padding: const EdgeInsets.all(10.0),
+                Visibility(
+                  visible: isSearchMode,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
                     child: SearchFieldAutoComplete<String>(
                       controller: _searchController,
                       placeholder: 'Rechercher...',
@@ -502,44 +579,92 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       },
                     ),
                   ),
-                if (!isSearchMode)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    child: FutureBuilder(
-                      future: _catList,
-                      builder: (_, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return buildLoadingDropdown();
-                        }
+                ),
 
-                        if (snapshot.hasData) {
-                          dynamic jsonString =
-                              utf8.decode(snapshot.data.bodyBytes);
-                          dynamic responseData = json.decode(jsonString);
+                // Padding(
+                //   padding: const EdgeInsets.all(10.0),
+                //   child: ToggleButtons(
+                //     children: [
+                //       Padding(
+                //         padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                //         child: Text('Rechercher'),
+                //       ),
+                //       Padding(
+                //         padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                //         child: Text('Filtrer'),
+                //       ),
+                //     ],
+                //     isSelected: [isSearchMode, !isSearchMode],
+                //      onPressed: _updateMode,
+                //   ),
+                // ),
+                // if (isSearchMode)
+                //  Padding(
+                //     padding: const EdgeInsets.all(10.0),
+                //     child: SearchFieldAutoComplete<String>(
+                //       controller: _searchController,
+                //       placeholder: 'Rechercher...',
+                //       placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
+                //       suggestions: AutoComplet.getAgriculturalProducts,
+                //       suggestionsDecoration: SuggestionDecoration(
+                //         marginSuggestions: const EdgeInsets.all(8.0),
+                //         color: const Color.fromARGB(255, 236, 234, 234),
+                //         borderRadius: BorderRadius.circular(16.0),
+                //       ),
+                //       onSuggestionSelected: (selectedItem) {
+                //         if (mounted) {
+                //           _searchController.text = selectedItem.searchKey;
+                //         }
+                //       },
+                //       suggestionItemBuilder: (context, searchFieldItem) {
+                //         return Padding(
+                //           padding: const EdgeInsets.all(8.0),
+                //           child: Text(
+                //             searchFieldItem.searchKey,
+                //             style: TextStyle(color: Colors.black),
+                //           ),
+                //         );
+                //       },
+                //     ),
+                //   ),
+                // if (!isSearchMode)
+                //   Padding(
+                //     padding: const EdgeInsets.symmetric(
+                //         vertical: 10, horizontal: 20),
+                //     child: FutureBuilder(
+                //       future: _catList,
+                //       builder: (_, snapshot) {
+                //         if (snapshot.connectionState ==
+                //             ConnectionState.waiting) {
+                //           return buildLoadingDropdown();
+                //         }
 
-                          if (responseData is List) {
-                            final reponse = responseData;
-                            final typeList = reponse
-                                .map((e) => CategorieProduit.fromMap(e))
-                                .where((con) => con.statutCategorie == true)
-                                .toList();
+                //         if (snapshot.hasData) {
+                //           dynamic jsonString =
+                //               utf8.decode(snapshot.data.bodyBytes);
+                //           dynamic responseData = json.decode(jsonString);
 
-                            if (typeList.isEmpty) {
-                              return buildEmptyDropdown();
-                            }
+                //           if (responseData is List) {
+                //             final reponse = responseData;
+                //             final typeList = reponse
+                //                 .map((e) => CategorieProduit.fromMap(e))
+                //                 .where((con) => con.statutCategorie == true)
+                //                 .toList();
 
-                            return buildDropdown(typeList);
-                          } else {
-                            return buildEmptyDropdown();
-                          }
-                        }
+                //             if (typeList.isEmpty) {
+                //               return buildEmptyDropdown();
+                //             }
 
-                        return buildEmptyDropdown();
-                      },
-                    ),
-                  ),
+                //             return buildDropdown(typeList);
+                //           } else {
+                //             return buildEmptyDropdown();
+                //           }
+                //         }
+
+                //         return buildEmptyDropdown();
+                //       },
+                //     ),
+                //   ),
                 const SizedBox(height: 10),
               ])),
             ];
@@ -1263,10 +1388,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
         });
       },
       decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1278,10 +1402,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
       onChanged: null,
       decoration: InputDecoration(
         labelText: '-- Aucun catégorie trouvé --',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1293,12 +1416,61 @@ class _ProductsScreenState extends State<ProductsScreen> {
       onChanged: null,
       decoration: InputDecoration(
         labelText: 'Chargement...',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
   }
 }
+
+
+//  Align(
+//                   alignment: Alignment.centerRight,
+//                   child: DropdownButtonHideUnderline(
+//                     child: DropdownButton<String>(
+//                       icon: Icon(Icons.more_vert, color: d_colorGreen),
+//                       onChanged: (String? newValue) {
+//                         if (newValue != null) {
+//                           _selectMode(newValue);
+//                         }
+//                       },
+//                       items: [
+//                         DropdownMenuItem<String>(
+//                           value: 'Rechercher',
+//                           child: Row(
+//                             children: [
+//                               Icon(Icons.search, color: Colors.black87),
+//                               SizedBox(width: 8.0),
+//                               Text('Rechercher',
+//                                   style: TextStyle(color: Colors.black87)),
+//                             ],
+//                           ),
+//                         ),
+//                         DropdownMenuItem<String>(
+//                           value: 'Filtrer',
+//                           child: Row(
+//                             children: [
+//                               Icon(Icons.filter_list, color: Colors.black87),
+//                               SizedBox(width: 8.0),
+//                               Text('Filtrer',
+//                                   style: TextStyle(color: Colors.black87)),
+//                             ],
+//                           ),
+//                         ),
+//                         DropdownMenuItem<String>(
+//                           value: 'Fermer',
+//                           child: Row(
+//                             children: [
+//                               Icon(Icons.close, color: Colors.black87),
+//                               SizedBox(width: 8.0),
+//                               Text('Fermer',
+//                                   style: TextStyle(color: Colors.black87)),
+//                             ],
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ),

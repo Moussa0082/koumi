@@ -47,7 +47,9 @@ class _MyProductScreenState extends State<MyProductScreen> {
   CategorieProduit? selectedCat;
   String? typeValue;
   late Future _catList;
-  bool isSearchMode = true;
+
+  bool isSearchMode = false;
+  bool isFilterMode = false;
   bool isExist = false;
   String? email = "";
   late Future<List<Stock>> stockListeFuture;
@@ -185,7 +187,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString('emailActeur');
+    email = prefs.getString('whatsAppActeur');
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -283,20 +285,34 @@ class _MyProductScreenState extends State<MyProductScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
     if (isSearchMode) {
       _searchController = TextEditingController();
     } else {
       _searchController.dispose();
     }
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
     // Disposez le TextEditingController lorsque vous n'en avez plus besoin
     scrollableController.dispose();
     scrollableController1.dispose();
     super.dispose();
+  }
+
+  void _selectMode(String mode) {
+    setState(() {
+      if (mode == 'Rechercher') {
+        isSearchMode = true;
+        isFilterMode = false;
+      } else if (mode == 'Filtrer') {
+        isSearchMode = false;
+        isFilterMode = true;
+      } else if (mode == 'Fermer') {
+        isSearchMode = false;
+        isFilterMode = false;
+      }
+    });
   }
 
   @override
@@ -466,32 +482,125 @@ class _MyProductScreenState extends State<MyProductScreen> {
                         SliverToBoxAdapter(
                             child: Column(children: [
                           const SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: ToggleButtons(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16.0),
-                                  child: Text('Rechercher'),
+                          if (!isSearchMode)
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: PopupMenuButton<String>(
+                                onSelected: _selectMode,
+                                itemBuilder: (BuildContext context) {
+                                  return [
+                                    {
+                                      'label': 'Rechercher',
+                                      'icon': Icons.search
+                                    },
+                                    {'label': 'Fermer', 'icon': Icons.close},
+                                  ].map((Map<String, dynamic> item) {
+                                    return PopupMenuItem<String>(
+                                      value: item['label'],
+                                      child: ListTile(
+                                        leading: Icon(
+                                          item['icon'],
+                                          color: Colors.black87,
+                                          size:
+                                              24.0, // Taille de l'icône augmentée
+                                        ),
+                                        title: Text(
+                                          item['label'],
+                                          style: TextStyle(
+                                            color: Colors.black87,
+                                            fontSize:
+                                                16.0, // Taille du texte augmentée
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList();
+                                },
+                                child: TextButton.icon(
+                                  onPressed: null,
+                                  icon: Icon(
+                                    Icons.search,
+                                    color: d_colorGreen,
+                                  ),
+                                  label: Text(
+                                    'Rechercher',
+                                    style: TextStyle(
+                                        color: d_colorGreen, fontSize: 17),
+                                  ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16.0),
-                                  child: Text('Filtrer'),
-                                ),
-                              ],
-                              isSelected: [isSearchMode, !isSearchMode],
-                              onPressed: _updateMode,
+                              ),
+                            ),
+                          if (isSearchMode)
+                            Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton.icon(
+                                  onPressed: () {
+                                    setState(() {
+                                      isSearchMode = false;
+                                      isFilterMode = false;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                  ),
+                                  label: Text(
+                                    'Fermer',
+                                    style: TextStyle(
+                                        color: Colors.red, fontSize: 17),
+                                  ),
+                                )),
+                          Visibility(
+                            visible: isSearchMode,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 3, horizontal: 10),
+                              child: FutureBuilder(
+                                future: _catList,
+                                builder: (_, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return buildLoadingDropdown();
+                                  }
+
+                                  if (snapshot.hasData) {
+                                    dynamic jsonString =
+                                        utf8.decode(snapshot.data.bodyBytes);
+                                    dynamic responseData =
+                                        json.decode(jsonString);
+
+                                    if (responseData is List) {
+                                      final response = responseData;
+                                      final typeList = response
+                                          .map((e) =>
+                                              CategorieProduit.fromMap(e))
+                                          .where((con) =>
+                                              con.statutCategorie == true)
+                                          .toList();
+
+                                      if (typeList.isEmpty) {
+                                        return buildEmptyDropdown();
+                                      }
+
+                                      return buildDropdown(typeList);
+                                    } else {
+                                      return buildEmptyDropdown();
+                                    }
+                                  }
+
+                                  return buildEmptyDropdown();
+                                },
+                              ),
                             ),
                           ),
-                          if (isSearchMode)
-                            Padding(
-                              padding: const EdgeInsets.all(10.0),
+                          Visibility(
+                            visible: isSearchMode,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 3, horizontal: 10),
                               child: SearchFieldAutoComplete<String>(
                                 controller: _searchController,
                                 placeholder: 'Rechercher...',
-                                itemHeight: 25,
                                 placeholderStyle:
                                     TextStyle(fontStyle: FontStyle.italic),
                                 suggestions:
@@ -520,47 +629,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                 },
                               ),
                             ),
-                          if (!isSearchMode)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              child: FutureBuilder(
-                                future: _catList,
-                                builder: (_, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return buildLoadingDropdown();
-                                  }
-
-                                  if (snapshot.hasData) {
-                                    dynamic jsonString =
-                                        utf8.decode(snapshot.data.bodyBytes);
-                                    dynamic responseData =
-                                        json.decode(jsonString);
-
-                                    if (responseData is List) {
-                                      final reponse = responseData;
-                                      final typeList = reponse
-                                          .map((e) =>
-                                              CategorieProduit.fromMap(e))
-                                          .where((con) =>
-                                              con.statutCategorie == true)
-                                          .toList();
-
-                                      if (typeList.isEmpty) {
-                                        return buildEmptyDropdown();
-                                      }
-
-                                      return buildDropdown(typeList);
-                                    } else {
-                                      return buildEmptyDropdown();
-                                    }
-                                  }
-
-                                  return buildEmptyDropdown();
-                                },
-                              ),
-                            ),
+                          ),
                           const SizedBox(height: 10),
                         ])),
                       ];
@@ -1475,10 +1544,9 @@ class _MyProductScreenState extends State<MyProductScreen> {
         });
       },
       decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1490,10 +1558,9 @@ class _MyProductScreenState extends State<MyProductScreen> {
       onChanged: null,
       decoration: InputDecoration(
         labelText: '-- Aucun categorie trouvé --',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1505,10 +1572,9 @@ class _MyProductScreenState extends State<MyProductScreen> {
       onChanged: null,
       decoration: InputDecoration(
         labelText: 'Chargement...',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );

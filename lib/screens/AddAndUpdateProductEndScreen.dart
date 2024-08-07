@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
+import 'package:koumi_app/screens/MyStores.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
@@ -84,7 +86,7 @@ class _AddAndUpdateProductEndSreenState
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString('emailActeur');
+    email = prefs.getString('whatsAppActeur');
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -262,6 +264,32 @@ class _AddAndUpdateProductEndSreenState
     }
   }
 
+  Future<void> _getResultFromZonePage(BuildContext context) async {
+    final result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => Zone()));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        zoneListe = http.get(Uri.parse(
+            '$apiOnlineUrl/ZoneProduction/getAllZonesByActeurs/${acteur.idActeur}'));
+      });
+    }
+  }
+
+  Future<void> _getResultFromMagasinPage(BuildContext context) async {
+    final result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MyStoresScreen()));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        magasinListe = http
+        .get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByActeur/${acteur.idActeur}'));
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
@@ -304,7 +332,6 @@ class _AddAndUpdateProductEndSreenState
                                     fontSize: 15, fontWeight: FontWeight.bold),
                               )),
                         ),
-                       
                         TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -1053,20 +1080,7 @@ class _AddAndUpdateProductEndSreenState
                                 ),
                               );
                             }
-                            if (snapshot.hasError) {
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Probleme de connexion',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              );
-                            }
+
                             if (snapshot.hasData) {
                               dynamic jsonString =
                                   utf8.decode(snapshot.data.bodyBytes);
@@ -1238,20 +1252,14 @@ class _AddAndUpdateProductEndSreenState
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Center(child: Text('Aucun magasin sélectionner')),
+          title: const Center(child: Text('Aucun magasin disponible')),
           content: const Text("Veuillez au préalable créer un magasin"),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 // Get.back();
                 Navigator.of(context).pop();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddMagasinScreen(
-                        isEditable: false,
-                      ),
-                    ));
+                _getResultFromMagasinPage(context);
               },
               child: const Text('Créer un magasin'),
             ),
@@ -1291,7 +1299,7 @@ class _AddAndUpdateProductEndSreenState
 
   String? _validateZone(String? value) {
     if (value == null || value.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _showMagasinDialog());
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showZoneDialog());
       return 'Veuillez sélectionner une zone de production';
     }
     return null;
@@ -1302,15 +1310,14 @@ class _AddAndUpdateProductEndSreenState
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Center(child: Text('Aucun zone sélectionner')),
+          title: const Center(child: Text('Aucune zone disponible')),
           content: const Text("Veuillez au préalable ajouter une zone"),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 // Get.back();
                 Navigator.of(context).pop();
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => Zone()));
+                _getResultFromZonePage(context);
               },
               child: const Text('Ajouter une zone'),
             ),

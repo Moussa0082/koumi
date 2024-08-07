@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/AddAlerte.dart';
-import 'package:koumi_app/Admin/AddAlertesOffLine.dart';
 import 'package:koumi_app/Admin/AlerteDisable.dart';
-import 'package:koumi_app/Admin/AlertesOffLine.dart';
 import 'package:koumi_app/Admin/DetailAlerte.dart';
 import 'package:koumi_app/Admin/UpdateAlerte.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -30,31 +28,33 @@ class _AlerteScreenState extends State<AlerteScreen> {
   late String type;
   late TextEditingController _searchController;
   List<Alertes> alerteList = [];
-
-  // void verify() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   email = prefs.getString('emailActeur');
-  //   if (email != null) {
-  //     // Si l'email de l'acteur est présent, exécute checkLoggedIn
-  //     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-  //     typeActeurData = acteur.typeActeur!;
-  //     type = typeActeurData.map((data) => data.libelle).join(', ');
-  //   }
-  // }
+  bool isSearchMode = false;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur!;
+    _scrollController = ScrollController();
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
   }
 
+  void _selectMode(String mode) {
+    setState(() {
+      if (mode == 'Rechercher') {
+        isSearchMode = true;
+      } else if (mode == 'Fermer') {
+        isSearchMode = false;
+      }
+    });
+  }
+
   @override
   void dispose() {
-    _searchController
-        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+      _searchController.dispose();
+         _scrollController.dispose();
     super.dispose();
   }
 
@@ -71,7 +71,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
               },
               icon: const Icon(Icons.arrow_back_ios)),
           title: const Text(
-            "Alerte ",
+            "Alertes ",
             style: TextStyle(
               color: d_colorGreen,
               fontSize: 20,
@@ -109,54 +109,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                             },
                           ),
                         ),
-                        // PopupMenuItem<String>(
-                        //   child: ListTile(
-                        //     leading: const Icon(
-                        //       Icons.add,
-                        //       color: d_colorGreen,
-                        //     ),
-                        //     title: const Text(
-                        //       "Ajouter Alerte PUB",
-                        //       style: TextStyle(
-                        //         color: d_colorGreen,
-                        //         fontSize: 18,
-                        //         fontWeight: FontWeight.bold,
-                        //       ),
-                        //     ),
-                        //     onTap: () async {
-                        //       Navigator.of(context).pop();
-                        //       Navigator.push(
-                        //           context,
-                        //           MaterialPageRoute(
-                        //               builder: (context) =>
-                        //                   AddAlertesOffLineScreen()));
-                        //     },
-                        //   ),
-                        // ),
-                        // PopupMenuItem<String>(
-                        //   child: ListTile(
-                        //     leading: const Icon(
-                        //       Icons.remove_red_eye,
-                        //       color: d_colorGreen,
-                        //     ),
-                        //     title: const Text(
-                        //       "Alerte PUB ",
-                        //       style: TextStyle(
-                        //         color: d_colorGreen,
-                        //         fontSize: 18,
-                        //         fontWeight: FontWeight.bold,
-                        //       ),
-                        //     ),
-                        //     onTap: () async {
-                        //       Navigator.of(context).pop();
-                        //       Navigator.push(
-                        //           context,
-                        //           MaterialPageRoute(
-                        //               builder: (context) =>
-                        //                   AlertesOffLineScreen()));
-                        //     },
-                        //   ),
-                        // ),
+                       
                         PopupMenuItem<String>(
                           child: ListTile(
                             leading: const Icon(
@@ -185,372 +138,404 @@ class _AlerteScreenState extends State<AlerteScreen> {
                   )
                 ]
               : null),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.search,
-                        color: Colors.blueGrey[400]), // Couleur de l'icône
-                    SizedBox(
-                        width:
-                            10), // Espacement entre l'icône et le champ de recherche
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (value) {
-                          setState(() {});
+      body: Container(
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              SliverToBoxAdapter(
+                  child: Column(children: [
+                                   Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            isSearchMode = !isSearchMode;
+                          });
                         },
-                        decoration: InputDecoration(
-                          hintText: 'Rechercher',
-                          border: InputBorder.none,
-                          hintStyle: TextStyle(
-                              color: Colors
-                                  .blueGrey[400]), // Couleur du texte d'aide
+                        icon: Icon(
+                          isSearchMode ? Icons.close : Icons.search,
+                          color: isSearchMode ? Colors.red : Colors.green,
+                        ),
+                        label: Text(
+                          isSearchMode ? 'Fermer' : 'Rechercher',
+                          style: TextStyle(
+                              color: isSearchMode ? Colors.red : Colors.green,
+                              fontSize: 17),
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Consumer<AlertesService>(builder: (context, alerteService, child) {
-              return FutureBuilder(
-                  future: alerteService.fetchAlertes(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return buildShimmerEffect();
-                    }
+                    if (isSearchMode)
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey[50],
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.search, color: Colors.blueGrey[400]),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: TextField(
+                                  controller: _searchController,
+                                  onChanged: (value) {
+                                    if (mounted) {
+                                      setState(() {});
+                                    }
+                                  },
+                                  decoration: InputDecoration(
+                                    hintText: 'Rechercher',
+                                    border: InputBorder.none,
+                                    hintStyle:
+                                        TextStyle(color: Colors.blueGrey[400]),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+              ])),
+            ];
+          },
+          body: SingleChildScrollView(
+             controller: _scrollController,
+            child: Column(
+              children: [
+                Consumer<AlertesService>(
+                    builder: (context, alerteService, child) {
+                  return FutureBuilder(
+                      future: alerteService.fetchAlertes(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return buildShimmerEffect();
+                        }
 
-                    if (!snapshot.hasData) {
-                      return const Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Center(child: Text("Aucun conseil trouvé")),
-                      );
-                    } else {
-                      alerteList = snapshot.data!;
-                      String searchText = "";
-                      List<Alertes> filtereSearch = alerteList.where((search) {
-                        String libelle = search.titreAlerte!.toLowerCase();
-                        searchText = _searchController.text.toLowerCase();
-                        return libelle.contains(searchText);
-                      }).toList();
-                      return filtereSearch
-                              .where((element) => element.statutAlerte == true)
-                              .isEmpty
-                          ? Padding(
-                              padding: EdgeInsets.all(10),
-                              child: Center(child: Text("Aucun alerte trouvé")),
-                            )
-                          : Column(
-                              children: filtereSearch
+                        if (!snapshot.hasData) {
+                          return const Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Center(child: Text("Aucun conseil trouvé")),
+                          );
+                        } else {
+                          alerteList = snapshot.data!;
+                          String searchText = "";
+                          List<Alertes> filtereSearch =
+                              alerteList.where((search) {
+                            String libelle = search.titreAlerte!.toLowerCase();
+                            searchText = _searchController.text.toLowerCase();
+                            return libelle.contains(searchText);
+                          }).toList();
+                          return filtereSearch
                                   .where(
                                       (element) => element.statutAlerte == true)
-                                  .map((e) => Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 10, horizontal: 15),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        DetailAlerte(
-                                                            alertes: e)));
-                                          },
-                                          child: Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.9,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.2),
-                                                  offset: const Offset(0, 2),
-                                                  blurRadius: 5,
-                                                  spreadRadius: 2,
+                                  .isEmpty
+                              ? Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Center(
+                                      child: Text("Aucun alerte trouvé")),
+                                )
+                              : Column(
+                                  children: filtereSearch
+                                      .where((element) =>
+                                          element.statutAlerte == true)
+                                      .map((e) => Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 15),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            DetailAlerte(
+                                                                alertes: e)));
+                                              },
+                                              child: Container(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.9,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.grey
+                                                          .withOpacity(0.2),
+                                                      offset:
+                                                          const Offset(0, 2),
+                                                      blurRadius: 5,
+                                                      spreadRadius: 2,
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
-                                            ),
-                                            child: Column(children: [
-                                              ListTile(
-                                                  leading: Image.asset(
-                                                    "assets/images/alt21.png",
-                                                    width: 80,
-                                                    height: 80,
-                                                  ),
-                                                  title: Text(
-                                                      e.titreAlerte!
-                                                          .toUpperCase(),
-                                                      style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 20,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      )),
-                                                  subtitle: Text(
-                                                      e.descriptionAlerte!,
-                                                      maxLines: 2,
+                                                child: Column(children: [
+                                                  ListTile(
+                                                      leading: Image.asset(
+                                                        "assets/images/alt21.png",
+                                                        width: 80,
+                                                        height: 80,
+                                                      ),
+                                                      title: Text(
+                                                          e.titreAlerte!
+                                                              .toUpperCase(),
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 20,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          )),
+                                                      subtitle: Text(
+                                                          e.descriptionAlerte!,
+                                                          maxLines: 2,
+                                                          style:
+                                                              const TextStyle(
+                                                            color:
+                                                                Colors.black87,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            fontSize: 17,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontStyle: FontStyle
+                                                                .italic,
+                                                          ))),
+                                                  Text(
+                                                      "Date d'ajout : ${e.dateAjout!}",
                                                       style: const TextStyle(
                                                         color: Colors.black87,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        fontSize: 17,
+                                                        fontSize: 15,
                                                         fontWeight:
                                                             FontWeight.w500,
                                                         fontStyle:
                                                             FontStyle.italic,
-                                                      ))),
-                                              Text(
-                                                  "Date d'ajout : ${e.dateAjout!}",
-                                                  style: const TextStyle(
-                                                    color: Colors.black87,
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontStyle: FontStyle.italic,
-                                                  )),
-                                              SizedBox(height: 10),
-                                              type.toLowerCase() != 'admin'
-                                                  ? Container()
-                                                  : Container(
-                                                      alignment:
-                                                          Alignment.bottomRight,
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 10),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          _buildEtat(
-                                                              e.statutAlerte!),
-                                                          PopupMenuButton<
-                                                              String>(
-                                                            padding:
-                                                                EdgeInsets.zero,
-                                                            itemBuilder: (context) =>
-                                                                <PopupMenuEntry<
-                                                                    String>>[
-                                                              PopupMenuItem<
+                                                      )),
+                                                  SizedBox(height: 10),
+                                                  type.toLowerCase() != 'admin'
+                                                      ? Container()
+                                                      : Container(
+                                                          alignment: Alignment
+                                                              .bottomRight,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      10),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              _buildEtat(e
+                                                                  .statutAlerte!),
+                                                              PopupMenuButton<
                                                                   String>(
-                                                                child: ListTile(
-                                                                  leading: e.statutAlerte ==
-                                                                          false
-                                                                      ? Icon(
-                                                                          Icons
-                                                                              .check,
-                                                                          color:
-                                                                              Colors.green,
-                                                                        )
-                                                                      : Icon(
-                                                                          Icons
-                                                                              .disabled_visible,
-                                                                          color:
-                                                                              Colors.orange[400]),
-                                                                  title: Text(
-                                                                    e.statutAlerte ==
-                                                                            false
-                                                                        ? "Activer"
-                                                                        : "Desactiver",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: e.statutAlerte ==
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .zero,
+                                                                itemBuilder:
+                                                                    (context) =>
+                                                                        <PopupMenuEntry<
+                                                                            String>>[
+                                                                  PopupMenuItem<
+                                                                      String>(
+                                                                    child:
+                                                                        ListTile(
+                                                                      leading: e.statutAlerte ==
                                                                               false
-                                                                          ? Colors
-                                                                              .green
-                                                                          : Colors
-                                                                              .orange[400],
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
+                                                                          ? Icon(
+                                                                              Icons.check,
+                                                                              color: Colors.green,
+                                                                            )
+                                                                          : Icon(
+                                                                              Icons.disabled_visible,
+                                                                              color: Colors.orange[400]),
+                                                                      title:
+                                                                          Text(
+                                                                        e.statutAlerte ==
+                                                                                false
+                                                                            ? "Activer"
+                                                                            : "Desactiver",
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color: e.statutAlerte == false
+                                                                              ? Colors.green
+                                                                              : Colors.orange[400],
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                      onTap:
+                                                                          () async {
+                                                                        e.statutAlerte ==
+                                                                                false
+                                                                            ? await AlertesService()
+                                                                                .activerAlertes(e.idAlerte!)
+                                                                                .then((value) => {
+                                                                                      Provider.of<AlertesService>(context, listen: false).applyChange(),
+                                                                                      Navigator.of(context).pop(),
+                                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        const SnackBar(
+                                                                                          content: Row(
+                                                                                            children: [
+                                                                                              Text("Activer avec succèss "),
+                                                                                            ],
+                                                                                          ),
+                                                                                          duration: Duration(seconds: 2),
+                                                                                        ),
+                                                                                      )
+                                                                                    })
+                                                                                .catchError((onError) => {
+                                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        const SnackBar(
+                                                                                          content: Row(
+                                                                                            children: [
+                                                                                              Text("Une erreur s'est produit"),
+                                                                                            ],
+                                                                                          ),
+                                                                                          duration: Duration(seconds: 5),
+                                                                                        ),
+                                                                                      ),
+                                                                                      Navigator.of(context).pop(),
+                                                                                    })
+                                                                            : await AlertesService()
+                                                                                .desactiverAlertes(e.idAlerte!)
+                                                                                .then((value) => {
+                                                                                      Provider.of<AlertesService>(context, listen: false).applyChange(),
+                                                                                      Navigator.of(context).pop(),
+                                                                                    })
+                                                                                .catchError((onError) => {
+                                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        const SnackBar(
+                                                                                          content: Row(
+                                                                                            children: [
+                                                                                              Text("Une erreur s'est produit"),
+                                                                                            ],
+                                                                                          ),
+                                                                                          duration: Duration(seconds: 5),
+                                                                                        ),
+                                                                                      ),
+                                                                                      Navigator.of(context).pop(),
+                                                                                    });
+
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          const SnackBar(
+                                                                            content:
+                                                                                Row(
+                                                                              children: [
+                                                                                Text("Désactiver avec succèss "),
+                                                                              ],
+                                                                            ),
+                                                                            duration:
+                                                                                Duration(seconds: 2),
+                                                                          ),
+                                                                        );
+                                                                      },
                                                                     ),
                                                                   ),
-                                                                  onTap:
-                                                                      () async {
-                                                                    e.statutAlerte ==
-                                                                            false
-                                                                        ? await AlertesService()
-                                                                            .activerAlertes(e
+                                                                  PopupMenuItem<
+                                                                      String>(
+                                                                    child:
+                                                                        ListTile(
+                                                                      leading:
+                                                                          const Icon(
+                                                                        Icons
+                                                                            .edit,
+                                                                        color: Colors
+                                                                            .green,
+                                                                      ),
+                                                                      title:
+                                                                          const Text(
+                                                                        "Modifier",
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color:
+                                                                              Colors.green,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                      onTap:
+                                                                          () async {
+                                                                        Navigator.push(
+                                                                            context,
+                                                                            MaterialPageRoute(builder: (context) => UpdateAlerted(alertes: e)));
+                                                                      },
+                                                                    ),
+                                                                  ),
+                                                                  PopupMenuItem<
+                                                                      String>(
+                                                                    child:
+                                                                        ListTile(
+                                                                      leading:
+                                                                          const Icon(
+                                                                        Icons
+                                                                            .delete,
+                                                                        color: Colors
+                                                                            .red,
+                                                                      ),
+                                                                      title:
+                                                                          const Text(
+                                                                        "Supprimer",
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color:
+                                                                              Colors.red,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                      onTap:
+                                                                          () async {
+                                                                        await AlertesService()
+                                                                            .deleteAlertes(e
                                                                                 .idAlerte!)
                                                                             .then((value) =>
                                                                                 {
                                                                                   Provider.of<AlertesService>(context, listen: false).applyChange(),
                                                                                   Navigator.of(context).pop(),
+                                                                                })
+                                                                            .catchError((onError) =>
+                                                                                {
                                                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                                                     const SnackBar(
                                                                                       content: Row(
                                                                                         children: [
-                                                                                          Text("Activer avec succèss "),
+                                                                                          Text("Impossible de supprimer"),
                                                                                         ],
                                                                                       ),
                                                                                       duration: Duration(seconds: 2),
                                                                                     ),
                                                                                   )
-                                                                                })
-                                                                            .catchError((onError) =>
-                                                                                {
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    const SnackBar(
-                                                                                      content: Row(
-                                                                                        children: [
-                                                                                          Text("Une erreur s'est produit"),
-                                                                                        ],
-                                                                                      ),
-                                                                                      duration: Duration(seconds: 5),
-                                                                                    ),
-                                                                                  ),
-                                                                                  Navigator.of(context).pop(),
-                                                                                })
-                                                                        : await AlertesService()
-                                                                            .desactiverAlertes(e
-                                                                                .idAlerte!)
-                                                                            .then((value) =>
-                                                                                {
-                                                                                  Provider.of<AlertesService>(context, listen: false).applyChange(),
-                                                                                  Navigator.of(context).pop(),
-                                                                                })
-                                                                            .catchError((onError) =>
-                                                                                {
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    const SnackBar(
-                                                                                      content: Row(
-                                                                                        children: [
-                                                                                          Text("Une erreur s'est produit"),
-                                                                                        ],
-                                                                                      ),
-                                                                                      duration: Duration(seconds: 5),
-                                                                                    ),
-                                                                                  ),
-                                                                                  Navigator.of(context).pop(),
                                                                                 });
-
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
-                                                                        .showSnackBar(
-                                                                      const SnackBar(
-                                                                        content:
-                                                                            Row(
-                                                                          children: [
-                                                                            Text("Désactiver avec succèss "),
-                                                                          ],
-                                                                        ),
-                                                                        duration:
-                                                                            Duration(seconds: 2),
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                ),
-                                                              ),
-                                                              PopupMenuItem<
-                                                                  String>(
-                                                                child: ListTile(
-                                                                  leading:
-                                                                      const Icon(
-                                                                    Icons.edit,
-                                                                    color: Colors
-                                                                        .green,
-                                                                  ),
-                                                                  title:
-                                                                      const Text(
-                                                                    "Modifier",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .green,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
+                                                                      },
                                                                     ),
                                                                   ),
-                                                                  onTap:
-                                                                      () async {
-                                                                    Navigator.push(
-                                                                        context,
-                                                                        MaterialPageRoute(
-                                                                            builder: (context) =>
-                                                                                UpdateAlerted(alertes: e)));
-                                                                  },
-                                                                ),
-                                                              ),
-                                                              PopupMenuItem<
-                                                                  String>(
-                                                                child: ListTile(
-                                                                  leading:
-                                                                      const Icon(
-                                                                    Icons
-                                                                        .delete,
-                                                                    color: Colors
-                                                                        .red,
-                                                                  ),
-                                                                  title:
-                                                                      const Text(
-                                                                    "Supprimer",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .red,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                    ),
-                                                                  ),
-                                                                  onTap:
-                                                                      () async {
-                                                                    await AlertesService()
-                                                                        .deleteAlertes(e
-                                                                            .idAlerte!)
-                                                                        .then((value) =>
-                                                                            {
-                                                                              Provider.of<AlertesService>(context, listen: false).applyChange(),
-                                                                              Navigator.of(context).pop(),
-                                                                            })
-                                                                        .catchError((onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Impossible de supprimer"),
-                                                                                    ],
-                                                                                  ),
-                                                                                  duration: Duration(seconds: 2),
-                                                                                ),
-                                                                              )
-                                                                            });
-                                                                  },
-                                                                ),
+                                                                ],
                                                               ),
                                                             ],
                                                           ),
-                                                        ],
-                                                      ),
-                                                    )
-                                            ]),
-                                          ),
-                                        ),
-                                      ))
-                                  .toList(),
-                            );
-                    }
-                  });
-            })
-          ],
+                                                        )
+                                                ]),
+                                              ),
+                                            ),
+                                          ))
+                                      .toList(),
+                                );
+                        }
+                      });
+                })
+              ],
+            ),
+          ),
         ),
       ),
     );

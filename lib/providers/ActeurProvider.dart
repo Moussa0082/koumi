@@ -105,7 +105,7 @@ class ActeurProvider with ChangeNotifier {
   Future<void> logout() async {
     // Récupérer les données utilisateur avant de les effacer
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? emailActeur = prefs.getString('emailActeur');
+    String? whatsAppActeur = prefs.getString('whatsAppActeur');
     String? codeActeur = prefs.getString('codeActeur');
 
     // Effacer toutes les préférences
@@ -113,10 +113,10 @@ class ActeurProvider with ChangeNotifier {
     _acteur = null;
 
     await prefs.clear();
-    if (emailActeur == null || emailActeur.isEmpty) {
-      debugPrint("Email shared : $emailActeur");
+    if (whatsAppActeur == null || whatsAppActeur.isEmpty) {
+      debugPrint("whatsAppActeur shared : $whatsAppActeur");
     } else {
-      debugPrint("Email shared isExist : $emailActeur");
+      debugPrint("whatsAppActeur shared isExist : $whatsAppActeur");
     }
     // Réenregistrer les valeurs nécessaires
     // if (emailActeur != null && emailActeur.isNotEmpty) {

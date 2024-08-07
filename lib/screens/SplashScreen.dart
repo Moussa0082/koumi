@@ -54,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void checkEmailInSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? emailActeur = prefs.getString('emailActeur');
+    String? emailActeur = prefs.getString('whatsAppActeur');
     if (emailActeur != null) {
       checkLoggedIn();
     } else {

@@ -23,13 +23,14 @@ class _ActeurListState extends State<ActeurList> {
   late TypeActeur typeActeurs;
   late Future<List<Acteur>> _liste;
   ScrollController scrollableController = ScrollController();
-
+  bool isSearchMode = false;
   Future<List<Acteur>> getActeurListe(String id) async {
     return await ActeurService().fetchActeurByTypeActeur(id);
   }
 
   @override
   void initState() {
+    scrollableController = ScrollController();
     _searchController = TextEditingController();
     typeActeurs = widget.typeActeur;
     _liste = getActeurListe(typeActeurs.idTypeActeur!);
@@ -66,39 +67,62 @@ class _ActeurListState extends State<ActeurList> {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                      borderRadius: BorderRadius.circular(25),
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            isSearchMode = !isSearchMode;
+                          });
+                        },
+                        icon: Icon(
+                          isSearchMode ? Icons.close : Icons.search,
+                          color: isSearchMode ? Colors.red : Colors.green,
+                        ),
+                        label: Text(
+                          isSearchMode ? 'Fermer' : 'Rechercher',
+                          style: TextStyle(
+                              color: isSearchMode ? Colors.red : Colors.green,
+                              fontSize: 17),
+                        ),
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.search,
-                            color: Colors.blueGrey[400]), // Couleur de l'icône
-                        SizedBox(
-                            width:
-                                10), // Espacement entre l'icône et le champ de recherche
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: (value) {
-                              setState(() {});
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Rechercher',
-                              border: InputBorder.none,
-                              hintStyle: TextStyle(
-                                  color: Colors.blueGrey[
-                                      400]), // Couleur du texte d'aide
-                            ),
+                    if (isSearchMode)
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey[50],
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.search, color: Colors.blueGrey[400]),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: TextField(
+                                  controller: _searchController,
+                                  onChanged: (value) {
+                                    if (mounted) {
+                                      setState(() {});
+                                    }
+                                  },
+                                  decoration: InputDecoration(
+                                    hintText: 'Rechercher',
+                                    border: InputBorder.none,
+                                    hintStyle:
+                                        TextStyle(color: Colors.blueGrey[400]),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                  ],
                 ),
               )
             ];

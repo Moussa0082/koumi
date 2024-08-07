@@ -40,7 +40,8 @@ const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
 class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
   late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
-  bool isSearchMode = true;
+  bool isSearchMode = false;
+  bool isFilterMode = false;
 
   late String type;
   late TextEditingController _searchController;
@@ -65,7 +66,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString('emailActeur');
+    email = prefs.getString('whatsAppActeur');
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -253,17 +254,40 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
     verify();
     _searchController = TextEditingController();
     _catList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
-  
+
     stockListeFuture = stockListeFuture1 = getAllStock();
   }
 
   @override
   void dispose() {
-    _searchController
-        .dispose();
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
+    }
     scrollableController.dispose();
     scrollableController1.dispose();
     super.dispose();
+  }
+
+  void _selectMode(String mode) {
+    setState(() {
+      if (mode == 'Rechercher') {
+        isSearchMode = true;
+        isFilterMode = false;
+      } else if (mode == 'Filtrer') {
+        isSearchMode = false;
+        isFilterMode = true;
+      } else if (mode == 'Fermer') {
+        isSearchMode = false;
+        isFilterMode = false;
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
@@ -399,34 +423,93 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
               SliverToBoxAdapter(
                   child: Column(children: [
                 const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ToggleButtons(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text('Rechercher'),
+                if (!isSearchMode)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          isSearchMode = true;
+                          isFilterMode = true;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.search,
+                        color: d_colorGreen,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text('Filtrer'),
+                      label: Text(
+                        'Rechercher',
+                        style: TextStyle(color: d_colorGreen, fontSize: 17),
                       ),
-                    ],
-                    isSelected: [isSearchMode, !isSearchMode],
-                    onPressed: (index) {
-                      setState(() {
-                        isSearchMode = index == 0;
-                      });
-                    },
+                    ),
+                  ),
+                if (isSearchMode)
+                  Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            isSearchMode = false;
+                            isFilterMode = false;
+                          });
+                        },
+                        icon: Icon(
+                          Icons.close,
+                          color: Colors.red,
+                        ),
+                        label: Text(
+                          'Fermer',
+                          style: TextStyle(color: Colors.red, fontSize: 17),
+                        ),
+                      )),
+                Visibility(
+                  visible: isSearchMode,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+                    child: FutureBuilder(
+                      future: _catList,
+                      builder: (_, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return buildLoadingDropdown();
+                        }
+
+                        if (snapshot.hasData) {
+                          dynamic jsonString =
+                              utf8.decode(snapshot.data.bodyBytes);
+                          dynamic responseData = json.decode(jsonString);
+
+                          if (responseData is List) {
+                            final response = responseData;
+                            final typeList = response
+                                .map((e) => CategorieProduit.fromMap(e))
+                                .where((con) => con.statutCategorie == true)
+                                .toList();
+
+                            if (typeList.isEmpty) {
+                              return buildEmptyDropdown();
+                            }
+
+                            return buildDropdown(typeList);
+                          } else {
+                            return buildEmptyDropdown();
+                          }
+                        }
+
+                        return buildEmptyDropdown();
+                      },
+                    ),
                   ),
                 ),
-                if (isSearchMode)
-               Padding(
-                    padding: const EdgeInsets.all(10.0),
+                Visibility(
+                  visible: isSearchMode,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
                     child: SearchFieldAutoComplete<String>(
                       controller: _searchController,
                       placeholder: 'Rechercher...',
-                       itemHeight: 25,
                       placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
                       suggestions: AutoComplet.getAgriculturalProducts,
                       suggestionsDecoration: SuggestionDecoration(
@@ -435,12 +518,8 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                         borderRadius: BorderRadius.circular(16.0),
                       ),
                       onSuggestionSelected: (selectedItem) {
-                        _searchController.text = selectedItem.searchKey;
-                        // setState(() {});
-                      },
-                     onChanged: (value) {
                         if (mounted) {
-                          setState(() {});
+                          _searchController.text = selectedItem.searchKey;
                         }
                       },
                       suggestionItemBuilder: (context, searchFieldItem) {
@@ -454,142 +533,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                       },
                     ),
                   ),
-                if (!isSearchMode)
-
-                  // const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    child: FutureBuilder(
-                      future: _catList,
-                      builder: (_, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return DropdownButtonFormField(
-                            items: [],
-                            onChanged: null,
-                            decoration: InputDecoration(
-                              labelText: 'En cours de chargement ...',
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          );
-                        }
-                        if (snapshot.hasError) {
-                          return DropdownButtonFormField(
-                            items: [],
-                            onChanged: null,
-                            decoration: InputDecoration(
-                              labelText:
-                                  'Une erreur s\'est produite veuiller réessayer',
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          );
-                        }
-                        if (snapshot.hasData) {
-                          dynamic jsonString =
-                              utf8.decode(snapshot.data.bodyBytes);
-                          dynamic responseData = json.decode(jsonString);
-                          if (responseData is List) {
-                            final reponse = responseData;
-                            final categorieList = reponse
-                                .map((e) => CategorieProduit.fromMap(e))
-                                .where((con) => con.statutCategorie == true)
-                                .toList();
-
-                            if (categorieList.isEmpty) {
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: '-- Aucune categorie trouvé --',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              );
-                            }
-                            return DropdownButtonFormField<String>(
-                              isExpanded: true,
-                              items: categorieList
-                                  .map(
-                                    (e) => DropdownMenuItem(
-                                      value: e.idCategorieProduit,
-                                      child: Text(e.libelleCategorie!),
-                                    ),
-                                  )
-                                  .toList(),
-                              hint: Text("-- Filtre par categorie --"),
-                              value: typeValue,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  typeValue = newValue;
-                                  if (newValue != null) {
-                                    selectedCat = categorieList.firstWhere(
-                                      (element) =>
-                                          element.idCategorieProduit ==
-                                          newValue,
-                                    );
-                                  }
-                                  page = 0;
-                                  hasMore = true;
-                                  fetchStockByCategorieAndMagasin(
-                                      refresh: true);
-                                  if (page == 0 && isLoading == true) {
-                                    SchedulerBinding.instance
-                                        .addPostFrameCallback((_) {
-                                      scrollableController1.jumpTo(0.0);
-                                    });
-                                  }
-                                });
-                              },
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
-                          } else {
-                            return DropdownButtonFormField(
-                              items: [],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                labelText: '-- Aucune categorie trouvé --',
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
-                          }
-                        }
-                        return DropdownButtonFormField(
-                          items: [],
-                          onChanged: null,
-                          decoration: InputDecoration(
-                            labelText: 'Probleme de connexion',
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                ),
                 const SizedBox(height: 10),
               ])),
             ];
@@ -1340,6 +1284,74 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         color: isState ? Colors.green : Colors.red,
+      ),
+    );
+  }
+
+  DropdownButtonFormField<String> buildDropdown(
+      List<CategorieProduit> typeList) {
+    return DropdownButtonFormField<String>(
+      isExpanded: true,
+      items: typeList
+          .map((e) => DropdownMenuItem(
+                value: e.idCategorieProduit,
+                child: Text(e.libelleCategorie!),
+              ))
+          .toList(),
+      hint: Text("-- Filtre par catégorie --"),
+      value: typeValue,
+      onChanged: (newValue) {
+        setState(() {
+          typeValue = newValue;
+          if (newValue != null) {
+            selectedCat = typeList.firstWhere(
+              (element) => element.idCategorieProduit == newValue,
+            );
+          }
+          page = 0;
+          hasMore = true;
+          fetchStockByCategorieAndMagasin(refresh: true);
+
+          if (page == 0 && isLoading == true) {
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              scrollableController1.jumpTo(0.0);
+            });
+          }
+        });
+      },
+      decoration: InputDecoration(
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(22),
+        ),
+      ),
+    );
+  }
+
+  DropdownButtonFormField buildEmptyDropdown() {
+    return DropdownButtonFormField(
+      items: [],
+      onChanged: null,
+      decoration: InputDecoration(
+        labelText: '-- Aucun catégorie trouvé --',
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(22),
+        ),
+      ),
+    );
+  }
+
+  DropdownButtonFormField buildLoadingDropdown() {
+    return DropdownButtonFormField(
+      items: [],
+      onChanged: null,
+      decoration: InputDecoration(
+        labelText: 'Chargement...',
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(22),
+        ),
       ),
     );
   }

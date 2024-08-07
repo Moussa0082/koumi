@@ -131,9 +131,24 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
     });
   }
 
+  bool isSearchMode = false;
+  void _selectMode(String mode) {
+    setState(() {
+      if (mode == 'Rechercher') {
+        isSearchMode = true;
+      } else if (mode == 'Fermer') {
+        isSearchMode = false;
+      }
+    });
+  }
+
   @override
   void dispose() {
-    _searchController.dispose();
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
+    }
     // Disposez le TextEditingController lorsque vous n'en avez plus besoin
     scrollableController.dispose();
     super.dispose();
@@ -172,40 +187,80 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
             return <Widget>[
               SliverToBoxAdapter(
                   child: Column(children: [
-                // const SizedBox(height: 10),
-                 Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: SearchFieldAutoComplete<String>(
-                    controller: _searchController,
-                     itemHeight: 25,
-                    placeholder: 'Rechercher...',
-                    placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
-                    suggestions: AutoComplet.getMateriels,
-                    suggestionsDecoration: SuggestionDecoration(
-                      marginSuggestions: const EdgeInsets.all(8.0),
-                      color: const Color.fromARGB(255, 236, 234, 234),
-                      borderRadius: BorderRadius.circular(16.0),
+                if (!isSearchMode)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          isSearchMode = true;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.search,
+                        color: d_colorGreen,
+                      ),
+                      label: Text(
+                        'Rechercher',
+                        style: TextStyle(color: d_colorGreen, fontSize: 17),
+                      ),
                     ),
-                    onSuggestionSelected: (selectedItem) {
-                      _searchController.text = selectedItem.searchKey;
-                      // setState(() {});
-                    },
-                    onChanged: (value) {
-                      if (mounted) {
-                        setState(() {});
-                      }
-                    },
-                    suggestionItemBuilder: (context, searchFieldItem) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          searchFieldItem.searchKey,
-                          style: TextStyle(color: Colors.black),
+                  ),
+                if (isSearchMode)
+                  Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            isSearchMode = false;
+                          });
+                        },
+                        icon: Icon(
+                          Icons.close,
+                          color: Colors.red,
                         ),
-                      );
-                    },
+                        label: Text(
+                          'Fermer',
+                          style: TextStyle(color: Colors.red, fontSize: 17),
+                        ),
+                      )),
+                Visibility(
+                  visible: isSearchMode,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: SearchFieldAutoComplete<String>(
+                      controller: _searchController,
+                      itemHeight: 25,
+                      placeholder: 'Rechercher...',
+                      placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
+                      suggestions: AutoComplet.getMateriels,
+                      suggestionsDecoration: SuggestionDecoration(
+                        marginSuggestions: const EdgeInsets.all(8.0),
+                        color: const Color.fromARGB(255, 236, 234, 234),
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      onSuggestionSelected: (selectedItem) {
+                        _searchController.text = selectedItem.searchKey;
+                        // setState(() {});
+                      },
+                      onChanged: (value) {
+                        if (mounted) {
+                          setState(() {});
+                        }
+                      },
+                      suggestionItemBuilder: (context, searchFieldItem) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            searchFieldItem.searchKey,
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
+
                 // Padding(
                 //   padding: const EdgeInsets.all(10.0),
                 //   child: Container(

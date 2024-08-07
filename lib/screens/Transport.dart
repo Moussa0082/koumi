@@ -48,7 +48,8 @@ class _TransportState extends State<Transport> {
   String? email = "";
   int page = 0;
   bool isLoading = false;
-  bool isSearchMode = true;
+  bool isSearchMode = false;
+  bool isFilterMode = false;
   int size = sized;
   bool hasMore = true;
   ScrollController scrollableController = ScrollController();
@@ -89,8 +90,8 @@ class _TransportState extends State<Transport> {
           page++;
         });
 
-      fetchVehiculeByTypeVoitureWithPagination(
-          selectedType!.idTypeVoiture!,  detectedCountry != null ? detectedCountry! : "Mali");
+      fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,
+          detectedCountry != null ? detectedCountry! : "Mali");
     }
     debugPrint("no");
   }
@@ -214,7 +215,8 @@ class _TransportState extends State<Transport> {
     if (selectedType != null) {
       vehiculeListe = await VehiculeService()
           .fetchVehiculeByTypeVoitureWithPagination(
-              selectedType!.idTypeVoiture!,  detectedCountry != null ? detectedCountry! : "Mali");
+              selectedType!.idTypeVoiture!,
+              detectedCountry != null ? detectedCountry! : "Mali");
     }
 
     return vehiculeListe;
@@ -222,7 +224,7 @@ class _TransportState extends State<Transport> {
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString('emailActeur');
+    email = prefs.getString('whatsAppActeur');
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -240,7 +242,6 @@ class _TransportState extends State<Transport> {
 
   @override
   void initState() {
-
     verify();
     final paysProvider = Provider.of<DetectorPays>(context, listen: false);
     paysProvider.hasLocation
@@ -253,18 +254,16 @@ class _TransportState extends State<Transport> {
     _searchController = TextEditingController();
     _typeList = http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
     WidgetsBinding.instance.addPostFrameCallback((_) {
-   
       scrollableController.addListener(_scrollListener);
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-    
       scrollableController1.addListener(_scrollListener1);
     });
     isExist == false
-        ? vehiculeListeFuture =
-            VehiculeService().fetchVehicule(detectedCountry != null ? detectedCountry! : "Mali")
-        : vehiculeListeFuture =
-            VehiculeService().fetchVehicule(detectedCountry != null ? detectedCountry! : "Mali");
+        ? vehiculeListeFuture = VehiculeService()
+            .fetchVehicule(detectedCountry != null ? detectedCountry! : "Mali")
+        : vehiculeListeFuture = VehiculeService()
+            .fetchVehicule(detectedCountry != null ? detectedCountry! : "Mali");
     vehiculeListeFuture1 = getAllVehicule();
 
     super.initState();
@@ -277,18 +276,16 @@ class _TransportState extends State<Transport> {
     if (result == true) {
       print("Rafraichissement en cours");
       selectedType == null
-                  ? setState(() {
-                      vehiculeListeFuture =
-                          VehiculeService().fetchVehicule(
-                          detectedCountry != null ? detectedCountry! : "Mali");
-                    })
-                  : setState(() {
-                      vehiculeListeFuture1 = VehiculeService()
-                          .fetchVehiculeByTypeVoitureWithPagination(
-                              selectedType!.idTypeVoiture!,  detectedCountry != null
-                                  ? detectedCountry!
-                                  : "Mali");
-                    });
+          ? setState(() {
+              vehiculeListeFuture = VehiculeService().fetchVehicule(
+                  detectedCountry != null ? detectedCountry! : "Mali");
+            })
+          : setState(() {
+              vehiculeListeFuture1 = VehiculeService()
+                  .fetchVehiculeByTypeVoitureWithPagination(
+                      selectedType!.idTypeVoiture!,
+                      detectedCountry != null ? detectedCountry! : "Mali");
+            });
     }
   }
 
@@ -299,30 +296,31 @@ class _TransportState extends State<Transport> {
     if (result == true) {
       print("Rafraichissement en cours");
       selectedType == null
-                  ? setState(() {
-                      vehiculeListeFuture =
-                          VehiculeService().fetchVehicule(
-                          detectedCountry != null ? detectedCountry! : "Mali");
-                    })
-                  : setState(() {
-                      vehiculeListeFuture1 = VehiculeService()
-                          .fetchVehiculeByTypeVoitureWithPagination(
-                              selectedType!.idTypeVoiture!,  detectedCountry != null
-                                  ? detectedCountry!
-                                  : "Mali");
-                    });
+          ? setState(() {
+              vehiculeListeFuture = VehiculeService().fetchVehicule(
+                  detectedCountry != null ? detectedCountry! : "Mali");
+            })
+          : setState(() {
+              vehiculeListeFuture1 = VehiculeService()
+                  .fetchVehiculeByTypeVoitureWithPagination(
+                      selectedType!.idTypeVoiture!,
+                      detectedCountry != null ? detectedCountry! : "Mali");
+            });
     }
   }
 
   @override
   void dispose() {
-    _searchController
-        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
+    }
     scrollableController.dispose();
     super.dispose();
   }
 
- void _updateMode(int index) {
+  void _updateMode(int index) {
     if (mounted) {
       setState(() {
         isSearchMode = index == 0;
@@ -335,16 +333,25 @@ class _TransportState extends State<Transport> {
     }
   }
 
+  void _selectMode(String mode) {
+    setState(() {
+      if (mode == 'Rechercher') {
+        isSearchMode = true;
+        isFilterMode = false;
+      } else if (mode == 'Filtrer') {
+        isSearchMode = false;
+        isFilterMode = true;
+      } else if (mode == 'Fermer') {
+        isSearchMode = false;
+        isFilterMode = false;
+      }
+    });
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (isSearchMode) {
-      _searchController = TextEditingController();
-    } else {
-      _searchController.dispose();
-    }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -369,19 +376,21 @@ class _TransportState extends State<Transport> {
                 ? [
                     IconButton(
                         onPressed: () {
-                           selectedType == null
-                  ? setState(() {
-                      vehiculeListeFuture =
-                          VehiculeService().fetchVehicule(
-                          detectedCountry != null ? detectedCountry! : "Mali");
-                    })
-                  : setState(() {
-                      vehiculeListeFuture1 = VehiculeService()
-                          .fetchVehiculeByTypeVoitureWithPagination(
-                              selectedType!.idTypeVoiture!,  detectedCountry != null
-                                  ? detectedCountry!
-                                  : "Mali");
-                    });
+                          selectedType == null
+                              ? setState(() {
+                                  vehiculeListeFuture = VehiculeService()
+                                      .fetchVehicule(detectedCountry != null
+                                          ? detectedCountry!
+                                          : "Mali");
+                                })
+                              : setState(() {
+                                  vehiculeListeFuture1 = VehiculeService()
+                                      .fetchVehiculeByTypeVoitureWithPagination(
+                                          selectedType!.idTypeVoiture!,
+                                          detectedCountry != null
+                                              ? detectedCountry!
+                                              : "Mali");
+                                });
                         },
                         icon: const Icon(Icons.refresh, color: d_colorGreen)),
                   ]
@@ -389,18 +398,20 @@ class _TransportState extends State<Transport> {
                     IconButton(
                         onPressed: () {
                           selectedType == null
-                  ? setState(() {
-                      vehiculeListeFuture =
-                          VehiculeService().fetchVehicule(
-                          detectedCountry != null ? detectedCountry! : "Mali");
-                    })
-                  : setState(() {
-                      vehiculeListeFuture1 = VehiculeService()
-                          .fetchVehiculeByTypeVoitureWithPagination(
-                              selectedType!.idTypeVoiture!,  detectedCountry != null
-                                  ? detectedCountry!
-                                  : "Mali");
-                    });
+                              ? setState(() {
+                                  vehiculeListeFuture = VehiculeService()
+                                      .fetchVehicule(detectedCountry != null
+                                          ? detectedCountry!
+                                          : "Mali");
+                                })
+                              : setState(() {
+                                  vehiculeListeFuture1 = VehiculeService()
+                                      .fetchVehiculeByTypeVoitureWithPagination(
+                                          selectedType!.idTypeVoiture!,
+                                          detectedCountry != null
+                                              ? detectedCountry!
+                                              : "Mali");
+                                });
                         },
                         icon: const Icon(Icons.refresh, color: d_colorGreen)),
                     (typeActeurData
@@ -517,14 +528,14 @@ class _TransportState extends State<Transport> {
               });
               selectedType == null
                   ? setState(() {
-                      vehiculeListeFuture =
-                          VehiculeService().fetchVehicule(
+                      vehiculeListeFuture = VehiculeService().fetchVehicule(
                           detectedCountry != null ? detectedCountry! : "Mali");
                     })
                   : setState(() {
                       vehiculeListeFuture1 = VehiculeService()
                           .fetchVehiculeByTypeVoitureWithPagination(
-                              selectedType!.idTypeVoiture!,  detectedCountry != null
+                              selectedType!.idTypeVoiture!,
+                              detectedCountry != null
                                   ? detectedCountry!
                                   : "Mali");
                     });
@@ -537,31 +548,91 @@ class _TransportState extends State<Transport> {
                   SliverToBoxAdapter(
                       child: Column(children: [
                     const SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: ToggleButtons(
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Text('Rechercher'),
+                    if (!isSearchMode)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: () {
+                            setState(() {
+                              isSearchMode = true;
+                              isFilterMode = true;
+                            });
+                          },
+                          icon: Icon(
+                            Icons.search,
+                            color: d_colorGreen,
                           ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Text('Filtrer'),
+                          label: Text(
+                            'Rechercher',
+                            style: TextStyle(color: d_colorGreen, fontSize: 17),
                           ),
-                        ],
-                        isSelected: [isSearchMode, !isSearchMode],
-                         onPressed: _updateMode,
+                        ),
                       ),
-                    ),
                     if (isSearchMode)
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
+                      Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                isSearchMode = false;
+                                isFilterMode = false;
+                              });
+                            },
+                            icon: Icon(
+                              Icons.close,
+                              color: Colors.red,
+                            ),
+                            label: Text(
+                              'Fermer',
+                              style: TextStyle(color: Colors.red, fontSize: 17),
+                            ),
+                          )),
+                    Visibility(
+                        visible: isSearchMode,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 3, horizontal: 10),
+                          child: FutureBuilder(
+                            future: _typeList,
+                            builder: (_, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return buildLoadingDropdown();
+                              }
+
+                              if (snapshot.hasData) {
+                                dynamic jsonString =
+                                    utf8.decode(snapshot.data.bodyBytes);
+                                dynamic responseData = json.decode(jsonString);
+
+                                if (responseData is List) {
+                                  final reponse = responseData;
+                                  final typeList = reponse
+                                      .map((e) => TypeVoiture.fromMap(e))
+                                      .where((con) => con.statutType == true)
+                                      .toList();
+
+                                  if (typeList.isEmpty) {
+                                    return buildEmptyDropdown();
+                                  }
+
+                                  return buildDropdown(typeList);
+                                } else {
+                                  return buildEmptyDropdown();
+                                }
+                              }
+
+                              return buildEmptyDropdown();
+                            },
+                          ),
+                        )),
+                    Visibility(
+                      visible: isSearchMode,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 3, horizontal: 10),
                         child: SearchFieldAutoComplete<String>(
                           controller: _searchController,
-                          itemHeight: 25,
                           placeholder: 'Rechercher...',
                           placeholderStyle:
                               TextStyle(fontStyle: FontStyle.italic),
@@ -572,10 +643,10 @@ class _TransportState extends State<Transport> {
                             borderRadius: BorderRadius.circular(16.0),
                           ),
                           onSuggestionSelected: (selectedItem) {
-                              if (mounted) {
-                                _searchController.text = selectedItem.searchKey;
-                              }
-                            },
+                            if (mounted) {
+                              _searchController.text = selectedItem.searchKey;
+                            }
+                          },
                           suggestionItemBuilder: (context, searchFieldItem) {
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -587,86 +658,7 @@ class _TransportState extends State<Transport> {
                           },
                         ),
                       ),
-                    //  Padding(
-                    //   padding: const EdgeInsets.all(10.0),
-                    //   child: Container(
-                    //     padding: EdgeInsets.symmetric(horizontal: 10),
-                    //     decoration: BoxDecoration(
-                    //       color:
-                    //           Colors.blueGrey[50], // Couleur d'arrière-plan
-                    //       borderRadius: BorderRadius.circular(25),
-                    //     ),
-                    //     child: Row(
-                    //       children: [
-                    //         Icon(Icons.search,
-                    //             color: Colors.blueGrey[400],
-                    //             size:
-                    //                 28), // Utiliser une icône de recherche plus grande
-                    //         SizedBox(width: 10),
-                    //         Expanded(
-                    //           child: TextField(
-                    //             controller: _searchController,
-                    //             onChanged: (value) {
-                    //               setState(() {});
-                    //             },
-                    //             decoration: InputDecoration(
-                    //               hintText: 'Rechercher...',
-                    //               border: InputBorder.none,
-                    //               hintStyle:
-                    //                   TextStyle(color: Colors.blueGrey[400]),
-                    //             ),
-                    //           ),
-                    //         ),
-                    //         // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
-                    //         IconButton(
-                    //           icon: Icon(Icons.clear),
-                    //           onPressed: () {
-                    //             _searchController.clear();
-                    //             setState(() {});
-                    //           },
-                    //         ),
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
-                    if (!isSearchMode)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        child: FutureBuilder(
-                          future: _typeList,
-                          builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return buildLoadingDropdown();
-                            }
-
-                            if (snapshot.hasData) {
-                              dynamic jsonString =
-                                  utf8.decode(snapshot.data.bodyBytes);
-                              dynamic responseData = json.decode(jsonString);
-
-                              if (responseData is List) {
-                                final reponse = responseData;
-                                final typeList = reponse
-                                    .map((e) => TypeVoiture.fromMap(e))
-                                    .where((con) => con.statutType == true)
-                                    .toList();
-
-                                if (typeList.isEmpty) {
-                                  return buildEmptyDropdown();
-                                }
-
-                                return buildDropdown(typeList);
-                              } else {
-                                return buildEmptyDropdown();
-                              }
-                            }
-
-                            return buildEmptyDropdown();
-                          },
-                        ),
-                      ),
+                    ),
                     const SizedBox(height: 10),
                   ])),
                 ];
@@ -678,8 +670,7 @@ class _TransportState extends State<Transport> {
                   });
                   selectedType == null
                       ? setState(() {
-                          vehiculeListeFuture =
-                              VehiculeService().fetchVehicule(
+                          vehiculeListeFuture = VehiculeService().fetchVehicule(
                               detectedCountry != null
                                   ? detectedCountry!
                                   : "Mali");
@@ -688,7 +679,7 @@ class _TransportState extends State<Transport> {
                           vehiculeListeFuture1 = VehiculeService()
                               .fetchVehiculeByTypeVoitureWithPagination(
                                   selectedType!.idTypeVoiture!,
-                                   detectedCountry != null
+                                  detectedCountry != null
                                       ? detectedCountry!
                                       : "Mali");
                         });
@@ -1227,8 +1218,8 @@ class _TransportState extends State<Transport> {
           }
           page = 0;
           hasMore = true;
-          fetchVehiculeByTypeVoitureWithPagination(
-              selectedType!.idTypeVoiture!,  detectedCountry != null ? detectedCountry! : "Mali",
+          fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,
+              detectedCountry != null ? detectedCountry! : "Mali",
               refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -1238,10 +1229,9 @@ class _TransportState extends State<Transport> {
         });
       },
       decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1253,10 +1243,9 @@ class _TransportState extends State<Transport> {
       onChanged: null,
       decoration: InputDecoration(
         labelText: '-- Aucun type trouvé --',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1268,10 +1257,9 @@ class _TransportState extends State<Transport> {
       onChanged: null,
       decoration: InputDecoration(
         labelText: 'Chargement...',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 22),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );

@@ -50,7 +50,8 @@ class _LocationState extends State<Location> {
   String? typeValue;
   TypeMateriel? selectedType;
   late Future _typeList;
-  bool isSearchMode = true;
+  bool isSearchMode = false;
+  bool isFilterMode = false;
   CountryProvider? countryProvider;
   String? detectedCountry;
   //   List<ParametreGeneraux> paraList = [];
@@ -78,7 +79,8 @@ class _LocationState extends State<Location> {
           page++;
         });
       debugPrint("yes - fetch all materiel by pays");
-      fetchMateriel(detectedCountry != null ? detectedCountry! : "mali").then((value) {
+      fetchMateriel(detectedCountry != null ? detectedCountry! : "mali")
+          .then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -219,7 +221,7 @@ class _LocationState extends State<Location> {
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString('emailActeur');
+    email = prefs.getString('whatsAppActeur');
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -241,7 +243,8 @@ class _LocationState extends State<Location> {
           .fetchMaterielByTypeAndPaysWithPagination(
               selectedType!.idTypeMateriel!);
     } else {
-      materielListe = await MaterielService().fetchMateriel(detectedCountry != null ? detectedCountry! : "mali");
+      materielListe = await MaterielService()
+          .fetchMateriel(detectedCountry != null ? detectedCountry! : "mali");
     }
     return materielListe;
   }
@@ -333,7 +336,7 @@ class _LocationState extends State<Location> {
     }
   }
 
- void _updateMode(int index) {
+  void _updateMode(int index) {
     if (mounted) {
       setState(() {
         isSearchMode = index == 0;
@@ -346,23 +349,35 @@ class _LocationState extends State<Location> {
     }
   }
 
-  
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (isSearchMode) {
-      _searchController = TextEditingController();
-    } else {
-      _searchController.dispose();
-    }
+  }
+
+  void _selectMode(String mode) {
+    setState(() {
+      if (mode == 'Rechercher') {
+        isSearchMode = true;
+        isFilterMode = false;
+      } else if (mode == 'Filtrer') {
+        isSearchMode = false;
+        isFilterMode = true;
+      } else if (mode == 'Fermer') {
+        isSearchMode = false;
+        isFilterMode = false;
+      }
+    });
   }
 
   @override
   void dispose() {
     scrollableController.dispose();
     scrollableController1.dispose();
-    _searchController.dispose();
-    // refreshList();
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
+    }
     super.dispose();
   }
 
@@ -462,34 +477,94 @@ class _LocationState extends State<Location> {
                     SliverToBoxAdapter(
                         child: Column(children: [
                       const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ToggleButtons(
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Text('Rechercher'),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Text('Filtrer'),
-                            ),
-                          ],
-                          isSelected: [isSearchMode, !isSearchMode],
-                          onPressed: _updateMode,
-                        ),
+                      if (!isSearchMode)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          isSearchMode = true;
+                          isFilterMode = true;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.search,
+                        color: d_colorGreen,
                       ),
+                      label: Text(
+                        'Rechercher',
+                        style: TextStyle(color: d_colorGreen, fontSize: 17),
+                      ),
+                    ),
+                  ),
                       if (isSearchMode)
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  isSearchMode = false;
+                                  isFilterMode = false;
+                                });
+                              },
+                              icon: Icon(
+                                Icons.close,
+                                color: Colors.red,
+                              ),
+                              label: Text(
+                                'Fermer',
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 17),
+                              ),
+                            )),
+                      Visibility(
+                          visible: isSearchMode,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 3, horizontal: 10),
+                            child: FutureBuilder(
+                              future: _typeList,
+                              builder: (_, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return buildLoadingDropdown();
+                                }
+
+                                if (snapshot.hasData) {
+                                  dynamic jsonString =
+                                      utf8.decode(snapshot.data.bodyBytes);
+                                  dynamic responseData =
+                                      json.decode(jsonString);
+
+                                  if (responseData is List) {
+                                    final reponse = responseData;
+                                    final typeList = reponse
+                                        .map((e) => TypeMateriel.fromMap(e))
+                                        .where((con) => con.statutType == true)
+                                        .toList();
+
+                                    if (typeList.isEmpty) {
+                                      return buildEmptyDropdown();
+                                    }
+
+                                    return buildDropdown(typeList);
+                                  } else {
+                                    return buildEmptyDropdown();
+                                  }
+                                }
+
+                                return buildEmptyDropdown();
+                              },
+                            ),
+                          )),
+                      Visibility(
+                        visible: isSearchMode,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 3, horizontal: 10),
                           child: SearchFieldAutoComplete<String>(
                             controller: _searchController,
-                             itemHeight: 25,
                             placeholder: 'Rechercher...',
-                            searchStyle:
-                                TextStyle(overflow: TextOverflow.ellipsis),
                             placeholderStyle:
                                 TextStyle(fontStyle: FontStyle.italic),
                             suggestions: AutoComplet.getMateriels,
@@ -498,7 +573,7 @@ class _LocationState extends State<Location> {
                               color: const Color.fromARGB(255, 236, 234, 234),
                               borderRadius: BorderRadius.circular(16.0),
                             ),
-                             onSuggestionSelected: (selectedItem) {
+                            onSuggestionSelected: (selectedItem) {
                               if (mounted) {
                                 _searchController.text = selectedItem.searchKey;
                               }
@@ -514,44 +589,7 @@ class _LocationState extends State<Location> {
                             },
                           ),
                         ),
-                      if (!isSearchMode)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          child: FutureBuilder(
-                            future: _typeList,
-                            builder: (_, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return buildLoadingDropdown();
-                              }
-
-                              if (snapshot.hasData) {
-                                dynamic jsonString =
-                                    utf8.decode(snapshot.data.bodyBytes);
-                                dynamic responseData = json.decode(jsonString);
-
-                                if (responseData is List) {
-                                  final reponse = responseData;
-                                  final typeList = reponse
-                                      .map((e) => TypeMateriel.fromMap(e))
-                                      .where((con) => con.statutType == true)
-                                      .toList();
-
-                                  if (typeList.isEmpty) {
-                                    return buildEmptyDropdown();
-                                  }
-
-                                  return buildDropdown(typeList);
-                                } else {
-                                  return buildEmptyDropdown();
-                                }
-                              }
-
-                              return buildEmptyDropdown();
-                            },
-                          ),
-                        ),
+                      ),
                       const SizedBox(height: 10),
                     ])),
                   ];
@@ -1146,7 +1184,8 @@ class _LocationState extends State<Location> {
           page = 0;
           hasMore = true;
           fetchMaterielByType(
-              detectedCountry != null ? detectedCountry! : "mali", refresh: true);
+              detectedCountry != null ? detectedCountry! : "mali",
+              refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
               scrollableController1.jumpTo(0.0);
@@ -1155,10 +1194,9 @@ class _LocationState extends State<Location> {
         });
       },
       decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1170,10 +1208,9 @@ class _LocationState extends State<Location> {
       onChanged: null,
       decoration: InputDecoration(
         labelText: '-- Aucun type  trouvé --',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );
@@ -1185,10 +1222,9 @@ class _LocationState extends State<Location> {
       onChanged: null,
       decoration: InputDecoration(
         labelText: 'Chargement...',
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(22),
         ),
       ),
     );

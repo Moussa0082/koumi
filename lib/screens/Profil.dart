@@ -43,7 +43,7 @@ class _ProfilState extends State<Profil> {
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString('emailActeur');
+    email = prefs.getString('whatsAppActeur');
 
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
@@ -160,6 +160,7 @@ class _ProfilState extends State<Profil> {
               : SingleChildScrollView(
                   child: Column(
                     children: [
+                     
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 15, horizontal: 10),

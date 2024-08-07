@@ -79,6 +79,23 @@ class CategorieService extends ChangeNotifier {
     }
   }
 
+ Future<List<CategorieProduit>> fetchSearchItems() async {
+    final response = await http.get(Uri.parse("$baseUrl/allCategorie"));
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      debugPrint("Body : ${response.body.toString()}");
+      categorieList =
+          body.map((item) => CategorieProduit.fromMap(item)).toList();
+      debugPrint(response.body);
+      return categorieList;
+    } else {
+      print(
+          'Échec de la requête fetch all cat avec le code d\'état: ${response.statusCode}');
+      return categorieList = [];
+    }
+  }
+
   Future<List<CategorieProduit>> fetchCategorieByFiliere(
       String idFiliere) async {
     final response =

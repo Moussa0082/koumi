@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -46,26 +47,6 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
   bool hasMore = true;
   ScrollController scrollableController = ScrollController();
 
-  //  Future <void>verify() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   email = prefs.getString('emailActeur');
-  //   if (email != null) {
-  //     // Si l'email de l'acteur est présent, exécute checkLoggedIn
-  //     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-  //     typeActeurData = acteur.typeActeur!;
-  //     type = typeActeurData.map((data) => data.libelle).join(', ');
-  //     setState(() {
-  //       isExist = true;
-
-  //     });
-  //     // Fetch magasins after setting the actor
-  //   } else {
-  //     setState(() {
-  //       isExist = false;
-  //     });
-  //   }
-  // }
-
   Future<List<Magasin>> fetchMagasins() async {
     if (selectedNiveau1Pays != null) {
       magasinListe = await MagasinService().fetchMagasinByRegionAndActeur(
@@ -80,7 +61,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
     return magasinListe;
   }
 
-  Future<List<Magasin>> fetchMagasinByActeur(String idMagasin,
+  Future<List<Magasin>> fetchMagasinByActeur(String idActeur,
       {bool refresh = false}) async {
     // if (_stockService.isLoading == true) return [];
 
@@ -98,7 +79,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
 
     try {
       final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/Magasin/getAllMagasinsByActeurWithPagination?idActeur=$idMagasin&page=${page}&size=${size}'));
+          '$apiOnlineUrl/Magasin/getAllMagasinsByActeurWithPagination?idActeur=$idActeur&page=${page}&size=${size}'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -164,16 +145,46 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
       scrollableController.addListener(_scrollListener);
     });
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    
+
     _searchController = TextEditingController();
     _niveau1PaysList = http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
     magasinListeFuture = fetchMagasinByActeur(acteur.idActeur!);
   }
 
+  Future<void> _getResultFromNextScreen2(BuildContext context) async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddMagasinScreen(
+                  isEditable: false,
+                )));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        magasinListeFuture = fetchMagasinByActeur(acteur.idActeur!);
+      });
+    }
+  }
+
+  bool isSearchMode = false;
+  void _selectMode(String mode) {
+    setState(() {
+      if (mode == 'Rechercher') {
+        isSearchMode = true;
+      } else if (mode == 'Fermer') {
+        isSearchMode = false;
+      }
+    });
+  }
+
   @override
   void dispose() {
-    _searchController
-        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    if (isSearchMode) {
+      _searchController = TextEditingController();
+    } else {
+      _searchController.dispose();
+    }
     super.dispose();
   }
 
@@ -181,33 +192,49 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-          centerTitle: true,
-          toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-          title: Text(
-            'Mes boutiques',
-            style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
-          ),
-          // actions:  [
-          //   IconButton(
-          //       onPressed: () {
-          //         setState(() {
-
-          //           // magasinListeFuture1 = fetchMagasinss() :
-          //           magasinListeFuture = fetchMagasins()
-          //           ;
-          //         });
-          //       },
-          //       icon: Icon(Icons.refresh)),
-
-          // ]
-        ),
+            backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+            centerTitle: true,
+            toolbarHeight: 100,
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context, true);
+                },
+                icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+            title: Text(
+              'Mes boutiques',
+              style: const TextStyle(
+                  color: d_colorGreen,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20),
+            ),
+            actions: [
+              PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                itemBuilder: (context) {
+                  return <PopupMenuEntry<String>>[
+                    PopupMenuItem<String>(
+                      child: ListTile(
+                        leading: const Icon(
+                          Icons.add,
+                          color: Colors.green,
+                        ),
+                        title: const Text(
+                          "Ajouter magasin",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onTap: () async {
+                          Navigator.of(context).pop();
+                          _getResultFromNextScreen2(context);
+                        },
+                      ),
+                    ),
+                  ];
+                },
+              )
+            ]),
         body: Container(
             child: NestedScrollView(
                 headerSliverBuilder:
@@ -215,50 +242,88 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                   return <Widget>[
                     SliverToBoxAdapter(
                         child: Column(children: [
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                            color:
-                                Colors.blueGrey[50], // Couleur d'arrière-plan
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.search,
-                                  color: Colors.blueGrey[400],
-                                  size:
-                                      28), // Utiliser une icône de recherche plus grande
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: TextField(
-                                  controller: _searchController,
-                                  onChanged: (value) {
-                                    setState(() {});
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Rechercher',
-                                    border: InputBorder.none,
-                                    hintStyle:
-                                        TextStyle(color: Colors.blueGrey[400]),
-                                  ),
-                                ),
-                              ),
-                              // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
-                              IconButton(
-                                icon: Icon(Icons.clear),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  setState(() {});
-                                },
-                              ),
-                            ],
+                      if (!isSearchMode)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                isSearchMode = true;
+                              });
+                            },
+                            icon: Icon(
+                              Icons.search,
+                              color: d_colorGreen,
+                            ),
+                            label: Text(
+                              'Rechercher',
+                              style:
+                                  TextStyle(color: d_colorGreen, fontSize: 17),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
+                      if (isSearchMode)
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  isSearchMode = false;
+                                });
+                              },
+                              icon: Icon(
+                                Icons.close,
+                                color: Colors.red,
+                              ),
+                              label: Text(
+                                'Fermer',
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 17),
+                              ),
+                            )),
+                      Visibility(
+                          visible: isSearchMode,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: Colors
+                                    .blueGrey[50], // Couleur d'arrière-plan
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.search,
+                                      color: Colors.blueGrey[400],
+                                      size:
+                                          28), // Utiliser une icône de recherche plus grande
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: TextField(
+                                      controller: _searchController,
+                                      onChanged: (value) {
+                                        setState(() {});
+                                      },
+                                      decoration: InputDecoration(
+                                        hintText: 'Rechercher',
+                                        border: InputBorder.none,
+                                        hintStyle: TextStyle(
+                                            color: Colors.blueGrey[400]),
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.clear),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      setState(() {});
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )),
                     ])),
                   ];
                 },
