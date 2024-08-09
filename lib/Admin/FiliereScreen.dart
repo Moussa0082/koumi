@@ -157,10 +157,11 @@ class _FiliereScreenState extends State<FiliereScreen> {
                           color: isSearchMode ? Colors.red : Colors.green,
                         ),
                         label: Text(
-                          isSearchMode ? 'Fermer' : 'Rechercher',
+                          isSearchMode ? 'Fermer' : 'Rechercher...',
                           style: TextStyle(
-                              color: isSearchMode ? Colors.red : Colors.green,
-                              fontSize: 17),
+                            color: isSearchMode ? Colors.red : Colors.green,
+                            fontSize: 17,
+                          ),
                         ),
                       ),
                     ),
@@ -188,8 +189,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                   decoration: InputDecoration(
                                     hintText: 'Rechercher',
                                     border: InputBorder.none,
-                                    hintStyle:
-                                        TextStyle(color: Colors.blueGrey[400]),
+                                    hintStyle: TextStyle(
+                                      color: Colors.blueGrey[400],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -389,9 +391,6 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                     ),
                                                                     onTap:
                                                                         () async {
-                                                                      Navigator.of(
-                                                                              context)
-                                                                          .pop();
                                                                       e.statutFiliere ==
                                                                               false
                                                                           ? await FiliereService()
@@ -428,6 +427,16 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                               .then((value) => {
                                                                                     Provider.of<FiliereService>(context, listen: false).applyChange(),
                                                                                     Navigator.of(context).pop(),
+                                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                                      const SnackBar(
+                                                                                        content: Row(
+                                                                                          children: [
+                                                                                            Text("Désactiver avec succèss "),
+                                                                                          ],
+                                                                                        ),
+                                                                                        duration: Duration(seconds: 2),
+                                                                                      ),
+                                                                                    )
                                                                                   })
                                                                               .catchError((onError) => {
                                                                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -442,21 +451,6 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                                     ),
                                                                                     Navigator.of(context).pop(),
                                                                                   });
-
-                                                                      ScaffoldMessenger.of(
-                                                                              context)
-                                                                          .showSnackBar(
-                                                                        const SnackBar(
-                                                                          content:
-                                                                              Row(
-                                                                            children: [
-                                                                              Text("Désactiver avec succèss "),
-                                                                            ],
-                                                                          ),
-                                                                          duration:
-                                                                              Duration(seconds: 2),
-                                                                        ),
-                                                                      );
                                                                     },
                                                                   ),
                                                                 ),

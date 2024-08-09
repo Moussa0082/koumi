@@ -189,43 +189,42 @@ class StockService extends ChangeNotifier {
     }
   }
 
-Future<void> updateQuantiteStock({
-  required String id,
-  required double quantite,
-}) async {
-  
-  try {
-    final response = await http.put(
-      Uri.parse('$baseUrl/$id/quantite?quantite=$quantite'),
-      headers: {'Content-Type': 'application/json'},
-    );
+  Future<void> updateQuantiteStock({
+    required String id,
+    required double quantite,
+  }) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/$id/quantite?quantite=$quantite'),
+        headers: {'Content-Type': 'application/json'},
+      );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      final donneesResponse = json.decode(response.body);
-      debugPrint('Stock service update: ${donneesResponse.toString()}');
-      // return Stock.fromJson(json.decode(response.body));
-      // applyChange();
-    } else {
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final donneesResponse = json.decode(response.body);
+        debugPrint('Stock service update: ${donneesResponse.toString()}');
+        // return Stock.fromJson(json.decode(response.body));
+        // applyChange();
+      } else {
+        Get.snackbar(
+          "Erreur",
+          "Une erreur s'est produite, veuillez réessayer ultérieurement",
+          duration: Duration(seconds: 3),
+        );
+        throw Exception(
+          'Impossible de mettre à jour la quantité : ${quantite} et code : ${response.statusCode}',
+        );
+      }
+    } catch (e) {
       Get.snackbar(
         "Erreur",
         "Une erreur s'est produite, veuillez réessayer ultérieurement",
         duration: Duration(seconds: 3),
       );
-      throw Exception(
-        'Impossible de mettre à jour la quantité : ${quantite} et code : ${response.statusCode}',
-      );
+      debugPrint('Erreur lors de la mise à jour de la quantité: $e');
+      throw Exception('Erreur lors de la mise à jour de la quantité: $e');
     }
-  } catch (e) {
-    Get.snackbar(
-      "Erreur",
-      "Une erreur s'est produite, veuillez réessayer ultérieurement",
-      duration: Duration(seconds: 3),
-    );
-    debugPrint('Erreur lors de la mise à jour de la quantité: $e');
-    throw Exception('Erreur lors de la mise à jour de la quantité: $e');
   }
-  }
-  
+
   Future<List<Stock>> fetchStock(String niveau3PaysActeur,
       {bool refresh = false}) async {
     if (isLoading == true) return [];
@@ -241,7 +240,8 @@ Future<void> updateQuantiteStock({
     try {
       final response = await http.get(Uri.parse(
           '$apiOnlineUrl/Stock/getStocksByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
-
+      debugPrint(
+          '$apiOnlineUrl/Stock/getStocksByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}');
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
@@ -314,8 +314,6 @@ Future<void> updateQuantiteStock({
     }
     return stockList;
   }
-
-
 
   Future<List<Stock>> fetchStockByCategorieAndFiliere(
       String idCategorie, String libelleFiliere, String niveau3PaysActeur,
@@ -738,5 +736,4 @@ class StockController extends GetxController {
   void clearstockList1() {
     stockList1.clear();
   }
-
 }

@@ -53,7 +53,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
   @override
   void initState() {
     super.initState();
-     _scrollController = ScrollController();
+    _scrollController = ScrollController();
     // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // typeActeurData = acteur.typeActeur!;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
@@ -73,8 +73,8 @@ class _ConseilScreenState extends State<ConseilScreen> {
 
   @override
   void dispose() {
-       _searchController.dispose();
-        _scrollController.dispose();
+    _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -196,64 +196,64 @@ class _ConseilScreenState extends State<ConseilScreen> {
             return <Widget>[
               SliverToBoxAdapter(
                   child: Column(children: [
-                  Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            isSearchMode = !isSearchMode;
-                          });
-                        },
-                        icon: Icon(
-                          isSearchMode ? Icons.close : Icons.search,
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        isSearchMode = !isSearchMode;
+                      });
+                    },
+                    icon: Icon(
+                      isSearchMode ? Icons.close : Icons.search,
+                      color: isSearchMode ? Colors.red : Colors.green,
+                    ),
+                    label: Text(
+                      isSearchMode ? 'Fermer' : 'Rechercher...',
+                      style: TextStyle(
                           color: isSearchMode ? Colors.red : Colors.green,
-                        ),
-                        label: Text(
-                          isSearchMode ? 'Fermer' : 'Rechercher',
-                          style: TextStyle(
-                              color: isSearchMode ? Colors.red : Colors.green,
-                              fontSize: 17),
-                        ),
+                          fontSize: 17),
+                    ),
+                  ),
+                ),
+                if (isSearchMode)
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.blueGrey[50],
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.search, color: Colors.blueGrey[400]),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              onChanged: (value) {
+                                if (mounted) {
+                                  setState(() {});
+                                }
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Rechercher',
+                                border: InputBorder.none,
+                                hintStyle:
+                                    TextStyle(color: Colors.blueGrey[400]),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    if (isSearchMode)
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey[50],
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.search, color: Colors.blueGrey[400]),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: TextField(
-                                  controller: _searchController,
-                                  onChanged: (value) {
-                                    if (mounted) {
-                                      setState(() {});
-                                    }
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Rechercher',
-                                    border: InputBorder.none,
-                                    hintStyle:
-                                        TextStyle(color: Colors.blueGrey[400]),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                  ),
               ])),
             ];
           },
           body: SingleChildScrollView(
-              controller: _scrollController,
+            controller: _scrollController,
             child: Column(
               children: [
                 Consumer<ConseilService>(
@@ -280,7 +280,10 @@ class _ConseilScreenState extends State<ConseilScreen> {
                             searchText = _searchController.text.toLowerCase();
                             return libelle.contains(searchText);
                           }).toList();
-                          return filtereSearch.isEmpty
+                          return filtereSearch
+                                  .where((element) =>
+                                      element.statutConseil == true)
+                                  .isEmpty
                               ? Padding(
                                   padding: EdgeInsets.all(10),
                                   child: Center(

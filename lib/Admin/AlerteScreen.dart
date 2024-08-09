@@ -157,7 +157,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                           color: isSearchMode ? Colors.red : Colors.green,
                         ),
                         label: Text(
-                          isSearchMode ? 'Fermer' : 'Rechercher',
+                          isSearchMode ? 'Fermer' : 'Rechercher...',
                           style: TextStyle(
                               color: isSearchMode ? Colors.red : Colors.green,
                               fontSize: 17),
@@ -201,7 +201,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
             ];
           },
           body: SingleChildScrollView(
-             controller: _scrollController,
+            controller: _scrollController,
             child: Column(
               children: [
                 Consumer<AlertesService>(

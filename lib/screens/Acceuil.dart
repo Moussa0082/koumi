@@ -129,33 +129,33 @@ class _AccueilState extends State<Accueil> {
             position.latitude, position.longitude);
         if (placemark.isNotEmpty) {
           Placemark place = placemark[0];
-          debugPrint("Address ISO: $detectedC");
+          debugPrint("Address ISO dans acceuil: $detectedC");
           address.value =
-              'Address : ${place.locality}, ${place.country}, ${place.isoCountryCode}';
+              'Address dans acceuil : ${place.locality}, ${place.country}, ${place.isoCountryCode}';
 
           if (mounted) {
             setState(() {
               detectedC = place.isoCountryCode;
               detectedCountryCode = place.isoCountryCode ?? "ML";
               detectedCountry = place.country ?? "Mali";
-              print("pays : ${detectedCountry} code: ${detectedCountryCode}");
+              print("pays dans acceuil: ${detectedCountry} code: ${detectedCountryCode}");
               if (detectedCountry != null || detectedCountry!.isNotEmpty) {
                 detectorPays.setDetectedCountryAndCode(
                     detectedCountry!, detectedCountryCode!);
-                print("pays : $detectedCountry code: $detectedCountryCode");
+                print("pays dans acceuil: $detectedCountry code: $detectedCountryCode");
               } else {
                 detectorPays.setDetectedCountryAndCode("Mali", "ML");
-                print("Le pays n'a pas pu être détecté.");
+                print("Le pays n'a pas pu être détecté dans acceuil.");
               }
             });
           }
 
           debugPrint(
-              "Address: ${place.locality}, ${place.country}, ${place.isoCountryCode}");
+              "Address dans acceuil: ${place.locality}, ${place.country}, ${place.isoCountryCode}");
         } else {
           detectorPays.setDetectedCountryAndCode("Mali", "ML");
           debugPrint(
-              "Aucun emplacement trouvé dans admin accueil pour les coordonnées fournies.");
+              "Aucun emplacement trouvé dans  accueil pour les coordonnées fournies.");
         }
       } catch (e) {
         detectorPays.setDetectedCountryAndCode("Mali", "ML");

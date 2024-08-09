@@ -607,7 +607,7 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                                   items: [],
                                   popupProps: PopupProps.menu(
                                       showSearchBox: true,
-                                      title: Text("Rechercher une localité",
+                                      title: Text("Tapez pour rechercher une localité",
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600)),
                                       searchFieldProps: TextFieldProps(

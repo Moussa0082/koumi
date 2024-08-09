@@ -264,7 +264,10 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         appBar: AppBar(
             leading: IconButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                 Get.offAll(BottomNavigationPage(),
+                      transition: Transition.leftToRight);
+                  Provider.of<BottomNavigationService>(context, listen: false)
+                      .changeIndex(0);
                 },
                 icon: const Icon(Icons.arrow_back_ios)),
             actions: [

@@ -47,7 +47,7 @@ class _ConseilDisableState extends State<ConseilDisable> {
   void initState() {
     super.initState();
     _liste = getListe();
-     _scrollController = ScrollController();
+    _scrollController = ScrollController();
     _searchController = TextEditingController();
   }
 
@@ -98,7 +98,7 @@ class _ConseilDisableState extends State<ConseilDisable> {
                           color: isSearchMode ? Colors.red : Colors.green,
                         ),
                         label: Text(
-                          isSearchMode ? 'Fermer' : 'Rechercher',
+                          isSearchMode ? 'Fermer' : 'Rechercher...',
                           style: TextStyle(
                               color: isSearchMode ? Colors.red : Colors.green,
                               fontSize: 17),
@@ -173,7 +173,9 @@ class _ConseilDisableState extends State<ConseilDisable> {
                             searchText = _searchController.text.toLowerCase();
                             return libelle.contains(searchText);
                           }).toList();
-                          return filtereSearch.isEmpty
+                          return filtereSearch.where((element) =>
+                                      element.statutConseil == false)
+                                  .isEmpty
                               ? Padding(
                                   padding: EdgeInsets.all(10),
                                   child: Center(
@@ -283,10 +285,7 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                                                 Colors.orange[400],
                                                                           ),
                                                                 title: Text(
-                                                                  e.statutConseil ==
-                                                                          false
-                                                                      ? "Activer"
-                                                                      : "Desactiver",
+                                                                "Activer",
                                                                   style:
                                                                       TextStyle(
                                                                     color: e.statutConseil ==
@@ -302,9 +301,7 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                                 ),
                                                                 onTap:
                                                                     () async {
-                                                                  e.statutConseil ==
-                                                                          false
-                                                                      ? await ConseilService()
+                                                                 await ConseilService()
                                                                           .activerConseil(e
                                                                               .idConseil!)
                                                                           .then((value) =>
@@ -339,48 +336,9 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                                                 ),
                                                                                 Navigator.of(context).pop(),
                                                                               })
-                                                                      : await ConseilService()
-                                                                          .desactiverConseil(e
-                                                                              .idConseil!)
-                                                                          .then((value) =>
-                                                                              {
-                                                                                Provider.of<ConseilService>(context, listen: false).applyChange(),
-                                                                                Navigator.of(context).pop(),
-                                                                                setState(() {
-                                                                                  _liste = getListe();
-                                                                                }),
-                                                                              })
-                                                                          .catchError((onError) =>
-                                                                              {
-                                                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                                                  const SnackBar(
-                                                                                    content: Row(
-                                                                                      children: [
-                                                                                        Text("Une erreur s'est produit"),
-                                                                                      ],
-                                                                                    ),
-                                                                                    duration: Duration(seconds: 5),
-                                                                                  ),
-                                                                                ),
-                                                                                Navigator.of(context).pop(),
-                                                                              });
+                                                                      ;
 
-                                                                  ScaffoldMessenger.of(
-                                                                          context)
-                                                                      .showSnackBar(
-                                                                    const SnackBar(
-                                                                      content:
-                                                                          Row(
-                                                                        children: [
-                                                                          Text(
-                                                                              "Désactiver avec succèss "),
-                                                                        ],
-                                                                      ),
-                                                                      duration: Duration(
-                                                                          seconds:
-                                                                              2),
-                                                                    ),
-                                                                  );
+                                                                
                                                                 },
                                                               ),
                                                             ),

@@ -267,7 +267,7 @@ class _CategoriPageState extends State<CategoriPage> {
                         border: Border.all(color: Colors.black45),
                         borderRadius: BorderRadius.circular(22),
                       ),
-                      child: Row( 
+                      child: Row(
                         children: [
                           Icon(Icons.search,
                               color:
@@ -837,12 +837,17 @@ class _CategoriPageState extends State<CategoriPage> {
                                                                             .then((value) =>
                                                                                 {
                                                                                   Provider.of<CategorieService>(context, listen: false).applyChange(),
-                                                                                  // setState(
-                                                                                  //     () {
-                                                                                  //   _liste =
-                                                                                  //       CategorieService().fetchCategorieByFiliere(filiere.idFiliere!);
-                                                                                  // }),
                                                                                   Navigator.of(context).pop(),
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Désactiver avec succèss "),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 2),
+                                                                                    ),
+                                                                                  )
                                                                                 })
                                                                             .catchError((onError) =>
                                                                                 {
@@ -858,21 +863,6 @@ class _CategoriPageState extends State<CategoriPage> {
                                                                                   ),
                                                                                   Navigator.of(context).pop(),
                                                                                 });
-
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
-                                                                        .showSnackBar(
-                                                                      const SnackBar(
-                                                                        content:
-                                                                            Row(
-                                                                          children: [
-                                                                            Text("Désactiver avec succèss "),
-                                                                          ],
-                                                                        ),
-                                                                        duration:
-                                                                            Duration(seconds: 2),
-                                                                      ),
-                                                                    );
                                                                   },
                                                                 ),
                                                               ),

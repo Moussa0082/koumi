@@ -208,7 +208,8 @@ class _AddConseilState extends State<AddConseil> {
     final status = await Permission.microphone.request();
 
     if (status != PermissionStatus.granted) {
-      throw 'Microphone permission not granted';
+      print('Microphone permission not granted');
+      // throw 'Microphone permission not granted';
     }
 
     await recorder.openRecorder();

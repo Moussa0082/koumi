@@ -304,7 +304,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
     // final countryProvider = Provider.of<CountryProvider>(context , listen: false);
 
     debugPrint(
-        "pays ${widget.detectedCountry != null ? widget.detectedCountry : "mali"}");
+        "pays detecter dans intrant  ${widget.detectedCountry != null ? widget.detectedCountry : "mali"}");
   }
 
   Future<void> _getResultFromNextScreen1(BuildContext context) async {
@@ -514,25 +514,26 @@ class _IntrantScreenState extends State<IntrantScreen> {
                     SliverToBoxAdapter(
                         child: Column(children: [
                       if (!isSearchMode)
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          isSearchMode = true;
-                          isFilterMode = true;
-                        });
-                      },
-                      icon: Icon(
-                        Icons.search,
-                        color: d_colorGreen,
-                      ),
-                      label: Text(
-                        'Rechercher',
-                        style: TextStyle(color: d_colorGreen, fontSize: 17),
-                      ),
-                    ),
-                  ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                isSearchMode = true;
+                                isFilterMode = true;
+                              });
+                            },
+                            icon: Icon(
+                              Icons.search,
+                              color: d_colorGreen,
+                            ),
+                            label: Text(
+                              'Rechercher...',
+                              style:
+                                  TextStyle(color: d_colorGreen, fontSize: 17),
+                            ),
+                          ),
+                        ),
                       if (isSearchMode)
                         Align(
                             alignment: Alignment.centerRight,

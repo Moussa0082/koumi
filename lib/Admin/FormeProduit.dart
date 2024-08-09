@@ -123,7 +123,7 @@ class _FormeProduitState extends State<FormeProduit> {
                           setState(() {});
                         },
                         decoration: InputDecoration(
-                          hintText: 'Rechercher',
+                          hintText: 'Rechercher...',
                           border: InputBorder.none,
                           hintStyle: TextStyle(
                               color: Colors

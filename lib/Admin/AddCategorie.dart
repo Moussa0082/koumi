@@ -355,6 +355,16 @@ class _AddCategorieState extends State<AddCategorie> {
                                                                                   _liste = CategorieService().fetchCategorieByFiliere(filiere.idFiliere!);
                                                                                 }),
                                                                                 Navigator.of(context).pop(),
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Désactiver avec succèss "),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 2),
+                                                                                  ),
+                                                                                )
                                                                               })
                                                                       .catchError(
                                                                           (onError) =>
@@ -371,23 +381,6 @@ class _AddCategorieState extends State<AddCategorie> {
                                                                                 ),
                                                                                 Navigator.of(context).pop(),
                                                                               });
-
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                const SnackBar(
-                                                                  content: Row(
-                                                                    children: [
-                                                                      Text(
-                                                                          "Désactiver avec succèss "),
-                                                                    ],
-                                                                  ),
-                                                                  duration:
-                                                                      Duration(
-                                                                          seconds:
-                                                                              2),
-                                                                ),
-                                                              );
                                                             },
                                                           ),
                                                         ),

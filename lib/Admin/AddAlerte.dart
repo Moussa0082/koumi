@@ -16,7 +16,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class AddAlerte extends StatefulWidget {
- const AddAlerte({super.key});
+  const AddAlerte({super.key});
   @override
   State<AddAlerte> createState() => _AddAlerteState();
 }
@@ -192,6 +192,205 @@ class _AddAlerteState extends State<AddAlerte> {
     );
   }
 
+  Map<String, String> countryTranslations = {
+    'Afghanistan': 'Afghanistan',
+    'Albania': 'Albanie',
+    'Algeria': 'Algérie',
+    'Andorra': 'Andorre',
+    'Angola': 'Angola',
+    'Argentina': 'Argentine',
+    'Armenia': 'Arménie',
+    'Australia': 'Australie',
+    'Austria': 'Autriche',
+    'Azerbaijan': 'Azerbaïdjan',
+    'Bahamas': 'Bahamas',
+    'Bahrain': 'Bahreïn',
+    'Bangladesh': 'Bangladesh',
+    'Barbados': 'Barbade',
+    'Belarus': 'Biélorussie',
+    'Belgium': 'Belgique',
+    'Belize': 'Belize',
+    'Benin': 'Bénin',
+    'Bhutan': 'Bhoutan',
+    'Bolivia': 'Bolivie',
+    'Bosnia and Herzegovina': 'Bosnie-Herzégovine',
+    'Botswana': 'Botswana',
+    'Brazil': 'Brésil',
+    'Brunei': 'Brunéi',
+    'Bulgaria': 'Bulgarie',
+    'Burkina Faso': 'Burkina Faso',
+    'Burundi': 'Burundi',
+    'Cabo Verde': 'Cap-Vert',
+    'Cambodia': 'Cambodge',
+    'Cameroon': 'Cameroun',
+    'Canada': 'Canada',
+    'Central African Republic': 'République centrafricaine',
+    'Chad': 'Tchad',
+    'Chile': 'Chili',
+    'China': 'Chine',
+    'Colombia': 'Colombie',
+    'Comoros': 'Comores',
+    'Congo': 'Congo Brazzaville',
+    'Costa Rica': 'Costa Rica',
+    'Croatia': 'Croatie',
+    'Cuba': 'Cuba',
+    'Cyprus': 'Chypre',
+    'Czechia (Czech Republic)': 'Tchéquie (République tchèque)',
+    'Congo, The Democratic Republic of the Congo':
+        'République démocratique du Congo',
+    'Denmark': 'Danemark',
+    'Djibouti': 'Djibouti',
+    'Dominica': 'Dominique',
+    'Dominican Republic': 'République dominicaine',
+    'Ecuador': 'Équateur',
+    'Egypt': 'Égypte',
+    'El Salvador': 'El Salvador',
+    'Equatorial Guinea': 'Guinée équatoriale',
+    'Eritrea': 'Érythrée',
+    'Estonia': 'Estonie',
+    'Eswatini': 'Eswatini',
+    'Ethiopia': 'Éthiopie',
+    'Fiji': 'Fidji',
+    'Finland': 'Finlande',
+    'France': 'France',
+    'Gabon': 'Gabon',
+    'Gambia': 'Gambie',
+    'Georgia': 'Géorgie',
+    'Germany': 'Allemagne',
+    'Ghana': 'Ghana',
+    'Greece': 'Grèce',
+    'Grenada': 'Grenade',
+    'Guatemala': 'Guatemala',
+    'Guinea': 'Guinée',
+    'Guinea-Bissau': 'Guinée-Bissau',
+    'Guyana': 'Guyana',
+    'Haiti': 'Haïti',
+    'Honduras': 'Honduras',
+    'Hungary': 'Hongrie',
+    'Iceland': 'Islande',
+    'India': 'Inde',
+    'Indonesia': 'Indonésie',
+    'Iran': 'Iran',
+    'Iraq': 'Irak',
+    'Ireland': 'Irlande',
+    'Israel': 'Israël',
+    'Italy': 'Italie',
+    'Ivory Coast': 'Côte d\'Ivoire',
+    'Jamaica': 'Jamaïque',
+    'Japan': 'Japon',
+    'Jordan': 'Jordanie',
+    'Kazakhstan': 'Kazakhstan',
+    'Kenya': 'Kenya',
+    'Kiribati': 'Kiribati',
+    'Kuwait': 'Koweït',
+    'Kyrgyzstan': 'Kirghizistan',
+    'Laos': 'Laos',
+    'Latvia': 'Lettonie',
+    'Lebanon': 'Liban',
+    'Lesotho': 'Lesotho',
+    'Liberia': 'Libéria',
+    'Libya': 'Libye',
+    'Liechtenstein': 'Liechtenstein',
+    'Lithuania': 'Lituanie',
+    'Luxembourg': 'Luxembourg',
+    'Madagascar': 'Madagascar',
+    'Malawi': 'Malawi',
+    'Malaysia': 'Malaisie',
+    'Maldives': 'Maldives',
+    'Mali': 'Mali',
+    'Malta': 'Malte',
+    'Marshall Islands': 'Îles Marshall',
+    'Mauritania': 'Mauritanie',
+    'Mauritius': 'Maurice',
+    'Mexico': 'Mexique',
+    'Micronesia': 'Micronésie',
+    'Moldova': 'Moldavie',
+    'Monaco': 'Monaco',
+    'Mongolia': 'Mongolie',
+    'Montenegro': 'Monténégro',
+    'Morocco': 'Maroc',
+    'Mozambique': 'Mozambique',
+    'Myanmar (Burma)': 'Myanmar (Birmanie)',
+    'Namibia': 'Namibie',
+    'Nauru': 'Nauru',
+    'Nepal': 'Népal',
+    'Netherlands': 'Pays-Bas',
+    'New Zealand': 'Nouvelle-Zélande',
+    'Nicaragua': 'Nicaragua',
+    'Niger': 'Niger',
+    'Nigeria': 'Nigeria',
+    'North Korea': 'Corée du Nord',
+    'North Macedonia': 'Macédoine du Nord',
+    'Norway': 'Norvège',
+    'Oman': 'Oman',
+    'Pakistan': 'Pakistan',
+    'Palau': 'Palaos',
+    'Palestine State': 'État de Palestine',
+    'Panama': 'Panama',
+    'Papua New Guinea': 'Papouasie-Nouvelle-Guinée',
+    'Paraguay': 'Paraguay',
+    'Peru': 'Pérou',
+    'Philippines': 'Philippines',
+    'Poland': 'Pologne',
+    'Portugal': 'Portugal',
+    'Qatar': 'Qatar',
+    'Romania': 'Roumanie',
+    'Russia': 'Russie',
+    'Rwanda': 'Rwanda',
+    'Saint Kitts and Nevis': 'Saint-Kitts-et-Nevis',
+    'Saint Lucia': 'Sainte-Lucie',
+    'Saint Vincent and the Grenadines': 'Saint-Vincent-et-les-Grenadines',
+    'Samoa': 'Samoa',
+    'San Marino': 'Saint-Marin',
+    'Sao Tome and Principe': 'Sao Tomé-et-Principe',
+    'Saudi Arabia': 'Arabie saoudite',
+    'Senegal': 'Sénégal',
+    'Serbia': 'Serbie',
+    'Seychelles': 'Seychelles',
+    'Sierra Leone': 'Sierra Leone',
+    'Singapore': 'Singapour',
+    'Slovakia': 'Slovaquie',
+    'Slovenia': 'Slovénie',
+    'Solomon Islands': 'Îles Salomon',
+    'Somalia': 'Somalie',
+    'South Africa': 'Afrique du Sud',
+    'South Korea': 'Corée du Sud',
+    'South Sudan': 'Soudan du Sud',
+    'Spain': 'Espagne',
+    'Sri Lanka': 'Sri Lanka',
+    'Sudan': 'Soudan',
+    'Suriname': 'Suriname',
+    'Sweden': 'Suède',
+    'Switzerland': 'Suisse',
+    'Syria': 'Syrie',
+    'Taiwan': 'Taïwan',
+    'Tajikistan': 'Tadjikistan',
+    'Tanzania': 'Tanzanie',
+    'Thailand': 'Thaïlande',
+    'Timor-Leste': 'Timor oriental',
+    'Togo': 'Togo',
+    'Tonga': 'Tonga',
+    'Trinidad and Tobago': 'Trinité-et-Tobago',
+    'Tunisia': 'Tunisie',
+    'Turkey': 'Turquie',
+    'Turkmenistan': 'Turkménistan',
+    'Tuvalu': 'Tuvalu',
+    'Uganda': 'Ouganda',
+    'Ukraine': 'Ukraine',
+    'United Arab Emirates': 'Émirats arabes unis',
+    'United Kingdom': 'Royaume-Uni',
+    'United States of America': 'États-Unis d\'Amérique',
+    'Uruguay': 'Uruguay',
+    'Uzbekistan': 'Ouzbékistan',
+    'Vanuatu': 'Vanuatu',
+    'Vatican City': 'Vatican',
+    'Venezuela': 'Venezuela',
+    'Vietnam': 'Vietnam',
+    'Yemen': 'Yémen',
+    'Zambia': 'Zambie',
+    'Zimbabwe': 'Zimbabwe',
+  };
+
   @override
   void initState() {
     super.initState();
@@ -203,7 +402,7 @@ class _AddAlerteState extends State<AddAlerte> {
         ? selectedCountryCode =
             Provider.of<DetectorPays>(context, listen: false)
                 .detectedCountryCode!
-        : selectedCountry = "ML";
+        : selectedCountryCode = "ML";
     paysProvider.hasLocation
         ? selectedCountry =
             Provider.of<DetectorPays>(context, listen: false).detectedCountry!
@@ -379,15 +578,25 @@ class _AddAlerteState extends State<AddAlerte> {
                                 ),
                               ),
                               child: CountryCodePicker(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 10),
                                 backgroundColor: Colors
                                     .transparent, // Fond transparent pour le picker
                                 onChanged: (CountryCode countryCode) {
                                   setState(() {
                                     selectedCountry = countryCode.name!;
                                     selectedCountryCode = countryCode.code!;
+                                    selectedCountry = countryTranslations[
+                                            countryCode.name.toString()] ??
+                                        countryCode.name.toString();
+                                    print('Country Origin : ' +
+                                        countryCode.name.toString());
+                                    print('Country changed to: ' +
+                                        selectedCountry!);
                                     print("Pays : $selectedCountry");
                                   });
                                 },
+                                showDropDownButton: true,
                                 initialSelection:
                                     selectedCountry, // Set initial selection based on detected country code
                                 showCountryOnly: true,
@@ -544,8 +753,13 @@ class _AddAlerteState extends State<AddAlerte> {
                                           .creerAlertes(
                                               titreAlerte: titre,
                                               descriptionAlerte: description,
-                                              pays: selectedCountry != null ? selectedCountry! : "Mali",
-                                              codePays: selectedCountryCode != null ? selectedCountryCode! : "ML",
+                                              pays: selectedCountry != null
+                                                  ? selectedCountry!
+                                                  : "Mali",
+                                              codePays:
+                                                  selectedCountryCode != null
+                                                      ? selectedCountryCode!
+                                                      : "ML",
                                               videoAlerte: _videoUploaded,
                                               audioAlerte: audiosUploaded,
                                               photoAlerte: photoUploaded)
@@ -601,7 +815,7 @@ class _AddAlerteState extends State<AddAlerte> {
                                           .creerAlertes(
                                             titreAlerte: titre,
                                             descriptionAlerte: description,
-                                             pays: selectedCountry != null
+                                            pays: selectedCountry != null
                                                 ? selectedCountry!
                                                 : "Mali",
                                             codePays:

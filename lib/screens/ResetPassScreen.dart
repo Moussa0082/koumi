@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:koumi_app/screens/PinLoginScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
@@ -108,9 +109,13 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("Mot de passe modifier avec succès"),
-                      duration: Duration(seconds: 5),
+                      duration: Duration(seconds: 1),
                     ),
-                  )
+                  ),
+                  Get.offAll(PinLoginScreen(),
+                      transition: Transition.leftToRight),
+                  Provider.of<BottomNavigationService>(context, listen: false)
+                      .changeIndex(0),
                 });
       } else {
         await ActeurService.resetPasswordWhatsApp(
@@ -122,9 +127,13 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("Mot de passe modifier avec succès"),
-                      duration: Duration(seconds: 5),
+                      duration: Duration(seconds: 1),
                     ),
-                  )
+                  ),
+                  Get.offAll(PinLoginScreen(),
+                      transition: Transition.leftToRight),
+                  Provider.of<BottomNavigationService>(context, listen: false)
+                      .changeIndex(0),
                 });
         debugPrint("Code envoyé par whats app");
       }
@@ -340,26 +349,19 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
                         const String errorMessage =
                             "Les mot de passe ne correspondent pas ";
                         // Gérez le cas où l'email ou le mot de passe est vide.
-                        ScaffoldMessenger.of(context)
-                                      .showSnackBar(SnackBar(
-                                    content: Text(
-                                        'Vérifie les mots de passe'),
-                                  ));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Vérifie les mots de passe'),
+                        ));
                         return;
-                      }else if (passwordController.text
-                                            .toString()
-                                            .trim() ==
-                                        "123456" ||
-                                    confirmPasswordController.text
-                                            .toString()
-                                            .trim() ==
-                                        "123456") {
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(SnackBar(
-                                    content: Text(
-                                        'Mot de passe faible, veuillez saisir un mot de passe sécurisé.'),
-                                  ));
-                                }
+                      } else if (passwordController.text.toString().trim() ==
+                              "123456" ||
+                          confirmPasswordController.text.toString().trim() ==
+                              "123456") {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              'Mot de passe faible, veuillez saisir un mot de passe sécurisé.'),
+                        ));
+                      }
                       handleSendButton(context);
                     }
                   },

@@ -170,7 +170,7 @@ class AlertesService extends ChangeNotifier {
 
   Future desactiverAlertes(String idAlertes) async {
     final response =
- await http.put(Uri.parse('$baseUrl/disable/$idAlertes'));
+    await http.put(Uri.parse('$baseUrl/disable/$idAlertes'));
     if (response.statusCode == 200 || response.statusCode == 201 ||
         response.statusCode == 202) {
       applyChange();

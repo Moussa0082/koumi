@@ -113,7 +113,7 @@ class _ZoneState extends State<Zone> {
                           color: isSearchMode ? Colors.red : Colors.green,
                         ),
                         label: Text(
-                          isSearchMode ? 'Fermer' : 'Rechercher',
+                          isSearchMode ? 'Fermer' : 'Rechercher...',
                           style: TextStyle(
                               color: isSearchMode ? Colors.red : Colors.green,
                               fontSize: 17),
