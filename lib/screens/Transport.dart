@@ -317,6 +317,7 @@ class _TransportState extends State<Transport> {
       _searchController.dispose();
     }
     scrollableController.dispose();
+    scrollableController1.dispose();
     super.dispose();
   }
 
@@ -706,6 +707,33 @@ class _TransportState extends State<Transport> {
                                 } else {
                                   vehiculeListe = snapshot.data!;
                                   String searchText = "";
+
+                                  List<Vehicule> produitsLocaux = vehiculeListe
+                                      .where((stock) =>
+                                          stock.acteur!.niveau3PaysActeur! ==
+                                          detectedCountry)
+                                      .where((search) {
+                                    String libelle =
+                                        search.nomVehicule.toLowerCase();
+                                    searchText =
+                                        _searchController.text.toLowerCase();
+                                    return libelle.contains(searchText);
+                                  }).toList();
+
+                                  List<Vehicule> produitsEtrangers =
+                                      vehiculeListe
+                                          .where((stock) =>
+                                              stock
+                                                  .acteur!.niveau3PaysActeur! !=
+                                              detectedCountry)
+                                          .where((search) {
+                                    String libelle =
+                                        search.nomVehicule.toLowerCase();
+                                    searchText =
+                                        _searchController.text.toLowerCase();
+                                    return libelle.contains(searchText);
+                                  }).toList();
+
                                   List<Vehicule> filtereSearch =
                                       vehiculeListe.where((search) {
                                     String libelle =
@@ -740,140 +768,306 @@ class _TransportState extends State<Transport> {
                                             ),
                                           ),
                                         )
-                                      : GridView.builder(
-                                          shrinkWrap: true,
-                                          physics:
-                                              NeverScrollableScrollPhysics(),
-                                          gridDelegate:
-                                              SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 2,
-                                            mainAxisSpacing: 10,
-                                            crossAxisSpacing: 10,
-                                            childAspectRatio: 0.8,
-                                          ),
-                                          itemCount: filtereSearch.length + 1,
-                                          itemBuilder: (context, index) {
-                                            if (index < filtereSearch.length) {
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              DetailTransport(
-                                                                  vehicule:
-                                                                      filtereSearch[
-                                                                          index])));
-                                                },
-                                                child: Card(
-                                                  margin: EdgeInsets.all(8),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .stretch,
-                                                    children: [
-                                                      ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8.0),
-                                                        child: SizedBox(
-                                                          height: 85,
-                                                          child: filtereSearch[
-                                                                              index]
-                                                                          .photoVehicule ==
-                                                                      null ||
-                                                                  filtereSearch[
-                                                                          index]
-                                                                      .photoVehicule!
-                                                                      .isEmpty
-                                                              ? Image.asset(
-                                                                  "assets/images/default_image.png",
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                )
-                                                              : CachedNetworkImage(
-                                                                  imageUrl:
-                                                                      "https://koumi.ml/api-koumi/vehicule/${filtereSearch[index].idVehicule}/image",
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                  placeholder: (context,
-                                                                          url) =>
-                                                                      const Center(
-                                                                          child:
-                                                                              CircularProgressIndicator()),
-                                                                  errorWidget: (context,
-                                                                          url,
-                                                                          error) =>
-                                                                      Image
-                                                                          .asset(
-                                                                    'assets/images/default_image.png',
-                                                                    fit: BoxFit
-                                                                        .cover,
-                                                                  ),
-                                                                ),
-                                                        ),
-                                                      ),
-                                                      // SizedBox(height: 8),
-                                                      ListTile(
-                                                        title: Text(
-                                                          filtereSearch[index]
-                                                              .nomVehicule,
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color:
-                                                                Colors.black87,
-                                                          ),
-                                                          maxLines: 2,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                        subtitle: Text(
-                                                          "${filtereSearch[index].nbKilometrage.toString()} Km",
-                                                          style: TextStyle(
-                                                            fontSize: 15,
-                                                            color:
-                                                                Colors.black87,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 15),
-                                                        child: Text(
-                                                          filtereSearch[index]
-                                                              .localisation,
-                                                          style: TextStyle(
-                                                            fontSize: 15,
-                                                            color:
-                                                                Colors.black87,
-                                                          ),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
+                                      : Column(
+                                          children: [
+                                            if (produitsLocaux.isNotEmpty) ...[
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  "Transport locaux",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 18),
                                                 ),
-                                              );
-                                            } else {
-                                              return isLoading == true
-                                                  ? Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 32),
-                                                      child: Center(
-                                                          child: const Center(
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                          color: Colors.orange,
-                                                        ),
-                                                      )),
-                                                    )
-                                                  : Container();
-                                            }
-                                          },
+                                              ),
+                                               GridView.builder(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              gridDelegate:
+                                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: 2,
+                                                mainAxisSpacing: 10,
+                                                crossAxisSpacing: 10,
+                                                childAspectRatio: 0.8,
+                                              ),
+                                              itemCount: produitsLocaux.length,
+                                              itemBuilder: (context, index) {
+                                                if (index < produitsLocaux.length) {
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  DetailTransport(
+                                                                      vehicule:
+                                                                          produitsLocaux[
+                                                                              index])));
+                                                    },
+                                                    child: Card(
+                                                      margin: EdgeInsets.all(8),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .stretch,
+                                                        children: [
+                                                          ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(8.0),
+                                                            child: SizedBox(
+                                                              height: 85,
+                                                              child: produitsLocaux[
+                                                                                  index]
+                                                                              .photoVehicule ==
+                                                                          null ||
+                                                                      produitsLocaux[
+                                                                              index]
+                                                                          .photoVehicule!
+                                                                          .isEmpty
+                                                                  ? Image.asset(
+                                                                      "assets/images/default_image.png",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    )
+                                                                  : CachedNetworkImage(
+                                                                      imageUrl:
+                                                                          "https://koumi.ml/api-koumi/vehicule/${produitsLocaux[index].idVehicule}/image",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      placeholder: (context,
+                                                                              url) =>
+                                                                          const Center(
+                                                                              child:
+                                                                                  CircularProgressIndicator()),
+                                                                      errorWidget: (context,
+                                                                              url,
+                                                                              error) =>
+                                                                          Image
+                                                                              .asset(
+                                                                        'assets/images/default_image.png',
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      ),
+                                                                    ),
+                                                            ),
+                                                          ),
+                                                          // SizedBox(height: 8),
+                                                          ListTile(
+                                                            title: Text(
+                                                              produitsLocaux[index]
+                                                                  .nomVehicule,
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight.bold,
+                                                                color:
+                                                                    Colors.black87,
+                                                              ),
+                                                              maxLines: 2,
+                                                              overflow: TextOverflow
+                                                                  .ellipsis,
+                                                            ),
+                                                            subtitle: Text(
+                                                              "${produitsLocaux[index].nbKilometrage.toString()} Km",
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color:
+                                                                    Colors.black87,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal: 15),
+                                                            child: Text(
+                                                              produitsLocaux[index]
+                                                                  .localisation,
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color:
+                                                                    Colors.black87,
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return isLoading == true
+                                                      ? Padding(
+                                                          padding: const EdgeInsets
+                                                              .symmetric(
+                                                              horizontal: 32),
+                                                          child: Center(
+                                                              child: const Center(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              color: Colors.orange,
+                                                            ),
+                                                          )),
+                                                        )
+                                                      : Container();
+                                                }
+                                              },
+                                            ),
+                                            ],
+
+                                            if (produitsEtrangers.isNotEmpty) ...[
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  "Transport etrangère",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 18),
+                                                ),
+                                              ),
+                                               GridView.builder(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              gridDelegate:
+                                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: 2,
+                                                mainAxisSpacing: 10,
+                                                crossAxisSpacing: 10,
+                                                childAspectRatio: 0.8,
+                                              ),
+                                              itemCount: produitsEtrangers.length,
+                                              itemBuilder: (context, index) {
+                                                if (index < produitsEtrangers.length) {
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  DetailTransport(
+                                                                      vehicule:
+                                                                          produitsEtrangers[
+                                                                              index])));
+                                                    },
+                                                    child: Card(
+                                                      margin: EdgeInsets.all(8),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .stretch,
+                                                        children: [
+                                                          ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(8.0),
+                                                            child: SizedBox(
+                                                              height: 85,
+                                                              child: produitsEtrangers[
+                                                                                  index]
+                                                                              .photoVehicule ==
+                                                                          null ||
+                                                                      produitsEtrangers[
+                                                                              index]
+                                                                          .photoVehicule!
+                                                                          .isEmpty
+                                                                  ? Image.asset(
+                                                                      "assets/images/default_image.png",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    )
+                                                                  : CachedNetworkImage(
+                                                                      imageUrl:
+                                                                          "https://koumi.ml/api-koumi/vehicule/${produitsEtrangers[index].idVehicule}/image",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      placeholder: (context,
+                                                                              url) =>
+                                                                          const Center(
+                                                                              child:
+                                                                                  CircularProgressIndicator()),
+                                                                      errorWidget: (context,
+                                                                              url,
+                                                                              error) =>
+                                                                          Image
+                                                                              .asset(
+                                                                        'assets/images/default_image.png',
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      ),
+                                                                    ),
+                                                            ),
+                                                          ),
+                                                          // SizedBox(height: 8),
+                                                          ListTile(
+                                                            title: Text(
+                                                              produitsEtrangers[index]
+                                                                  .nomVehicule,
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight.bold,
+                                                                color:
+                                                                    Colors.black87,
+                                                              ),
+                                                              maxLines: 2,
+                                                              overflow: TextOverflow
+                                                                  .ellipsis,
+                                                            ),
+                                                            subtitle: Text(
+                                                              "${produitsEtrangers[index].nbKilometrage.toString()} Km",
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color:
+                                                                    Colors.black87,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal: 15),
+                                                            child: Text(
+                                                              produitsEtrangers[index]
+                                                                  .localisation,
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color:
+                                                                    Colors.black87,
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return isLoading == true
+                                                      ? Padding(
+                                                          padding: const EdgeInsets
+                                                              .symmetric(
+                                                              horizontal: 32),
+                                                          child: Center(
+                                                              child: const Center(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              color: Colors.orange,
+                                                            ),
+                                                          )),
+                                                        )
+                                                      : Container();
+                                                }
+                                              },
+                                            ),
+                                            ],
+                                          ],
                                         );
                                 }
                               });
@@ -900,6 +1094,33 @@ class _TransportState extends State<Transport> {
                                 } else {
                                   vehiculeListe = snapshot.data!;
                                   String searchText = "";
+                                  
+                                  List<Vehicule> produitsLocaux = vehiculeListe
+                                      .where((stock) =>
+                                          stock.acteur!.niveau3PaysActeur! ==
+                                          detectedCountry)
+                                      .where((search) {
+                                    String libelle =
+                                        search.nomVehicule.toLowerCase();
+                                    searchText =
+                                        _searchController.text.toLowerCase();
+                                    return libelle.contains(searchText);
+                                  }).toList();
+
+                                  List<Vehicule> produitsEtrangers =
+                                      vehiculeListe
+                                          .where((stock) =>
+                                              stock
+                                                  .acteur!.niveau3PaysActeur! !=
+                                              detectedCountry)
+                                          .where((search) {
+                                    String libelle =
+                                        search.nomVehicule.toLowerCase();
+                                    searchText =
+                                        _searchController.text.toLowerCase();
+                                    return libelle.contains(searchText);
+                                  }).toList();
+
                                   List<Vehicule> filtereSearch =
                                       vehiculeListe.where((search) {
                                     String libelle =
@@ -938,7 +1159,21 @@ class _TransportState extends State<Transport> {
                                       : filtereSearch.isEmpty &&
                                               isLoading == true
                                           ? _buildShimmerEffect()
-                                          : GridView.builder(
+                                          :  Column(
+                                          children: [
+                                            if (produitsLocaux.isNotEmpty) ...[
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  "Transport locaux",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 18),
+                                                ),
+                                              ),
+                                               GridView.builder(
                                               shrinkWrap: true,
                                               physics:
                                                   NeverScrollableScrollPhysics(),
@@ -949,17 +1184,9 @@ class _TransportState extends State<Transport> {
                                                 crossAxisSpacing: 10,
                                                 childAspectRatio: 0.8,
                                               ),
-                                              itemCount:
-                                                  filtereSearch.length + 1,
+                                              itemCount: produitsLocaux.length,
                                               itemBuilder: (context, index) {
-                                                if (index <
-                                                    filtereSearch.length) {
-                                                  var e = filtereSearch
-                                                      .where((element) =>
-                                                          element
-                                                              .statutVehicule ==
-                                                          true)
-                                                      .elementAt(index);
+                                                if (index < produitsLocaux.length) {
                                                   return GestureDetector(
                                                     onTap: () {
                                                       Navigator.push(
@@ -968,22 +1195,11 @@ class _TransportState extends State<Transport> {
                                                               builder: (context) =>
                                                                   DetailTransport(
                                                                       vehicule:
-                                                                          e)));
+                                                                          produitsLocaux[
+                                                                              index])));
                                                     },
                                                     child: Card(
                                                       margin: EdgeInsets.all(8),
-                                                      // decoration: BoxDecoration(
-                                                      //   color: Color.fromARGB(250, 250, 250, 250),
-                                                      //   borderRadius: BorderRadius.circular(15),
-                                                      //   boxShadow: [
-                                                      //     BoxShadow(
-                                                      //       color: Colors.grey.withOpacity(0.3),
-                                                      //       offset: Offset(0, 2),
-                                                      //       blurRadius: 8,
-                                                      //       spreadRadius: 2,
-                                                      //     ),
-                                                      //   ],
-                                                      // ),
                                                       child: Column(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
@@ -992,13 +1208,16 @@ class _TransportState extends State<Transport> {
                                                           ClipRRect(
                                                             borderRadius:
                                                                 BorderRadius
-                                                                    .circular(
-                                                                        8.0),
+                                                                    .circular(8.0),
                                                             child: SizedBox(
                                                               height: 85,
-                                                              child: e.photoVehicule ==
+                                                              child: produitsLocaux[
+                                                                                  index]
+                                                                              .photoVehicule ==
                                                                           null ||
-                                                                      e.photoVehicule!
+                                                                      produitsLocaux[
+                                                                              index]
+                                                                          .photoVehicule!
                                                                           .isEmpty
                                                                   ? Image.asset(
                                                                       "assets/images/default_image.png",
@@ -1007,13 +1226,14 @@ class _TransportState extends State<Transport> {
                                                                     )
                                                                   : CachedNetworkImage(
                                                                       imageUrl:
-                                                                          "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
+                                                                          "https://koumi.ml/api-koumi/vehicule/${produitsLocaux[index].idVehicule}/image",
                                                                       fit: BoxFit
                                                                           .cover,
                                                                       placeholder: (context,
                                                                               url) =>
                                                                           const Center(
-                                                                              child: CircularProgressIndicator()),
+                                                                              child:
+                                                                                  CircularProgressIndicator()),
                                                                       errorWidget: (context,
                                                                               url,
                                                                               error) =>
@@ -1029,26 +1249,25 @@ class _TransportState extends State<Transport> {
                                                           // SizedBox(height: 8),
                                                           ListTile(
                                                             title: Text(
-                                                              e.nomVehicule,
+                                                              produitsLocaux[index]
+                                                                  .nomVehicule,
                                                               style: TextStyle(
                                                                 fontSize: 16,
                                                                 fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Colors
-                                                                    .black87,
+                                                                    FontWeight.bold,
+                                                                color:
+                                                                    Colors.black87,
                                                               ),
                                                               maxLines: 2,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
+                                                              overflow: TextOverflow
+                                                                  .ellipsis,
                                                             ),
                                                             subtitle: Text(
-                                                              "${e.nbKilometrage.toString()} Km",
+                                                              "${produitsLocaux[index].nbKilometrage.toString()} Km",
                                                               style: TextStyle(
                                                                 fontSize: 15,
-                                                                color: Colors
-                                                                    .black87,
+                                                                color:
+                                                                    Colors.black87,
                                                               ),
                                                             ),
                                                           ),
@@ -1056,14 +1275,14 @@ class _TransportState extends State<Transport> {
                                                             padding:
                                                                 const EdgeInsets
                                                                     .symmetric(
-                                                                    horizontal:
-                                                                        15),
+                                                                    horizontal: 15),
                                                             child: Text(
-                                                              e.localisation,
+                                                              produitsLocaux[index]
+                                                                  .localisation,
                                                               style: TextStyle(
                                                                 fontSize: 15,
-                                                                color: Colors
-                                                                    .black87,
+                                                                color:
+                                                                    Colors.black87,
                                                               ),
                                                             ),
                                                           )
@@ -1074,25 +1293,173 @@ class _TransportState extends State<Transport> {
                                                 } else {
                                                   return isLoading == true
                                                       ? Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      32),
+                                                          padding: const EdgeInsets
+                                                              .symmetric(
+                                                              horizontal: 32),
                                                           child: Center(
-                                                              child:
-                                                                  const Center(
+                                                              child: const Center(
                                                             child:
                                                                 CircularProgressIndicator(
-                                                              color:
-                                                                  Colors.orange,
+                                                              color: Colors.orange,
                                                             ),
                                                           )),
                                                         )
                                                       : Container();
                                                 }
                                               },
-                                            );
+                                            ),
+                                            ],
+
+                                            if (produitsEtrangers.isNotEmpty) ...[
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  "Transport etrangère",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 18),
+                                                ),
+                                              ),
+                                               GridView.builder(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              gridDelegate:
+                                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: 2,
+                                                mainAxisSpacing: 10,
+                                                crossAxisSpacing: 10,
+                                                childAspectRatio: 0.8,
+                                              ),
+                                              itemCount: produitsEtrangers.length,
+                                              itemBuilder: (context, index) {
+                                                if (index < produitsEtrangers.length) {
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  DetailTransport(
+                                                                      vehicule:
+                                                                          produitsEtrangers[
+                                                                              index])));
+                                                    },
+                                                    child: Card(
+                                                      margin: EdgeInsets.all(8),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .stretch,
+                                                        children: [
+                                                          ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(8.0),
+                                                            child: SizedBox(
+                                                              height: 85,
+                                                              child: produitsEtrangers[
+                                                                                  index]
+                                                                              .photoVehicule ==
+                                                                          null ||
+                                                                      produitsEtrangers[
+                                                                              index]
+                                                                          .photoVehicule!
+                                                                          .isEmpty
+                                                                  ? Image.asset(
+                                                                      "assets/images/default_image.png",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    )
+                                                                  : CachedNetworkImage(
+                                                                      imageUrl:
+                                                                          "https://koumi.ml/api-koumi/vehicule/${produitsEtrangers[index].idVehicule}/image",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      placeholder: (context,
+                                                                              url) =>
+                                                                          const Center(
+                                                                              child:
+                                                                                  CircularProgressIndicator()),
+                                                                      errorWidget: (context,
+                                                                              url,
+                                                                              error) =>
+                                                                          Image
+                                                                              .asset(
+                                                                        'assets/images/default_image.png',
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      ),
+                                                                    ),
+                                                            ),
+                                                          ),
+                                                          // SizedBox(height: 8),
+                                                          ListTile(
+                                                            title: Text(
+                                                              produitsEtrangers[index]
+                                                                  .nomVehicule,
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight.bold,
+                                                                color:
+                                                                    Colors.black87,
+                                                              ),
+                                                              maxLines: 2,
+                                                              overflow: TextOverflow
+                                                                  .ellipsis,
+                                                            ),
+                                                            subtitle: Text(
+                                                              "${produitsEtrangers[index].nbKilometrage.toString()} Km",
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color:
+                                                                    Colors.black87,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal: 15),
+                                                            child: Text(
+                                                              produitsEtrangers[index]
+                                                                  .localisation,
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color:
+                                                                    Colors.black87,
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return isLoading == true
+                                                      ? Padding(
+                                                          padding: const EdgeInsets
+                                                              .symmetric(
+                                                              horizontal: 32),
+                                                          child: Center(
+                                                              child: const Center(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              color: Colors.orange,
+                                                            ),
+                                                          )),
+                                                        )
+                                                      : Container();
+                                                }
+                                              },
+                                            ),
+                                            ],
+                                          ],
+                                        );
                                 }
                               });
                         }),
