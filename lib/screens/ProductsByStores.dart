@@ -260,11 +260,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
 
   @override
   void dispose() {
-    if (isSearchMode) {
-      _searchController = TextEditingController();
-    } else {
-      _searchController.dispose();
-    }
+    _searchController.dispose();
     scrollableController.dispose();
     scrollableController1.dispose();
     super.dispose();
@@ -416,711 +412,722 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                           },
                         ),
                 ]),
-      body: Container(
-        child: NestedScrollView(
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
-              SliverToBoxAdapter(
-                  child: Column(children: [
-                const SizedBox(height: 10),
-                if (!isSearchMode)
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          isSearchMode = true;
-                          isFilterMode = true;
-                        });
-                      },
-                      icon: Icon(
-                        Icons.search,
-                        color: d_colorGreen,
-                      ),
-                      label: Text(
-                        'Rechercher',
-                        style: TextStyle(color: d_colorGreen, fontSize: 17),
-                      ),
-                    ),
-                  ),
-                if (isSearchMode)
-                  Align(
+      body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+        child: Container(
+          child: NestedScrollView(
+            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                SliverToBoxAdapter(
+                    child: Column(children: [
+                  const SizedBox(height: 10),
+                  if (!isSearchMode)
+                    Align(
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
                         onPressed: () {
                           setState(() {
-                            isSearchMode = false;
-                            isFilterMode = false;
+                            isSearchMode = true;
+                            isFilterMode = true;
                           });
                         },
                         icon: Icon(
-                          Icons.close,
-                          color: Colors.red,
+                          Icons.search,
+                          color: d_colorGreen,
                         ),
                         label: Text(
-                          'Fermer',
-                          style: TextStyle(color: Colors.red, fontSize: 17),
+                          'Rechercher',
+                          style: TextStyle(color: d_colorGreen, fontSize: 17),
                         ),
-                      )),
-                Visibility(
-                  visible: isSearchMode,
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
-                    child: FutureBuilder(
-                      future: _catList,
-                      builder: (_, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return buildLoadingDropdown();
-                        }
-
-                        if (snapshot.hasData) {
-                          dynamic jsonString =
-                              utf8.decode(snapshot.data.bodyBytes);
-                          dynamic responseData = json.decode(jsonString);
-
-                          if (responseData is List) {
-                            final response = responseData;
-                            final typeList = response
-                                .map((e) => CategorieProduit.fromMap(e))
-                                .where((con) => con.statutCategorie == true)
-                                .toList();
-
-                            if (typeList.isEmpty) {
+                      ),
+                    ),
+                  if (isSearchMode)
+                    Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: () {
+                            if (mounted) {
+                              setState(() {
+                                isSearchMode = false;
+                                isFilterMode = false;
+                                _searchController.clear();
+                                _searchController = TextEditingController();
+                              });
+                              debugPrint(
+                                  "Rechercher mode désactivé : $isSearchMode");
+                            }
+                          },
+                          icon: Icon(
+                            Icons.close,
+                            color: Colors.red,
+                          ),
+                          label: Text(
+                            'Fermer',
+                            style: TextStyle(color: Colors.red, fontSize: 17),
+                          ),
+                        )),
+                  Visibility(
+                    visible: isSearchMode,
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+                      child: FutureBuilder(
+                        future: _catList,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return buildLoadingDropdown();
+                          }
+        
+                          if (snapshot.hasData) {
+                            dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
+        
+                            if (responseData is List) {
+                              final response = responseData;
+                              final typeList = response
+                                  .map((e) => CategorieProduit.fromMap(e))
+                                  .where((con) => con.statutCategorie == true)
+                                  .toList();
+        
+                              if (typeList.isEmpty) {
+                                return buildEmptyDropdown();
+                              }
+        
+                              return buildDropdown(typeList);
+                            } else {
                               return buildEmptyDropdown();
                             }
-
-                            return buildDropdown(typeList);
-                          } else {
-                            return buildEmptyDropdown();
                           }
-                        }
-
-                        return buildEmptyDropdown();
-                      },
-                    ),
-                  ),
-                ),
-                Visibility(
-                  visible: isSearchMode,
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
-                    child: SearchFieldAutoComplete<String>(
-                      controller: _searchController,
-                      placeholder: 'Rechercher...',
-                      placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
-                      suggestions: AutoComplet.getAgriculturalProducts,
-                      suggestionsDecoration: SuggestionDecoration(
-                        marginSuggestions: const EdgeInsets.all(8.0),
-                        color: const Color.fromARGB(255, 236, 234, 234),
-                        borderRadius: BorderRadius.circular(16.0),
+        
+                          return buildEmptyDropdown();
+                        },
                       ),
-                      onSuggestionSelected: (selectedItem) {
-                        if (mounted) {
-                          _searchController.text = selectedItem.searchKey;
-                        }
-                      },
-                      suggestionItemBuilder: (context, searchFieldItem) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            searchFieldItem.searchKey,
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        );
-                      },
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-              ])),
-            ];
-          },
-          body: RefreshIndicator(
-            onRefresh: () async {
-              setState(() {
-                page = 0;
-                // Rafraîchir les données ici
-              });
-              debugPrint("refresh page ${page}");
-              setState(() {
-                stockListeFuture = stockListeFuture1 = getAllStock();
-              });
+                  Visibility(
+                    visible: isSearchMode,
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+                      child: SearchFieldAutoComplete<String>(
+                        controller: _searchController,
+                        placeholder: 'Rechercher...',
+                        placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
+                        suggestions: AutoComplet.getAgriculturalProducts,
+                        suggestionsDecoration: SuggestionDecoration(
+                          marginSuggestions: const EdgeInsets.all(8.0),
+                          color: const Color.fromARGB(255, 236, 234, 234),
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        onSuggestionSelected: (selectedItem) {
+                          if (mounted) {
+                            _searchController.text = selectedItem.searchKey;
+                          }
+                        },
+                        suggestionItemBuilder: (context, searchFieldItem) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              searchFieldItem.searchKey,
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                ])),
+              ];
             },
-            child: selectedCat == null
-                ? SingleChildScrollView(
-                    controller: scrollableController,
-                    child: Consumer<StockService>(
-                        builder: (context, stockService, child) {
-                      return FutureBuilder<List<Stock>>(
-                          future: stockListeFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return _buildShimmerEffect();
-                            }
-                            if (snapshot.hasError == true) {
-                              return SingleChildScrollView(
-                                child: Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Image.asset('assets/images/notif.jpg'),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Text(
-                                          'Aucun produit trouvé une erreur s\'est produite',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 17,
-                                            overflow: TextOverflow.ellipsis,
+            body: RefreshIndicator(
+              onRefresh: () async {
+                setState(() {
+                  page = 0;
+                  // Rafraîchir les données ici
+                });
+                debugPrint("refresh page ${page}");
+                setState(() {
+                  stockListeFuture = stockListeFuture1 = getAllStock();
+                });
+              },
+              child: selectedCat == null
+                  ? SingleChildScrollView(
+                      controller: scrollableController,
+                      child: Consumer<StockService>(
+                          builder: (context, stockService, child) {
+                        return FutureBuilder<List<Stock>>(
+                            future: stockListeFuture,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return _buildShimmerEffect();
+                              }
+                              if (snapshot.hasError == true) {
+                                return SingleChildScrollView(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          Image.asset('assets/images/notif.jpg'),
+                                          SizedBox(
+                                            height: 10,
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-                            if (snapshot.hasError) {
-                              return SingleChildScrollView(
-                                child: Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Image.asset('assets/images/notif.jpg'),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Text(
-                                          "Une erreur s'est produite veuiller réessayer",
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 17,
-                                            overflow: TextOverflow.ellipsis,
+                                          Text(
+                                            'Aucun produit trouvé une erreur s\'est produite',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 17,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-                            if (!snapshot.hasData) {
-                              return SingleChildScrollView(
-                                child: Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Image.asset('assets/images/notif.jpg'),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Text(
-                                          'Aucun produit trouvé',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 17,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            } else {
-                              stockListe = snapshot.data!;
-                              // Vous pouvez afficher une image ou un texte ici
-                              String searchText = "";
-                              // List<Stock> filtereSearch = stockListe.where((search) {
-                              //   String libelle = search.nomProduit!.toLowerCase();
-                              //   searchText = _searchController.text.trim().toLowerCase();
-                              //   return libelle.contains(searchText);
-                              // }).toList();
-
-                              return stockListe
-                                      // .where((element) => element.statutSotck == true )
-                                      .isEmpty
-                                  ? SingleChildScrollView(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: Center(
-                                          child: Column(
-                                            children: [
-                                              Image.asset(
-                                                  'assets/images/notif.jpg'),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              Text(
-                                                'Aucun produit trouvé',
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 17,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                        ],
                                       ),
-                                    )
-                                  : Center(
-                                      child: GridView.builder(
-                                        shrinkWrap: true,
-                                        physics: NeverScrollableScrollPhysics(),
-                                        gridDelegate:
-                                            SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 2,
-                                          mainAxisSpacing: 10,
-                                          crossAxisSpacing: 10,
-                                          childAspectRatio: 0.8,
+                                    ),
+                                  ),
+                                );
+                              }
+                              if (snapshot.hasError) {
+                                return SingleChildScrollView(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          Image.asset('assets/images/notif.jpg'),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text(
+                                            "Une erreur s'est produite veuiller réessayer",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 17,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              if (!snapshot.hasData) {
+                                return SingleChildScrollView(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          Image.asset('assets/images/notif.jpg'),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text(
+                                            'Aucun produit trouvé',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 17,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                stockListe = snapshot.data!;
+                                // Vous pouvez afficher une image ou un texte ici
+                                String searchText = "";
+                                // List<Stock> filtereSearch = stockListe.where((search) {
+                                //   String libelle = search.nomProduit!.toLowerCase();
+                                //   searchText = _searchController.text.trim().toLowerCase();
+                                //   return libelle.contains(searchText);
+                                // }).toList();
+        
+                                return stockListe
+                                        // .where((element) => element.statutSotck == true )
+                                        .isEmpty
+                                    ? SingleChildScrollView(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: Center(
+                                            child: Column(
+                                              children: [
+                                                Image.asset(
+                                                    'assets/images/notif.jpg'),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text(
+                                                  'Aucun produit trouvé',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 17,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
-                                        itemCount: stockListe.length + 1,
-                                        // itemCount: stockListe.length + (isLoading ? 1 : 0),
-                                        itemBuilder: (context, index) {
-                                          //     if (index == stockListe.length) {
-                                          // return
-                                          // _buildShimmerEffects()
-                                          // // Center(
-                                          // //   child: CircularProgressIndicator(
-                                          // //     color: Colors.orange,
-                                          // //   ),
-                                          // // )
-                                          // ;
-                                          //     }
-
-                                          if (index < stockListe.length) {
-                                            // var e = stockListe
-                                            //     // .where((element) =>
-                                            //     //     element.statutSotck == true)
-                                            //     .elementAt(index-1);
-                                            return GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          DetailProduits(
-                                                        stock:
-                                                            stockListe[index],
+                                      )
+                                    : Center(
+                                        child: GridView.builder(
+                                          shrinkWrap: true,
+                                          physics: NeverScrollableScrollPhysics(),
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 2,
+                                            mainAxisSpacing: 10,
+                                            crossAxisSpacing: 10,
+                                            childAspectRatio: 0.8,
+                                          ),
+                                          itemCount: stockListe.length + 1,
+                                          // itemCount: stockListe.length + (isLoading ? 1 : 0),
+                                          itemBuilder: (context, index) {
+                                            //     if (index == stockListe.length) {
+                                            // return
+                                            // _buildShimmerEffects()
+                                            // // Center(
+                                            // //   child: CircularProgressIndicator(
+                                            // //     color: Colors.orange,
+                                            // //   ),
+                                            // // )
+                                            // ;
+                                            //     }
+        
+                                            if (index < stockListe.length) {
+                                              // var e = stockListe
+                                              //     // .where((element) =>
+                                              //     //     element.statutSotck == true)
+                                              //     .elementAt(index-1);
+                                              return GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            DetailProduits(
+                                                          stock:
+                                                              stockListe[index],
+                                                        ),
                                                       ),
-                                                    ),
-                                                  );
-                                                },
-                                                child: Card(
-                                                  margin: EdgeInsets.all(8),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .stretch,
-                                                    children: [
-                                                      ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8.0),
-                                                        child: Container(
-                                                          height: 85,
-                                                          child: stockListe[index]
-                                                                          .photo ==
-                                                                      null ||
-                                                                  stockListe[
-                                                                          index]
-                                                                      .photo!
-                                                                      .isEmpty
-                                                              ? Image.asset(
-                                                                  "assets/images/default_image.png",
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                )
-                                                              : CachedNetworkImage(
-                                                                  imageUrl:
-                                                                      "https://koumi.ml/api-koumi/Stock/${stockListe[index].idStock}/image",
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                  placeholder: (context,
-                                                                          url) =>
-                                                                      const Center(
-                                                                          child:
-                                                                              CircularProgressIndicator()),
-                                                                  errorWidget: (context,
-                                                                          url,
-                                                                          error) =>
-                                                                      Image
-                                                                          .asset(
-                                                                    'assets/images/default_image.png',
+                                                    );
+                                                  },
+                                                  child: Card(
+                                                    margin: EdgeInsets.all(8),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .stretch,
+                                                      children: [
+                                                        ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8.0),
+                                                          child: Container(
+                                                            height: 85,
+                                                            child: stockListe[index]
+                                                                            .photo ==
+                                                                        null ||
+                                                                    stockListe[
+                                                                            index]
+                                                                        .photo!
+                                                                        .isEmpty
+                                                                ? Image.asset(
+                                                                    "assets/images/default_image.png",
                                                                     fit: BoxFit
                                                                         .cover,
+                                                                  )
+                                                                : CachedNetworkImage(
+                                                                    imageUrl:
+                                                                        "https://koumi.ml/api-koumi/Stock/${stockListe[index].idStock}/image",
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                    placeholder: (context,
+                                                                            url) =>
+                                                                        const Center(
+                                                                            child:
+                                                                                CircularProgressIndicator()),
+                                                                    errorWidget: (context,
+                                                                            url,
+                                                                            error) =>
+                                                                        Image
+                                                                            .asset(
+                                                                      'assets/images/default_image.png',
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                        ),
-                                                      ),
-                                                      // SizedBox(height: 8),
-                                                      ListTile(
-                                                        title: Text(
-                                                          stockListe[index]
-                                                              .nomProduit!,
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color:
-                                                                Colors.black87,
-                                                          ),
-                                                          maxLines: 2,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                        subtitle: Text(
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          "${stockListe[index].quantiteStock!.toString()} ${stockListe[index].unite!.nomUnite} ",
-                                                          style: TextStyle(
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            fontSize: 15,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color:
-                                                                Colors.black87,
                                                           ),
                                                         ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 15),
-                                                        child: Text(
-                                                          stockListe[index]
-                                                                      .monnaie !=
-                                                                  null
-                                                              ? "${stockListe[index].prix.toString()} ${stockListe[index].monnaie!.libelle}"
-                                                              : "${stockListe[index].prix.toString()} ",
-                                                          style: TextStyle(
-                                                            fontSize: 15,
-                                                            color:
-                                                                Colors.black87,
+                                                        // SizedBox(height: 8),
+                                                        ListTile(
+                                                          title: Text(
+                                                            stockListe[index]
+                                                                .nomProduit!,
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight.bold,
+                                                              color:
+                                                                  Colors.black87,
+                                                            ),
+                                                            maxLines: 2,
+                                                            overflow: TextOverflow
+                                                                .ellipsis,
+                                                          ),
+                                                          subtitle: Text(
+                                                            overflow: TextOverflow
+                                                                .ellipsis,
+                                                            "${stockListe[index].quantiteStock!.toString()} ${stockListe[index].unite!.nomUnite} ",
+                                                            style: TextStyle(
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              fontSize: 15,
+                                                              fontWeight:
+                                                                  FontWeight.bold,
+                                                              color:
+                                                                  Colors.black87,
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ));
-                                          } else {
-                                            return isLoading == true
-                                                ? Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        vertical: 32),
-                                                    child: Center(
-                                                        child: const Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        color: Colors.orange,
-                                                      ),
-                                                    )),
-                                                  )
-                                                : Container();
-                                          }
-                                        },
-                                      ),
-                                    );
-                            }
-                          });
-                    }),
-                  )
-                : SingleChildScrollView(
-                    controller: scrollableController1,
-                    child: Consumer<StockService>(
-                        builder: (context, stockService, child) {
-                      return FutureBuilder<List<Stock>>(
-                          future: stockListeFuture1,
-                          // StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!),
-                          // fetchStockByCategorie(selectedCat!.idCategorieProduit!) ,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return _buildShimmerEffect();
-                              // const Center(
-                              //   child: CircularProgressIndicator(
-                              //     color: Colors.orange,
-                              //   ),
-                              // );
-                            }
-                            if (snapshot.hasError == true) {
-                              return SingleChildScrollView(
-                                child: Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Image.asset('assets/images/notif.jpg'),
-                                        SizedBox(
-                                          height: 10,
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal: 15),
+                                                          child: Text(
+                                                            stockListe[index]
+                                                                        .monnaie !=
+                                                                    null
+                                                                ? "${stockListe[index].prix.toString()} ${stockListe[index].monnaie!.libelle}"
+                                                                : "${stockListe[index].prix.toString()} ",
+                                                            style: TextStyle(
+                                                              fontSize: 15,
+                                                              color:
+                                                                  Colors.black87,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ));
+                                            } else {
+                                              return isLoading == true
+                                                  ? Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 32),
+                                                      child: Center(
+                                                          child: const Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          color: Colors.orange,
+                                                        ),
+                                                      )),
+                                                    )
+                                                  : Container();
+                                            }
+                                          },
                                         ),
-                                        Text(
-                                          'Aucun produit trouvé une erreur s\'est produite',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 17,
-                                            overflow: TextOverflow.ellipsis,
+                                      );
+                              }
+                            });
+                      }),
+                    )
+                  : SingleChildScrollView(
+                      controller: scrollableController1,
+                      child: Consumer<StockService>(
+                          builder: (context, stockService, child) {
+                        return FutureBuilder<List<Stock>>(
+                            future: stockListeFuture1,
+                            // StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!),
+                            // fetchStockByCategorie(selectedCat!.idCategorieProduit!) ,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return _buildShimmerEffect();
+                                // const Center(
+                                //   child: CircularProgressIndicator(
+                                //     color: Colors.orange,
+                                //   ),
+                                // );
+                              }
+                              if (snapshot.hasError == true) {
+                                return SingleChildScrollView(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          Image.asset('assets/images/notif.jpg'),
+                                          SizedBox(
+                                            height: 10,
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-
-                            if (!snapshot.hasData) {
-                              return SingleChildScrollView(
-                                child: Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Image.asset('assets/images/notif.jpg'),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Text(
-                                          'Aucun produit trouvé',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 17,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            } else {
-                              stockListe = snapshot.data!;
-                              // Vous pouvez afficher une image ou un texte ici
-                              String searchText = "";
-                              // List<Stock> filtereSearch = stockListe.where((search) {
-                              //   String libelle = search.nomProduit!.toLowerCase();
-                              //   searchText = _searchController.text.trim().toLowerCase();
-                              //   return libelle.contains(searchText);
-                              // }).toList();
-
-                              return stockListe
-                                          // .where((element) => element.statutSotck == true )
-                                          .isEmpty &&
-                                      isLoading == false
-                                  ? SingleChildScrollView(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: Center(
-                                          child: Column(
-                                            children: [
-                                              Image.asset(
-                                                  'assets/images/notif.jpg'),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              Text(
-                                                'Aucun produit trouvé',
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 17,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  : stockListe
-                                              // .where((element) => element.statutSotck == true )
-                                              .isEmpty &&
-                                          isLoading == true
-                                      ? _buildShimmerEffect()
-                                      : Center(
-                                          child: GridView.builder(
-                                            shrinkWrap: true,
-                                            physics:
-                                                NeverScrollableScrollPhysics(),
-                                            gridDelegate:
-                                                SliverGridDelegateWithFixedCrossAxisCount(
-                                              crossAxisCount: 2,
-                                              mainAxisSpacing: 10,
-                                              crossAxisSpacing: 10,
-                                              childAspectRatio: 0.8,
+                                          Text(
+                                            'Aucun produit trouvé une erreur s\'est produite',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 17,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                            itemCount: stockListe.length + 1,
-                                            //  itemCount: stockListe.length + (!isLoading ? 1 : 0),
-                                            itemBuilder: (context, index) {
-                                              //   if (index == stockListe.length) {
-                                              // return
-                                              // _buildShimmerEffect()
-                                              // // Center(
-                                              // //   child: CircularProgressIndicator(
-                                              // //     color: Colors.orange,
-                                              // //   ),
-                                              // // )
-                                              // ;
-                                              //     }
-
-                                              if (index < stockListe.length) {
-                                                return GestureDetector(
-                                                    onTap: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              DetailProduits(
-                                                            stock: stockListe[
-                                                                index],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+        
+                              if (!snapshot.hasData) {
+                                return SingleChildScrollView(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          Image.asset('assets/images/notif.jpg'),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text(
+                                            'Aucun produit trouvé',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 17,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                stockListe = snapshot.data!;
+                                // Vous pouvez afficher une image ou un texte ici
+                                String searchText = "";
+                                // List<Stock> filtereSearch = stockListe.where((search) {
+                                //   String libelle = search.nomProduit!.toLowerCase();
+                                //   searchText = _searchController.text.trim().toLowerCase();
+                                //   return libelle.contains(searchText);
+                                // }).toList();
+        
+                                return stockListe
+                                            // .where((element) => element.statutSotck == true )
+                                            .isEmpty &&
+                                        isLoading == false
+                                    ? SingleChildScrollView(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: Center(
+                                            child: Column(
+                                              children: [
+                                                Image.asset(
+                                                    'assets/images/notif.jpg'),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text(
+                                                  'Aucun produit trouvé',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 17,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : stockListe
+                                                // .where((element) => element.statutSotck == true )
+                                                .isEmpty &&
+                                            isLoading == true
+                                        ? _buildShimmerEffect()
+                                        : Center(
+                                            child: GridView.builder(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              gridDelegate:
+                                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: 2,
+                                                mainAxisSpacing: 10,
+                                                crossAxisSpacing: 10,
+                                                childAspectRatio: 0.8,
+                                              ),
+                                              itemCount: stockListe.length + 1,
+                                              //  itemCount: stockListe.length + (!isLoading ? 1 : 0),
+                                              itemBuilder: (context, index) {
+                                                //   if (index == stockListe.length) {
+                                                // return
+                                                // _buildShimmerEffect()
+                                                // // Center(
+                                                // //   child: CircularProgressIndicator(
+                                                // //     color: Colors.orange,
+                                                // //   ),
+                                                // // )
+                                                // ;
+                                                //     }
+        
+                                                if (index < stockListe.length) {
+                                                  return GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                DetailProduits(
+                                                              stock: stockListe[
+                                                                  index],
+                                                            ),
                                                           ),
-                                                        ),
-                                                      );
-                                                    },
-                                                    child: Card(
-                                                      margin: EdgeInsets.all(8),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .stretch,
-                                                        children: [
-                                                          ClipRRect(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8.0),
-                                                            child: Container(
-                                                              height: 85,
-                                                              child: stockListe[index]
-                                                                              .photo ==
-                                                                          null ||
-                                                                      stockListe[
-                                                                              index]
-                                                                          .photo!
-                                                                          .isEmpty
-                                                                  ? Image.asset(
-                                                                      "assets/images/default_image.png",
-                                                                      fit: BoxFit
-                                                                          .cover,
-                                                                    )
-                                                                  : CachedNetworkImage(
-                                                                      imageUrl:
-                                                                          "https://koumi.ml/api-koumi/Stock/${stockListe[index].idStock}/image",
-                                                                      fit: BoxFit
-                                                                          .cover,
-                                                                      placeholder: (context,
-                                                                              url) =>
-                                                                          const Center(
-                                                                              child: CircularProgressIndicator()),
-                                                                      errorWidget: (context,
-                                                                              url,
-                                                                              error) =>
-                                                                          Image
-                                                                              .asset(
-                                                                        'assets/images/default_image.png',
+                                                        );
+                                                      },
+                                                      child: Card(
+                                                        margin: EdgeInsets.all(8),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .stretch,
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8.0),
+                                                              child: Container(
+                                                                height: 85,
+                                                                child: stockListe[index]
+                                                                                .photo ==
+                                                                            null ||
+                                                                        stockListe[
+                                                                                index]
+                                                                            .photo!
+                                                                            .isEmpty
+                                                                    ? Image.asset(
+                                                                        "assets/images/default_image.png",
                                                                         fit: BoxFit
                                                                             .cover,
+                                                                      )
+                                                                    : CachedNetworkImage(
+                                                                        imageUrl:
+                                                                            "https://koumi.ml/api-koumi/Stock/${stockListe[index].idStock}/image",
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                        placeholder: (context,
+                                                                                url) =>
+                                                                            const Center(
+                                                                                child: CircularProgressIndicator()),
+                                                                        errorWidget: (context,
+                                                                                url,
+                                                                                error) =>
+                                                                            Image
+                                                                                .asset(
+                                                                          'assets/images/default_image.png',
+                                                                          fit: BoxFit
+                                                                              .cover,
+                                                                        ),
                                                                       ),
-                                                                    ),
-                                                            ),
-                                                          ),
-                                                          // SizedBox(height: 8),
-                                                          ListTile(
-                                                            title: Text(
-                                                              stockListe[index]
-                                                                  .nomProduit!,
-                                                              style: TextStyle(
-                                                                fontSize: 16,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Colors
-                                                                    .black87,
                                                               ),
-                                                              maxLines: 2,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
                                                             ),
-                                                            subtitle: Text(
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                              "${stockListe[index].quantiteStock!.toString()} ${stockListe[index].unite!.nomUnite} ",
-                                                              style: TextStyle(
+                                                            // SizedBox(height: 8),
+                                                            ListTile(
+                                                              title: Text(
+                                                                stockListe[index]
+                                                                    .nomProduit!,
+                                                                style: TextStyle(
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .black87,
+                                                                ),
+                                                                maxLines: 2,
                                                                 overflow:
                                                                     TextOverflow
                                                                         .ellipsis,
-                                                                fontSize: 15,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Colors
-                                                                    .black87,
+                                                              ),
+                                                              subtitle: Text(
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                "${stockListe[index].quantiteStock!.toString()} ${stockListe[index].unite!.nomUnite} ",
+                                                                style: TextStyle(
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .black87,
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        15),
-                                                            child: Text(
-                                                              stockListe[index]
-                                                                          .monnaie !=
-                                                                      null
-                                                                  ? "${stockListe[index].prix.toString()} ${stockListe[index].monnaie!.libelle}"
-                                                                  : "${stockListe[index].prix.toString()} FCFA",
-                                                              style: TextStyle(
-                                                                fontSize: 15,
-                                                                color: Colors
-                                                                    .black87,
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          15),
+                                                              child: Text(
+                                                                stockListe[index]
+                                                                            .monnaie !=
+                                                                        null
+                                                                    ? "${stockListe[index].prix.toString()} ${stockListe[index].monnaie!.libelle}"
+                                                                    : "${stockListe[index].prix.toString()} FCFA",
+                                                                style: TextStyle(
+                                                                  fontSize: 15,
+                                                                  color: Colors
+                                                                      .black87,
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ));
-                                              } else {
-                                                return isLoading == true
-                                                    ? Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 32),
-                                                        child: Center(
-                                                            child: const Center(
-                                                          child:
-                                                              CircularProgressIndicator(
-                                                            color:
-                                                                Colors.orange,
-                                                          ),
-                                                        )),
-                                                      )
-                                                    : Container();
-                                              }
-                                            },
-                                          ),
-                                        );
-                            }
-                          });
-                    }),
-                  ),
+                                                          ],
+                                                        ),
+                                                      ));
+                                                } else {
+                                                  return isLoading == true
+                                                      ? Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal: 32),
+                                                          child: Center(
+                                                              child: const Center(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              color:
+                                                                  Colors.orange,
+                                                            ),
+                                                          )),
+                                                        )
+                                                      : Container();
+                                                }
+                                              },
+                                            ),
+                                          );
+                              }
+                            });
+                      }),
+                    ),
+            ),
           ),
         ),
       ),

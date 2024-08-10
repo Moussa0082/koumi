@@ -202,6 +202,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
                     onPressed: () {
                       setState(() {
                         isSearchMode = !isSearchMode;
+                        _searchController.clear();
                       });
                     },
                     icon: Icon(

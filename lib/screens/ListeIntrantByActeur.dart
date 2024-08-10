@@ -152,11 +152,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
 
   @override
   void dispose() {
-    if (isSearchMode) {
-      _searchController = TextEditingController();
-    } else {
-      _searchController.dispose();
-    }
+    _searchController.dispose();
     scrollableController.dispose();
     super.dispose();
   }
@@ -182,566 +178,556 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
           ),
         ),
       ),
-      body: Container(
-        child: NestedScrollView(
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
-              SliverToBoxAdapter(
-                  child: Column(children: [
-                if (!isSearchMode)
+      body:GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+        child: Container(
+          child: NestedScrollView(
+            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                SliverToBoxAdapter(
+                    child: Column(children: [
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton.icon(
                       onPressed: () {
-                        setState(() {
-                          isSearchMode = true;
-                        });
+                        if (mounted) {
+                          setState(() {
+                            isSearchMode = !isSearchMode;
+                            _searchController.clear();
+                            _searchController = TextEditingController();
+                          });
+                          debugPrint("Rechercher mode désactivé : $isSearchMode");
+                        }
                       },
                       icon: Icon(
-                        Icons.search,
-                        color: d_colorGreen,
+                        isSearchMode ? Icons.close : Icons.search,
+                        color: isSearchMode ? Colors.red : Colors.green,
                       ),
                       label: Text(
-                        'Rechercher',
-                        style: TextStyle(color: d_colorGreen, fontSize: 17),
+                        isSearchMode ? 'Fermer' : 'Rechercher...',
+                        style: TextStyle(
+                            color: isSearchMode ? Colors.red : Colors.green,
+                            fontSize: 17),
                       ),
                     ),
                   ),
-                if (isSearchMode)
-                  Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            isSearchMode = false;
-                          });
+                  if (isSearchMode)
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: SearchFieldAutoComplete<String>(
+                        controller: _searchController,
+                        itemHeight: 25,
+                        placeholder: 'Rechercher...',
+                        placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
+                        suggestions: AutoComplet.getAgriculturalInputs,
+                        suggestionsDecoration: SuggestionDecoration(
+                          marginSuggestions: const EdgeInsets.all(8.0),
+                          color: const Color.fromARGB(255, 236, 234, 234),
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        onSuggestionSelected: (selectedItem) {
+                          _searchController.text = selectedItem.searchKey;
                         },
-                        icon: Icon(
-                          Icons.close,
-                          color: Colors.red,
-                        ),
-                        label: Text(
-                          'Fermer',
-                          style: TextStyle(color: Colors.red, fontSize: 17),
-                        ),
-                      )),
-                Visibility(
-                  visible: isSearchMode,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: SearchFieldAutoComplete<String>(
-                      controller: _searchController,
-                      itemHeight: 25,
-                      placeholder: 'Rechercher...',
-                      placeholderStyle: TextStyle(fontStyle: FontStyle.italic),
-                      suggestions: AutoComplet.getAgriculturalInputs,
-                      suggestionsDecoration: SuggestionDecoration(
-                        marginSuggestions: const EdgeInsets.all(8.0),
-                        color: const Color.fromARGB(255, 236, 234, 234),
-                        borderRadius: BorderRadius.circular(16.0),
-                      ),
-                      onSuggestionSelected: (selectedItem) {
-                        _searchController.text = selectedItem.searchKey;
-                        // setState(() {});
-                      },
-                      onChanged: (value) {
-                        if (mounted) {
-                          setState(() {});
-                        }
-                      },
-                      suggestionItemBuilder: (context, searchFieldItem) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            searchFieldItem.searchKey,
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-
-                // const SizedBox(height: 10),
-                // Padding(
-                //   padding: const EdgeInsets.all(10.0),
-                //   child: Container(
-                //     padding: EdgeInsets.symmetric(horizontal: 10),
-                //     decoration: BoxDecoration(
-                //       color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                //       borderRadius: BorderRadius.circular(25),
-                //     ),
-                //     child: Row(
-                //       children: [
-                //         Icon(Icons.search,
-                //             color: Colors.blueGrey[400],
-                //             size:
-                //                 28), // Utiliser une icône de recherche plus grande
-                //         SizedBox(width: 10),
-                //         Expanded(
-                //           child: TextField(
-                //             controller: _searchController,
-                //             onChanged: (value) {
-                //               setState(() {});
-                //             },
-                //             decoration: InputDecoration(
-                //               hintText: 'Rechercher...',
-                //               border: InputBorder.none,
-                //               hintStyle: TextStyle(color: Colors.blueGrey[400]),
-                //             ),
-                //           ),
-                //         ),
-                //         // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
-                //         IconButton(
-                //           icon: Icon(Icons.clear),
-                //           onPressed: () {
-                //             _searchController.clear();
-                //             setState(() {});
-                //           },
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
-                // const SizedBox(height: 10),
-              ])),
-            ];
-          },
-          body: RefreshIndicator(
-            onRefresh: () async {
-              setState(() {
-                hasMore = true;
-                page = 0;
-                // Rafraîchir les données ici
-                futureList = IntrantService()
-                    .fetchIntrantByActeurWithPagination(acteur.idActeur!,
-                        refresh: true);
-              });
-              debugPrint("refresh page ${page}");
-            },
-            child: SingleChildScrollView(
-                controller: scrollableController,
-                child: Consumer<IntrantService>(
-                    builder: (context, intrantService, child) {
-                  return FutureBuilder(
-                      future: futureList,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return _buildShimmerEffect();
-                        }
-
-                        if (!snapshot.hasData) {
-                          return SingleChildScrollView(
-                            child: Padding(
-                              padding: EdgeInsets.all(10),
-                              child: Center(
-                                child: Column(
-                                  children: [
-                                    Image.asset('assets/images/notif.jpg'),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      'Aucun intrant trouvé',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 17,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                        onChanged: (value) {
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        },
+                        suggestionItemBuilder: (context, searchFieldItem) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              searchFieldItem.searchKey,
+                              style: TextStyle(color: Colors.black),
                             ),
                           );
-                        } else {
-                          intrantListe = snapshot.data!;
-                          String searchText = "";
-                          List<Intrant> filtereSearch =
-                              intrantListe.where((search) {
-                            String libelle = search.nomIntrant!.toLowerCase();
-                            searchText = _searchController.text.toLowerCase();
-                            return libelle.contains(searchText);
-                          }).toList();
-                          return filtereSearch.isEmpty
-                              ? SingleChildScrollView(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(10),
-                                    child: Center(
-                                      child: Column(
-                                        children: [
-                                          Image.asset(
-                                              'assets/images/notif.jpg'),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Text(
-                                            'Aucun intrant trouvé',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 17,
-                                              overflow: TextOverflow.ellipsis,
+                        },
+                      ),
+                    ),
+        
+                  // const SizedBox(height: 10),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(10.0),
+                  //   child: Container(
+                  //     padding: EdgeInsets.symmetric(horizontal: 10),
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                  //       borderRadius: BorderRadius.circular(25),
+                  //     ),
+                  //     child: Row(
+                  //       children: [
+                  //         Icon(Icons.search,
+                  //             color: Colors.blueGrey[400],
+                  //             size:
+                  //                 28), // Utiliser une icône de recherche plus grande
+                  //         SizedBox(width: 10),
+                  //         Expanded(
+                  //           child: TextField(
+                  //             controller: _searchController,
+                  //             onChanged: (value) {
+                  //               setState(() {});
+                  //             },
+                  //             decoration: InputDecoration(
+                  //               hintText: 'Rechercher...',
+                  //               border: InputBorder.none,
+                  //               hintStyle: TextStyle(color: Colors.blueGrey[400]),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //         // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                  //         IconButton(
+                  //           icon: Icon(Icons.clear),
+                  //           onPressed: () {
+                  //             _searchController.clear();
+                  //             setState(() {});
+                  //           },
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 10),
+                ])),
+              ];
+            },
+            body: RefreshIndicator(
+              onRefresh: () async {
+                setState(() {
+                  hasMore = true;
+                  page = 0;
+                  // Rafraîchir les données ici
+                  futureList = IntrantService()
+                      .fetchIntrantByActeurWithPagination(acteur.idActeur!,
+                          refresh: true);
+                });
+                debugPrint("refresh page ${page}");
+              },
+              child: SingleChildScrollView(
+                  controller: scrollableController,
+                  child: Consumer<IntrantService>(
+                      builder: (context, intrantService, child) {
+                    return FutureBuilder(
+                        future: futureList,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return _buildShimmerEffect();
+                          }
+        
+                          if (!snapshot.hasData) {
+                            return SingleChildScrollView(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Center(
+                                  child: Column(
+                                    children: [
+                                      Image.asset('assets/images/notif.jpg'),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        'Aucun intrant trouvé',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 17,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          } else {
+                            intrantListe = snapshot.data!;
+                            String searchText = "";
+                            List<Intrant> filtereSearch =
+                                intrantListe.where((search) {
+                              String libelle = search.nomIntrant!.toLowerCase();
+                              searchText = _searchController.text.toLowerCase();
+                              return libelle.contains(searchText);
+                            }).toList();
+                            return filtereSearch.isEmpty
+                                ? SingleChildScrollView(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Center(
+                                        child: Column(
+                                          children: [
+                                            Image.asset(
+                                                'assets/images/notif.jpg'),
+                                            SizedBox(
+                                              height: 10,
                                             ),
-                                          ),
-                                        ],
+                                            Text(
+                                              'Aucun intrant trouvé',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 17,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                )
-                              : GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    mainAxisSpacing: 10,
-                                    crossAxisSpacing: 10,
-                                    childAspectRatio: 0.8,
-                                  ),
-                                  itemCount: filtereSearch.length + 1,
-                                  itemBuilder: (context, index) {
-                                    // var e = intrantListe.elementAt(index);
-                                    if (index < filtereSearch.length) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          // Navigator.push(
-                                          //   context,
-                                          //   MaterialPageRoute(
-                                          //     builder: (context) =>
-                                          //         DetailIntrant(
-                                          //       intrant: filtereSearch[index],
-                                          //     )
-                                          //   ),
-                                          // );
-                                          _getResultFromNextScreen1(
-                                              context, filtereSearch[index]);
-                                        },
-                                        child: Card(
-                                          margin: EdgeInsets.all(8),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0),
-                                                child: SizedBox(
-                                                  height: 72,
-                                                  child: filtereSearch[index]
-                                                                  .photoIntrant ==
-                                                              null ||
-                                                          filtereSearch[index]
-                                                              .photoIntrant!
-                                                              .isEmpty
-                                                      ? Image.asset(
-                                                          "assets/images/default_image.png",
-                                                          fit: BoxFit.cover,
-                                                        )
-                                                      : CachedNetworkImage(
-                                                          imageUrl:
-                                                              "https://koumi.ml/api-koumi/intrant/${filtereSearch[index].idIntrant}/image",
-                                                          fit: BoxFit.cover,
-                                                          placeholder: (context,
-                                                                  url) =>
-                                                              const Center(
-                                                                  child:
-                                                                      CircularProgressIndicator()),
-                                                          errorWidget: (context,
-                                                                  url, error) =>
-                                                              Image.asset(
-                                                            'assets/images/default_image.png',
+                                  )
+                                : GridView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      mainAxisSpacing: 10,
+                                      crossAxisSpacing: 10,
+                                      childAspectRatio: 0.8,
+                                    ),
+                                    itemCount: filtereSearch.length + 1,
+                                    itemBuilder: (context, index) {
+                                      // var e = intrantListe.elementAt(index);
+                                      if (index < filtereSearch.length) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            // Navigator.push(
+                                            //   context,
+                                            //   MaterialPageRoute(
+                                            //     builder: (context) =>
+                                            //         DetailIntrant(
+                                            //       intrant: filtereSearch[index],
+                                            //     )
+                                            //   ),
+                                            // );
+                                            _getResultFromNextScreen1(
+                                                context, filtereSearch[index]);
+                                          },
+                                          child: Card(
+                                            margin: EdgeInsets.all(8),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              children: [
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8.0),
+                                                  child: SizedBox(
+                                                    height: 72,
+                                                    child: filtereSearch[index]
+                                                                    .photoIntrant ==
+                                                                null ||
+                                                            filtereSearch[index]
+                                                                .photoIntrant!
+                                                                .isEmpty
+                                                        ? Image.asset(
+                                                            "assets/images/default_image.png",
                                                             fit: BoxFit.cover,
+                                                          )
+                                                        : CachedNetworkImage(
+                                                            imageUrl:
+                                                                "https://koumi.ml/api-koumi/intrant/${filtereSearch[index].idIntrant}/image",
+                                                            fit: BoxFit.cover,
+                                                            placeholder: (context,
+                                                                    url) =>
+                                                                const Center(
+                                                                    child:
+                                                                        CircularProgressIndicator()),
+                                                            errorWidget: (context,
+                                                                    url, error) =>
+                                                                Image.asset(
+                                                              'assets/images/default_image.png',
+                                                              fit: BoxFit.cover,
+                                                            ),
                                                           ),
-                                                        ),
-                                                ),
-                                              ),
-                                              ListTile(
-                                                title: Text(
-                                                  filtereSearch[index]
-                                                      .nomIntrant!,
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black87,
                                                   ),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
                                                 ),
-                                                subtitle: Text(
-                                                  "${filtereSearch[index].prixIntrant.toString()} ${filtereSearch[index].monnaie!.libelle}",
-                                                  style: TextStyle(
+                                                ListTile(
+                                                  title: Text(
+                                                    filtereSearch[index]
+                                                        .nomIntrant!,
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.black87,
+                                                    ),
+                                                    maxLines: 1,
                                                     overflow:
                                                         TextOverflow.ellipsis,
-                                                    fontSize: 15,
-                                                    color: Colors.black87,
+                                                  ),
+                                                  subtitle: Text(
+                                                    "${filtereSearch[index].prixIntrant.toString()} ${filtereSearch[index].monnaie!.libelle}",
+                                                    style: TextStyle(
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      fontSize: 15,
+                                                      color: Colors.black87,
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              Container(
-                                                alignment:
-                                                    Alignment.bottomRight,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    _buildEtat(
-                                                        filtereSearch[index]
-                                                            .statutIntrant!),
-                                                    PopupMenuButton<String>(
-                                                      padding: EdgeInsets.zero,
-                                                      itemBuilder: (context) =>
-                                                          <PopupMenuEntry<
-                                                              String>>[
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: filtereSearch[
-                                                                            index]
-                                                                        .statutIntrant ==
-                                                                    false
-                                                                ? Icon(
-                                                                    Icons.check,
-                                                                    color: Colors
-                                                                        .green,
-                                                                  )
-                                                                : Icon(
-                                                                    Icons
-                                                                        .disabled_visible,
-                                                                    color: Colors
-                                                                            .orange[
-                                                                        400],
-                                                                  ),
-                                                            title: Text(
-                                                              filtereSearch[index]
+                                                Container(
+                                                  alignment:
+                                                      Alignment.bottomRight,
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                          horizontal: 10),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      _buildEtat(
+                                                          filtereSearch[index]
+                                                              .statutIntrant!),
+                                                      PopupMenuButton<String>(
+                                                        padding: EdgeInsets.zero,
+                                                        itemBuilder: (context) =>
+                                                            <PopupMenuEntry<
+                                                                String>>[
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading: filtereSearch[
+                                                                              index]
                                                                           .statutIntrant ==
                                                                       false
-                                                                  ? "Activer"
-                                                                  : "Desactiver",
-                                                              style: TextStyle(
-                                                                color: filtereSearch[index]
+                                                                  ? Icon(
+                                                                      Icons.check,
+                                                                      color: Colors
+                                                                          .green,
+                                                                    )
+                                                                  : Icon(
+                                                                      Icons
+                                                                          .disabled_visible,
+                                                                      color: Colors
+                                                                              .orange[
+                                                                          400],
+                                                                    ),
+                                                              title: Text(
+                                                                filtereSearch[index]
                                                                             .statutIntrant ==
                                                                         false
-                                                                    ? Colors
-                                                                        .green
-                                                                    : Colors.orange[
-                                                                        400],
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                    ? "Activer"
+                                                                    : "Desactiver",
+                                                                style: TextStyle(
+                                                                  color: filtereSearch[index]
+                                                                              .statutIntrant ==
+                                                                          false
+                                                                      ? Colors
+                                                                          .green
+                                                                      : Colors.orange[
+                                                                          400],
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
                                                               ),
+                                                              onTap: () async {
+                                                                filtereSearch[index]
+                                                                            .statutIntrant ==
+                                                                        false
+                                                                    ? await IntrantService()
+                                                                        .activerIntrant(
+                                                                            filtereSearch[index]
+                                                                                .idIntrant!)
+                                                                        .then(
+                                                                            (value) =>
+                                                                                {
+                                                                                  Navigator.of(context).pop(),
+                                                                                  Provider.of<IntrantService>(context, listen: false).applyChange(),
+                                                                                  setState(() {
+                                                                                    page++;
+                                                                                    futureList = IntrantService().fetchIntrantByActeurWithPagination(acteur.idActeur!);
+                                                                                  }),
+                                                                                  // Navigator.of(context).pop(),
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Activer avec succèss "),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 2),
+                                                                                    ),
+                                                                                  )
+                                                                                })
+                                                                        .catchError(
+                                                                            (onError) =>
+                                                                                {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Une erreur s'est produit"),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 5),
+                                                                                    ),
+                                                                                  ),
+                                                                                })
+                                                                    : await IntrantService()
+                                                                        .desactiverIntrant(
+                                                                            filtereSearch[index]
+                                                                                .idIntrant!)
+                                                                        .then(
+                                                                            (value) =>
+                                                                                {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Désactiver avec succèss "),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 2),
+                                                                                    ),
+                                                                                  ),
+                                                                                  Navigator.of(context).pop(),
+                                                                                  Provider.of<IntrantService>(context, listen: false).applyChange(),
+                                                                                  setState(() {
+                                                                                    page++;
+                                                                                    futureList = IntrantService().fetchIntrantByActeurWithPagination(acteur.idActeur!);
+                                                                                  }),
+                                                                                })
+                                                                        .catchError(
+                                                                            (onError) =>
+                                                                                {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Une erreur s'est produit"),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 5),
+                                                                                    ),
+                                                                                  ),
+                                                                                  // Navigator.of(context).pop(),
+                                                                                });
+                                                              },
                                                             ),
-                                                            onTap: () async {
-                                                              filtereSearch[index]
-                                                                          .statutIntrant ==
-                                                                      false
-                                                                  ? await IntrantService()
-                                                                      .activerIntrant(
-                                                                          filtereSearch[index]
-                                                                              .idIntrant!)
-                                                                      .then(
-                                                                          (value) =>
-                                                                              {
-                                                                                Navigator.of(context).pop(),
-                                                                                Provider.of<IntrantService>(context, listen: false).applyChange(),
-                                                                                setState(() {
-                                                                                  page++;
-                                                                                  futureList = IntrantService().fetchIntrantByActeurWithPagination(acteur.idActeur!);
-                                                                                }),
-                                                                                // Navigator.of(context).pop(),
-                                                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                                                  const SnackBar(
-                                                                                    content: Row(
-                                                                                      children: [
-                                                                                        Text("Activer avec succèss "),
-                                                                                      ],
-                                                                                    ),
-                                                                                    duration: Duration(seconds: 2),
-                                                                                  ),
-                                                                                )
-                                                                              })
-                                                                      .catchError(
-                                                                          (onError) =>
-                                                                              {
-                                                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                                                  const SnackBar(
-                                                                                    content: Row(
-                                                                                      children: [
-                                                                                        Text("Une erreur s'est produit"),
-                                                                                      ],
-                                                                                    ),
-                                                                                    duration: Duration(seconds: 5),
-                                                                                  ),
-                                                                                ),
-                                                                              })
-                                                                  : await IntrantService()
-                                                                      .desactiverIntrant(
-                                                                          filtereSearch[index]
-                                                                              .idIntrant!)
-                                                                      .then(
-                                                                          (value) =>
-                                                                              {
-                                                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                                                  const SnackBar(
-                                                                                    content: Row(
-                                                                                      children: [
-                                                                                        Text("Désactiver avec succèss "),
-                                                                                      ],
-                                                                                    ),
-                                                                                    duration: Duration(seconds: 2),
-                                                                                  ),
-                                                                                ),
-                                                                                Navigator.of(context).pop(),
-                                                                                Provider.of<IntrantService>(context, listen: false).applyChange(),
-                                                                                setState(() {
-                                                                                  page++;
-                                                                                  futureList = IntrantService().fetchIntrantByActeurWithPagination(acteur.idActeur!);
-                                                                                }),
-                                                                              })
-                                                                      .catchError(
-                                                                          (onError) =>
-                                                                              {
-                                                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                                                  const SnackBar(
-                                                                                    content: Row(
-                                                                                      children: [
-                                                                                        Text("Une erreur s'est produit"),
-                                                                                      ],
-                                                                                    ),
-                                                                                    duration: Duration(seconds: 5),
-                                                                                  ),
-                                                                                ),
-                                                                                // Navigator.of(context).pop(),
-                                                                              });
-                                                            },
                                                           ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.edit,
-                                                              color:
-                                                                  Colors.green,
-                                                            ),
-                                                            title: const Text(
-                                                              "Modifier la quantité",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                              await afficherBottomSheet(
-                                                                      context,
-                                                                      filtereSearch[
-                                                                          index])
-                                                                  .then(
-                                                                      (value) {
-                                                                Provider.of<IntrantService>(
-                                                                        context,
-                                                                        listen:
-                                                                            false)
-                                                                    .applyChange();
-                                                                setState(() {
-                                                                  page++;
-                                                                  futureList = IntrantService()
-                                                                      .fetchIntrantByActeurWithPagination(
-                                                                          acteur
-                                                                              .idActeur!);
-                                                                });
-                                                                // Navigator.of(context).pop();
-                                                              });
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.delete,
-                                                              color: Colors.red,
-                                                            ),
-                                                            title: const Text(
-                                                              "Supprimer",
-                                                              style: TextStyle(
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading: const Icon(
+                                                                Icons.edit,
                                                                 color:
-                                                                    Colors.red,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                    Colors.green,
                                                               ),
+                                                              title: const Text(
+                                                                "Modifier la quantité",
+                                                                style: TextStyle(
+                                                                  color: Colors
+                                                                      .green,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              onTap: () async {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                                await afficherBottomSheet(
+                                                                        context,
+                                                                        filtereSearch[
+                                                                            index])
+                                                                    .then(
+                                                                        (value) {
+                                                                  Provider.of<IntrantService>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .applyChange();
+                                                                  setState(() {
+                                                                    page++;
+                                                                    futureList = IntrantService()
+                                                                        .fetchIntrantByActeurWithPagination(
+                                                                            acteur
+                                                                                .idActeur!);
+                                                                  });
+                                                                  // Navigator.of(context).pop();
+                                                                });
+                                                              },
                                                             ),
-                                                            onTap: () async {
-                                                              await IntrantService()
-                                                                  .deleteIntrant(
-                                                                      filtereSearch[index]
-                                                                          .idIntrant!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Navigator.of(context).pop(),
-                                                                            Provider.of<IntrantService>(context, listen: false).applyChange(),
-                                                                            setState(() {
-                                                                              page++;
-                                                                              futureList = IntrantService().fetchIntrantByActeurWithPagination(acteur.idActeur!);
-                                                                            }),
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Impossible de supprimer"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ),
-                                                                            )
-                                                                          });
-                                                            },
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
-                                            ],
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading: const Icon(
+                                                                Icons.delete,
+                                                                color: Colors.red,
+                                                              ),
+                                                              title: const Text(
+                                                                "Supprimer",
+                                                                style: TextStyle(
+                                                                  color:
+                                                                      Colors.red,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              onTap: () async {
+                                                                await IntrantService()
+                                                                    .deleteIntrant(
+                                                                        filtereSearch[index]
+                                                                            .idIntrant!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Navigator.of(context).pop(),
+                                                                              Provider.of<IntrantService>(context, listen: false).applyChange(),
+                                                                              setState(() {
+                                                                                page++;
+                                                                                futureList = IntrantService().fetchIntrantByActeurWithPagination(acteur.idActeur!);
+                                                                              }),
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Impossible de supprimer"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
+                                                                                ),
+                                                                              )
+                                                                            });
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    } else {
-                                      return isLoading == true
-                                          ? Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 32),
-                                              child: Center(
-                                                  child: const Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  color: Colors.orange,
-                                                ),
-                                              )),
-                                            )
-                                          : Container();
-                                    }
-                                  },
-                                );
-                        }
-                      });
-                })),
+                                        );
+                                      } else {
+                                        return isLoading == true
+                                            ? Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 32),
+                                                child: Center(
+                                                    child: const Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    color: Colors.orange,
+                                                  ),
+                                                )),
+                                              )
+                                            : Container();
+                                      }
+                                    },
+                                  );
+                          }
+                        });
+                  })),
+            ),
           ),
         ),
       ),

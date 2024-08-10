@@ -75,6 +75,7 @@ class _ActeurListState extends State<ActeurList> {
                         onPressed: () {
                           setState(() {
                             isSearchMode = !isSearchMode;
+                            _searchController.clear();
                           });
                         },
                         icon: Icon(

@@ -150,6 +150,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                         onPressed: () {
                           setState(() {
                             isSearchMode = !isSearchMode;
+                            _searchController.clear();
                           });
                         },
                         icon: Icon(

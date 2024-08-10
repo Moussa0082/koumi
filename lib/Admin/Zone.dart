@@ -106,6 +106,7 @@ class _ZoneState extends State<Zone> {
                         onPressed: () {
                           setState(() {
                             isSearchMode = !isSearchMode;
+                            _searchController.clear();
                           });
                         },
                         icon: Icon(

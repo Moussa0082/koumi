@@ -149,6 +149,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                           if (mounted) {
                             setState(() {
                               isSearchMode = !isSearchMode;
+                              _searchController.clear();
                             });
                           }
                         },

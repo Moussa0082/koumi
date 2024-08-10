@@ -99,6 +99,7 @@ class _AlerteDisableState extends State<AlerteDisable> {
                     onPressed: () {
                       setState(() {
                         isSearchMode = !isSearchMode;
+                        _searchController.clear();
                       });
                     },
                     icon: Icon(

@@ -41,6 +41,7 @@ class _StoreScreenState extends State<StoreScreen> {
   late Future _paysList;
   // String? detectedCountry;
   List<Magasin> magasinListe = [];
+  List<Magasin> magasinListeSearch = [];
   List<Magasin> magasinList = [];
   late Future<List<Magasin>> magasinListeFuture;
   late Future<List<Magasin>> magasinListeFuture1;
@@ -252,6 +253,8 @@ class _StoreScreenState extends State<StoreScreen> {
     debugPrint("no");
   }
 
+  // FocusNode _focusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -263,6 +266,13 @@ class _StoreScreenState extends State<StoreScreen> {
         : detectedCountry = "Mali";
     print("pays dans store : $detectedCountry");
     verify();
+    // _focusNode.addListener(() {
+    //   if (!_focusNode.hasFocus) {
+    //     setState(() {
+    //       // Ferme la liste des suggestions si le focus est perdu
+    //     });
+    //   }
+    // });
     _searchController = TextEditingController();
     _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
     // _magasinListe = http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagagin'));
@@ -300,11 +310,8 @@ class _StoreScreenState extends State<StoreScreen> {
   void dispose() {
     scrollableController.dispose();
     scrollableController1.dispose();
-    if (isSearchMode) {
-      _searchController = TextEditingController();
-    } else {
-      _searchController.dispose();
-    }
+    // _focusNode.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -318,21 +325,6 @@ class _StoreScreenState extends State<StoreScreen> {
         magasinListeFuture = MagasinService().fetchAllMagasin();
       });
     }
-  }
-
-  void _selectMode(String mode) {
-    setState(() {
-      if (mode == 'Rechercher') {
-        isSearchMode = true;
-        isFilterMode = false;
-      } else if (mode == 'Filtrer') {
-        isSearchMode = false;
-        isFilterMode = true;
-      } else if (mode == 'Fermer') {
-        isSearchMode = false;
-        isFilterMode = false;
-      }
-    });
   }
 
   Future<void> _getResultFromNextScreen2(BuildContext context) async {
@@ -353,6 +345,7 @@ class _StoreScreenState extends State<StoreScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //  FocusScope.of(context).unfocus();
     return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(255, 250, 250, 250),
@@ -442,146 +435,84 @@ class _StoreScreenState extends State<StoreScreen> {
                       : Container()
                 ],
         ),
-        body: Container(
-            child: NestedScrollView(
-                headerSliverBuilder:
-                    (BuildContext context, bool innerBoxIsScrolled) {
-                  return <Widget>[
-                    SliverToBoxAdapter(
-                        child: Column(children: [
-                      const SizedBox(height: 10),
-                      if (!isSearchMode)
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton.icon(
-                            onPressed: () {
-                              setState(() {
-                                isSearchMode = true;
-                                isFilterMode = true;
-                              });
-                            },
-                            icon: Icon(
-                              Icons.search,
-                              color: d_colorGreen,
-                            ),
-                            label: Text(
-                              'Rechercher',
-                              style:
-                                  TextStyle(color: d_colorGreen, fontSize: 17),
-                            ),
-                          ),
-                        ),
-                      if (isSearchMode)
-                        Align(
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Container(
+              child: NestedScrollView(
+                  headerSliverBuilder:
+                      (BuildContext context, bool innerBoxIsScrolled) {
+                    return <Widget>[
+                      SliverToBoxAdapter(
+                          child: Column(children: [
+                        const SizedBox(height: 10),
+                        if (!isSearchMode)
+                          Align(
                             alignment: Alignment.centerRight,
                             child: TextButton.icon(
                               onPressed: () {
                                 setState(() {
-                                  isSearchMode = false;
-                                  isFilterMode = false;
+                                  isSearchMode = true;
+                                  isFilterMode = true;
                                 });
                               },
                               icon: Icon(
-                                Icons.close,
-                                color: Colors.red,
+                                Icons.search,
+                                color: d_colorGreen,
                               ),
                               label: Text(
-                                'Fermer',
-                                style:
-                                    TextStyle(color: Colors.red, fontSize: 17),
+                                'Rechercher...',
+                                style: TextStyle(
+                                    color: d_colorGreen, fontSize: 17),
                               ),
-                            )),
-                      Visibility(
-                          visible: isSearchMode,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: FutureBuilder(
-                                    future: _paysList,
-                                    builder: (_, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return DropdownButtonFormField(
-                                          items: [],
-                                          isExpanded: true,
-                                          onChanged: null,
-                                          decoration: InputDecoration(
-                                            labelText: 'Chargement...',
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                    vertical: 5,
-                                                    horizontal: 22),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(22),
-                                            ),
-                                          ),
-                                        );
-                                      }
-
-                                      if (snapshot.hasData) {
-                                        dynamic jsonString = utf8
-                                            .decode(snapshot.data.bodyBytes);
-                                        dynamic responseData =
-                                            json.decode(jsonString);
-
-                                        // final reponse = json.decode(snapshot.data.body);
-                                        if (responseData is List) {
-                                          final paysList = responseData
-                                              .map((e) => Pays.fromMap(e))
-                                              .where((con) =>
-                                                  con.statutPays == true)
-                                              .toList();
-                                          if (paysList.isEmpty) {
-                                            return DropdownButtonFormField(
-                                              items: [],
-                                              isExpanded: true,
-                                              onChanged: null,
-                                              decoration: InputDecoration(
-                                                labelText: 'Aucun pays trouvé',
-                                                contentPadding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5,
-                                                        horizontal: 22),
-                                                border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(22),
-                                                ),
-                                              ),
-                                            );
-                                          }
-
-                                          return DropdownButtonFormField<
-                                              String>(
+                            ),
+                          ),
+                        if (isSearchMode)
+                          Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton.icon(
+                                onPressed: () {
+                                  if (mounted) {
+                                    setState(() {
+                                      isSearchMode = false;
+                                      isFilterMode = false;
+                                      _searchController.clear();
+                                      _searchController =
+                                          TextEditingController();
+                                    });
+                                    debugPrint(
+                                        "Rechercher mode désactivé : $isSearchMode");
+                                  }
+                                },
+                                icon: Icon(
+                                  Icons.close,
+                                  color: Colors.red,
+                                ),
+                                label: Text(
+                                  'Fermer',
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 17),
+                                ),
+                              )),
+                        Visibility(
+                            visible: isSearchMode,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: FutureBuilder(
+                                      future: _paysList,
+                                      builder: (_, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return DropdownButtonFormField(
+                                            items: [],
                                             isExpanded: true,
-                                            items: paysList
-                                                .map(
-                                                  (e) => DropdownMenuItem(
-                                                    value: e.idPays,
-                                                    child: Text(e.nomPays!),
-                                                  ),
-                                                )
-                                                .toList(),
-                                            value: paysValue,
-                                            onChanged: (newValue) {
-                                              setState(() {
-                                                typeValue = null;
-                                                paysValue = newValue;
-                                                if (newValue != null) {
-                                                  pays = paysList.firstWhere(
-                                                      (element) =>
-                                                          element.idPays ==
-                                                          newValue);
-                                                  _niveau1PaysList = http.get(
-                                                      Uri.parse(
-                                                          '$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByIdPays/${newValue}'));
-                                                }
-                                              });
-                                            },
+                                            onChanged: null,
                                             decoration: InputDecoration(
-                                              labelText: '--Filtre par pays--',
+                                              labelText: 'Chargement...',
                                               contentPadding:
                                                   const EdgeInsets.symmetric(
                                                       vertical: 5,
@@ -593,988 +524,1058 @@ class _StoreScreenState extends State<StoreScreen> {
                                             ),
                                           );
                                         }
-                                      }
-                                      return DropdownButtonFormField(
-                                        items: [],
-                                        isExpanded: true,
-                                        onChanged: null,
-                                        decoration: InputDecoration(
-                                          labelText: 'Aucun pays trouvé',
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 5, horizontal: 22),
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(22),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 8,
-                                ),
-                                Expanded(
-                                  child: FutureBuilder(
-                                    future: _niveau1PaysList,
-                                    builder: (_, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return buildLoadingDropdown();
-                                      }
 
-                                      if (snapshot.hasData) {
-                                        dynamic jsonString = utf8
-                                            .decode(snapshot.data.bodyBytes);
-                                        dynamic responseData =
-                                            json.decode(jsonString);
-                                        //
-                                        // }
-                                        if (responseData is List) {
-                                          final reponse = responseData;
-                                          final niveau1PaysList = reponse
-                                              .map(
-                                                  (e) => Niveau1Pays.fromMap(e))
-                                              .where(
-                                                  (con) => con.statutN1 == true)
-                                              .toList();
+                                        if (snapshot.hasData) {
+                                          dynamic jsonString = utf8
+                                              .decode(snapshot.data.bodyBytes);
+                                          dynamic responseData =
+                                              json.decode(jsonString);
 
-                                          if (niveau1PaysList.isEmpty) {
-                                            return buildEmptyDropdown();
-                                          }
-
-                                          return buildDropdown(niveau1PaysList);
-                                        } else {
-                                          return buildEmptyDropdown();
-                                        }
-                                      }
-
-                                      return buildEmptyDropdown();
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )),
-                      Visibility(
-                          visible: isSearchMode,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 3, horizontal: 10),
-                            child: FutureBuilder<List<Magasin>>(
-                              future: _magasinList,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return SearchFieldAutoComplete<String>(
-                                    placeholder: 'Rechercher...',
-                                    suggestions: [],
-                                  );
-                                } else {
-                                  return SearchFieldAutoComplete<String>(
-                                    controller: _searchController,
-                                    placeholder: 'Rechercher...',
-                                    placeholderStyle:
-                                        TextStyle(fontStyle: FontStyle.italic),
-                                    suggestions: snapshot.data!
-                                        .map((item) =>
-                                            SearchFieldAutoCompleteItem<String>(
-                                              searchKey: item.nomMagasin!,
-                                              value: item.nomMagasin!,
-                                            ))
-                                        .toList(),
-                                    suggestionsDecoration: SuggestionDecoration(
-                                      marginSuggestions:
-                                          const EdgeInsets.all(8.0),
-                                      color: const Color.fromARGB(
-                                          255, 236, 234, 234),
-                                      borderRadius: BorderRadius.circular(16.0),
-                                    ),
-                                    onSuggestionSelected: (selectedItem) {
-                                      if (mounted) {
-                                        _searchController.text =
-                                            selectedItem.searchKey;
-                                      }
-                                    },
-                                    suggestionItemBuilder:
-                                        (context, searchFieldItem) {
-                                      return Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          searchFieldItem.searchKey,
-                                          style: TextStyle(color: Colors.black),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                }
-                              },
-                            ),
-                          )),
-                      const SizedBox(height: 10),
-                    ])),
-                  ];
-                },
-                body: RefreshIndicator(
-                    onRefresh: () async {
-                      setState(() {
-                        page = 0;
-                        // Rafraîchir les données ici
-                      });
-                      debugPrint("refresh page ${page}");
-                      selectedNiveau1Pays != null
-                          ? setState(() {
-                              magasinListeFuture1 = MagasinService()
-                                  .fetchMagasinByNiveau1PaysWithPagination(
-                                      selectedNiveau1Pays!.idNiveau1Pays!);
-                            })
-                          : setState(() {
-                              magasinListeFuture =
-                                  MagasinService().fetchAllMagasin();
-                            });
-                    },
-                    child: selectedNiveau1Pays == null
-                        ? SingleChildScrollView(
-                            controller: scrollableController,
-                            child: Consumer<MagasinService>(
-                                builder: (context, magasinService, child) {
-                              return FutureBuilder<List<Magasin>>(
-                                  future: magasinListeFuture,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return _buildShimmerEffect();
-                                    }
-                                    if (!snapshot.hasData) {
-                                      return const Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: Center(
-                                            child:
-                                                Text("Aucun magasin trouvé")),
-                                      );
-                                    } else {
-                                      magasinListe = snapshot.data!;
-                                      String searchText = "";
-
-                                      List<Magasin> produitsLocaux =
-                                          magasinListe
-                                              .where(
-                                        (element) =>
-                                            element
-                                                .acteur!.niveau3PaysActeur! ==
-                                            detectedCountry!,
-                                      )
-                                              .where((cate) {
-                                        String nomCat =
-                                            cate.nomMagasin!.toLowerCase();
-                                        searchText = _searchController.text
-                                            .toLowerCase();
-                                        return nomCat.contains(searchText);
-                                      }).toList();
-
-                                      List<Magasin> produitsEtrangers =
-                                          magasinListe
-                                              .where(
-                                        (element) =>
-                                            element
-                                                .acteur!.niveau3PaysActeur! !=
-                                            detectedCountry,
-                                      )
-                                              .where((cate) {
-                                        String nomCat =
-                                            cate.nomMagasin!.toLowerCase();
-                                        searchText = _searchController.text
-                                            .toLowerCase();
-                                        return nomCat.contains(searchText);
-                                      }).toList();
-
-                                      List<Magasin> filteredSearch =
-                                          magasinListe.where((cate) {
-                                        String nomCat =
-                                            cate.nomMagasin!.toLowerCase();
-                                        searchText = _searchController.text
-                                            .toLowerCase();
-                                        return nomCat.contains(searchText);
-                                      }).toList();
-
-                                      return filteredSearch.isEmpty
-                                          ? SingleChildScrollView(
-                                              child: Padding(
-                                                padding: EdgeInsets.all(10),
-                                                child: Center(
-                                                  child: Column(
-                                                    children: [
-                                                      Image.asset(
-                                                          'assets/images/notif.jpg'),
-                                                      SizedBox(
-                                                        height: 10,
-                                                      ),
-                                                      Text(
-                                                        'Aucun magasin trouvé',
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 17,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                      ),
-                                                    ],
+                                          // final reponse = json.decode(snapshot.data.body);
+                                          if (responseData is List) {
+                                            final paysList = responseData
+                                                .map((e) => Pays.fromMap(e))
+                                                .where((con) =>
+                                                    con.statutPays == true)
+                                                .toList();
+                                            if (paysList.isEmpty) {
+                                              return DropdownButtonFormField(
+                                                items: [],
+                                                isExpanded: true,
+                                                onChanged: null,
+                                                decoration: InputDecoration(
+                                                  labelText:
+                                                      'Aucun pays trouvé',
+                                                  contentPadding:
+                                                      const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 5,
+                                                          horizontal: 22),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            22),
                                                   ),
+                                                ),
+                                              );
+                                            }
+
+                                            return DropdownButtonFormField<
+                                                String>(
+                                              isExpanded: true,
+                                              items: paysList
+                                                  .map(
+                                                    (e) => DropdownMenuItem(
+                                                      value: e.idPays,
+                                                      child: Text(e.nomPays!),
+                                                    ),
+                                                  )
+                                                  .toList(),
+                                              value: paysValue,
+                                              onChanged: (newValue) {
+                                                setState(() {
+                                                  typeValue = null;
+                                                  paysValue = newValue;
+                                                  if (newValue != null) {
+                                                    pays = paysList.firstWhere(
+                                                        (element) =>
+                                                            element.idPays ==
+                                                            newValue);
+                                                    _niveau1PaysList = http.get(
+                                                        Uri.parse(
+                                                            '$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByIdPays/${newValue}'));
+                                                  }
+                                                });
+                                              },
+                                              decoration: InputDecoration(
+                                                labelText:
+                                                    '--Filtre par pays--',
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 5,
+                                                        horizontal: 22),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(22),
                                                 ),
                                               ),
-                                            )
-                                          : Column(
-                                              children: [
-                                                if (produitsLocaux
-                                                    .isNotEmpty) ...[
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Text(
-                                                      "Magasins locaux",
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 18),
-                                                    ),
-                                                  ),
-                                                  GridView.builder(
-                                                    shrinkWrap: true,
-                                                    physics:
-                                                        NeverScrollableScrollPhysics(),
-                                                    gridDelegate:
-                                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                                      crossAxisCount: 2,
-                                                      mainAxisSpacing: 10,
-                                                      crossAxisSpacing: 10,
-                                                      childAspectRatio: 0.8,
-                                                    ),
-                                                    itemCount:
-                                                        produitsLocaux.length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      if (index <
-                                                          produitsLocaux
-                                                              .length) {
-                                                        return GestureDetector(
-                                                          onTap: () {
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder: (context) => ProductsByStoresScreen(
-                                                                    id: produitsLocaux[
-                                                                            index]
-                                                                        .idMagasin,
-                                                                    nom: produitsLocaux[
-                                                                            index]
-                                                                        .nomMagasin),
-                                                              ),
-                                                            );
-                                                          },
-                                                          child: Card(
-                                                            margin:
-                                                                EdgeInsets.all(
-                                                                    8),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .stretch,
-                                                              children: [
-                                                                ClipRRect(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              8.0),
-                                                                  child:
-                                                                      Container(
-                                                                    height: 72,
-                                                                    child: produitsLocaux[index].photo ==
-                                                                                null ||
-                                                                            produitsLocaux[index]
-                                                                                .photo!
-                                                                                .isEmpty
-                                                                        ? Image
-                                                                            .asset(
-                                                                            "assets/images/default_image.png",
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          )
-                                                                        : CachedNetworkImage(
-                                                                            imageUrl:
-                                                                                "https://koumi.ml/api-koumi/Magasin/${produitsLocaux[index].idMagasin}/image",
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                            placeholder: (context, url) =>
-                                                                                const Center(child: CircularProgressIndicator()),
-                                                                            errorWidget: (context, url, error) =>
-                                                                                Image.asset(
-                                                                              'assets/images/default_image.png',
-                                                                              fit: BoxFit.cover,
-                                                                            ),
-                                                                          ),
-                                                                  ),
-                                                                ),
-                                                                // SizedBox(height: 8),
-                                                                ListTile(
-                                                                  title: Text(
-                                                                    produitsLocaux[
-                                                                            index]
-                                                                        .nomMagasin!,
-                                                                    maxLines: 2,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          17,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: Colors
-                                                                          .black87,
-                                                                    ),
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                  ),
-                                                                  subtitle:
-                                                                      Text(
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                    produitsLocaux[
-                                                                            index]
-                                                                        .localiteMagasin!,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          15,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: Colors
-                                                                          .black87,
-                                                                    ),
-                                                                  ),
-                                                                ),
-
-                                                                _buildItem(
-                                                                    produitsLocaux[
-                                                                            index]
-                                                                        .contactMagasin!)
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        );
-                                                      } else {
-                                                        return isLoading == true
-                                                            ? Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .symmetric(
-                                                                        vertical:
-                                                                            32),
-                                                                child: Center(
-                                                                    child:
-                                                                        const Center(
-                                                                  child:
-                                                                      CircularProgressIndicator(
-                                                                    color: Colors
-                                                                        .orange,
-                                                                  ),
-                                                                )),
-                                                              )
-                                                            : Container();
-                                                      }
-                                                    },
-                                                  ),
-                                                ],
-                                                if (produitsEtrangers
-                                                    .isNotEmpty) ...[
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Text(
-                                                      "Magasins etrangère",
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 18),
-                                                    ),
-                                                  ),
-                                                  GridView.builder(
-                                                    shrinkWrap: true,
-                                                    physics:
-                                                        NeverScrollableScrollPhysics(),
-                                                    gridDelegate:
-                                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                                      crossAxisCount: 2,
-                                                      mainAxisSpacing: 10,
-                                                      crossAxisSpacing: 10,
-                                                      childAspectRatio: 0.8,
-                                                    ),
-                                                    itemCount: produitsEtrangers
-                                                        .length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      if (index <
-                                                          produitsEtrangers
-                                                              .length) {
-                                                        return GestureDetector(
-                                                          onTap: () {
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder: (context) => ProductsByStoresScreen(
-                                                                    id: produitsEtrangers[
-                                                                            index]
-                                                                        .idMagasin,
-                                                                    nom: produitsEtrangers[
-                                                                            index]
-                                                                        .nomMagasin),
-                                                              ),
-                                                            );
-                                                          },
-                                                          child: Card(
-                                                            margin:
-                                                                EdgeInsets.all(
-                                                                    8),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .stretch,
-                                                              children: [
-                                                                ClipRRect(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              8.0),
-                                                                  child:
-                                                                      Container(
-                                                                    height: 72,
-                                                                    child: produitsEtrangers[index].photo ==
-                                                                                null ||
-                                                                            produitsEtrangers[index]
-                                                                                .photo!
-                                                                                .isEmpty
-                                                                        ? Image
-                                                                            .asset(
-                                                                            "assets/images/default_image.png",
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          )
-                                                                        : CachedNetworkImage(
-                                                                            imageUrl:
-                                                                                "https://koumi.ml/api-koumi/Magasin/${produitsEtrangers[index].idMagasin}/image",
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                            placeholder: (context, url) =>
-                                                                                const Center(child: CircularProgressIndicator()),
-                                                                            errorWidget: (context, url, error) =>
-                                                                                Image.asset(
-                                                                              'assets/images/default_image.png',
-                                                                              fit: BoxFit.cover,
-                                                                            ),
-                                                                          ),
-                                                                  ),
-                                                                ),
-                                                                // SizedBox(height: 8),
-                                                                ListTile(
-                                                                  title: Text(
-                                                                    produitsEtrangers[
-                                                                            index]
-                                                                        .nomMagasin!,
-                                                                    maxLines: 2,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          17,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: Colors
-                                                                          .black87,
-                                                                    ),
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                  ),
-                                                                  subtitle:
-                                                                      Text(
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                    produitsEtrangers[
-                                                                            index]
-                                                                        .localiteMagasin!,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          15,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: Colors
-                                                                          .black87,
-                                                                    ),
-                                                                  ),
-                                                                ),
-
-                                                                _buildItem(
-                                                                    produitsEtrangers[
-                                                                            index]
-                                                                        .contactMagasin!)
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        );
-                                                      } else {
-                                                        return isLoading == true
-                                                            ? Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .symmetric(
-                                                                        vertical:
-                                                                            32),
-                                                                child: Center(
-                                                                    child:
-                                                                        const Center(
-                                                                  child:
-                                                                      CircularProgressIndicator(
-                                                                    color: Colors
-                                                                        .orange,
-                                                                  ),
-                                                                )),
-                                                              )
-                                                            : Container();
-                                                      }
-                                                    },
-                                                  ),
-                                                ],
-                                              ],
                                             );
-                                    }
-                                  });
-                            }),
-                          )
-                        : SingleChildScrollView(
-                            controller: scrollableController1,
-                            child: Consumer<MagasinService>(
-                                builder: (context, magasinService, child) {
-                              return FutureBuilder<List<Magasin>>(
-                                  future: magasinListeFuture1,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return _buildShimmerEffect();
-                                    }
-
-                                    if (!snapshot.hasData) {
-                                      return SingleChildScrollView(
-                                        child: Padding(
-                                          padding: EdgeInsets.all(10),
-                                          child: Center(
-                                            child: Column(
-                                              children: [
-                                                Image.asset(
-                                                    'assets/images/notif.jpg'),
-                                                SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Text(
-                                                  'Aucun magasin trouvé',
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 17,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                              ],
+                                          }
+                                        }
+                                        return DropdownButtonFormField(
+                                          items: [],
+                                          isExpanded: true,
+                                          onChanged: null,
+                                          decoration: InputDecoration(
+                                            labelText: 'Aucun pays trouvé',
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 5,
+                                                    horizontal: 22),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(22),
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    } else {
-                                      magasinListe = snapshot.data!;
-                                      String searchText = "";
-                                      List<Magasin> produitsLocaux =
-                                          magasinListe
-                                              .where(
-                                        (element) =>
-                                            element
-                                                .acteur!.niveau3PaysActeur! ==
-                                            detectedCountry!,
-                                      )
-                                              .where((cate) {
-                                        String nomCat =
-                                            cate.nomMagasin!.toLowerCase();
-                                        searchText = _searchController.text
-                                            .toLowerCase();
-                                        return nomCat.contains(searchText);
-                                      }).toList();
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 8,
+                                  ),
+                                  Expanded(
+                                    child: FutureBuilder(
+                                      future: _niveau1PaysList,
+                                      builder: (_, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return buildLoadingDropdown();
+                                        }
 
-                                      List<Magasin> produitsEtrangers =
-                                          magasinListe
-                                              .where(
-                                        (element) =>
-                                            element
-                                                .acteur!.niveau3PaysActeur! !=
-                                            detectedCountry,
-                                      )
-                                              .where((cate) {
-                                        String nomCat =
-                                            cate.nomMagasin!.toLowerCase();
-                                        searchText = _searchController.text
-                                            .toLowerCase();
-                                        return nomCat.contains(searchText);
-                                      }).toList();
+                                        if (snapshot.hasData) {
+                                          dynamic jsonString = utf8
+                                              .decode(snapshot.data.bodyBytes);
+                                          dynamic responseData =
+                                              json.decode(jsonString);
+                                          //
+                                          // }
+                                          if (responseData is List) {
+                                            final reponse = responseData;
+                                            final niveau1PaysList = reponse
+                                                .map((e) =>
+                                                    Niveau1Pays.fromMap(e))
+                                                .where((con) =>
+                                                    con.statutN1 == true)
+                                                .toList();
 
-                                      List<Magasin> filteredSearch =
-                                          magasinListe.where((cate) {
-                                        String nomCat =
-                                            cate.nomMagasin!.toLowerCase();
-                                        searchText = _searchController.text
-                                            .toLowerCase();
-                                        return nomCat.contains(searchText);
-                                      }).toList();
-                                      return filteredSearch
-                                                  // .where((element) => element.statutMagasin == true)
-                                                  .isEmpty &&
-                                              isLoading == false
-                                          ? SingleChildScrollView(
-                                              child: Padding(
-                                                padding: EdgeInsets.all(10),
-                                                child: Center(
-                                                  child: Column(
-                                                    children: [
-                                                      Image.asset(
-                                                          'assets/images/notif.jpg'),
-                                                      SizedBox(
-                                                        height: 10,
-                                                      ),
-                                                      Text(
-                                                        'Aucun magasin trouvé',
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 17,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
+                                            if (niveau1PaysList.isEmpty) {
+                                              return buildEmptyDropdown();
+                                            }
+
+                                            return buildDropdown(
+                                                niveau1PaysList);
+                                          } else {
+                                            return buildEmptyDropdown();
+                                          }
+                                        }
+
+                                        return buildEmptyDropdown();
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )),
+                        Visibility(
+                            visible: isSearchMode,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 3, horizontal: 10),
+                              child: FutureBuilder<List<Magasin>>(
+                                future: _magasinList,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return SearchFieldAutoComplete<String>(
+                                      placeholder: 'Rechercher...',
+                                      suggestions: [],
+                                    );
+                                  } else {
+                                    magasinListeSearch = snapshot.data!;
+                                    return SearchFieldAutoComplete<String>(
+                                      controller: _searchController,
+                                      // focusNode: _focusNode,
+                                      placeholder: 'Rechercher...',
+                                      placeholderStyle: TextStyle(
+                                          fontStyle: FontStyle.italic),
+                                      suggestions: magasinListeSearch
+                                          .map((item) =>
+                                              SearchFieldAutoCompleteItem<
+                                                  String>(
+                                                searchKey: item.nomMagasin!,
+                                                value: item.nomMagasin!,
+                                              ))
+                                          .toList(),
+                                      suggestionsDecoration:
+                                          SuggestionDecoration(
+                                        marginSuggestions:
+                                            const EdgeInsets.all(8.0),
+                                        color: const Color.fromARGB(
+                                            255, 236, 234, 234),
+                                        borderRadius:
+                                            BorderRadius.circular(16.0),
+                                      ),
+                                      onSuggestionSelected: (selectedItem) {
+                                        if (mounted) {
+                                          _searchController.text =
+                                              selectedItem.searchKey;
+                                          FocusScope.of(context).unfocus();
+                                        }
+                                      },
+                                      suggestionItemBuilder:
+                                          (context, searchFieldItem) {
+                                        return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            searchFieldItem.searchKey,
+                                            style:
+                                                TextStyle(color: Colors.black),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }
+                                },
+                              ),
+                            )),
+                        const SizedBox(height: 10),
+                      ])),
+                    ];
+                  },
+                  body: RefreshIndicator(
+                      onRefresh: () async {
+                        setState(() {
+                          page = 0;
+                          // Rafraîchir les données ici
+                        });
+                        debugPrint("refresh page ${page}");
+                        selectedNiveau1Pays != null
+                            ? setState(() {
+                                magasinListeFuture1 = MagasinService()
+                                    .fetchMagasinByNiveau1PaysWithPagination(
+                                        selectedNiveau1Pays!.idNiveau1Pays!);
+                              })
+                            : setState(() {
+                                magasinListeFuture =
+                                    MagasinService().fetchAllMagasin();
+                              });
+                      },
+                      child: selectedNiveau1Pays == null
+                          ? SingleChildScrollView(
+                              controller: scrollableController,
+                              child: Consumer<MagasinService>(
+                                  builder: (context, magasinService, child) {
+                                return FutureBuilder<List<Magasin>>(
+                                    future: magasinListeFuture,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return _buildShimmerEffect();
+                                      }
+                                      if (!snapshot.hasData) {
+                                        return const Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: Center(
+                                              child:
+                                                  Text("Aucun magasin trouvé")),
+                                        );
+                                      } else {
+                                        magasinListe = snapshot.data!;
+                                        String searchText = "";
+
+                                        List<Magasin> produitsLocaux =
+                                            magasinListe
+                                                .where(
+                                          (element) =>
+                                              element
+                                                  .acteur!.niveau3PaysActeur! ==
+                                              detectedCountry!,
+                                        )
+                                                .where((cate) {
+                                          String nomCat =
+                                              cate.nomMagasin!.toLowerCase();
+                                          searchText = _searchController.text
+                                              .toLowerCase();
+                                          return nomCat.contains(searchText);
+                                        }).toList();
+
+                                        List<Magasin> produitsEtrangers =
+                                            magasinListe
+                                                .where(
+                                          (element) =>
+                                              element
+                                                  .acteur!.niveau3PaysActeur! !=
+                                              detectedCountry,
+                                        )
+                                                .where((cate) {
+                                          String nomCat =
+                                              cate.nomMagasin!.toLowerCase();
+                                          searchText = _searchController.text
+                                              .toLowerCase();
+                                          return nomCat.contains(searchText);
+                                        }).toList();
+
+                                        List<Magasin> filteredSearch =
+                                            magasinListe.where((cate) {
+                                          String nomCat =
+                                              cate.nomMagasin!.toLowerCase();
+                                          searchText = _searchController.text
+                                              .toLowerCase();
+                                          return nomCat.contains(searchText);
+                                        }).toList();
+
+                                        return filteredSearch.isEmpty
+                                            ? SingleChildScrollView(
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(10),
+                                                  child: Center(
+                                                    child: Column(
+                                                      children: [
+                                                        Image.asset(
+                                                            'assets/images/notif.jpg'),
+                                                        SizedBox(
+                                                          height: 10,
                                                         ),
-                                                      ),
-                                                    ],
+                                                        Text(
+                                                          'Aucun magasin trouvé',
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 17,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            )
-                                          : filteredSearch.isEmpty &&
-                                                  isLoading == true
-                                              ? _buildShimmerEffect()
-                                              : Column(
-                                                  children: [
-                                                    if (produitsLocaux
-                                                        .isNotEmpty) ...[
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: Text(
-                                                          "Magasins locaux",
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 18),
-                                                        ),
+                                              )
+                                            : Column(
+                                                children: [
+                                                  if (produitsLocaux
+                                                      .isNotEmpty) ...[
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Text(
+                                                        "Magasins locaux",
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 18),
                                                       ),
-                                                      GridView.builder(
-                                                        shrinkWrap: true,
-                                                        physics:
-                                                            NeverScrollableScrollPhysics(),
-                                                        gridDelegate:
-                                                            SliverGridDelegateWithFixedCrossAxisCount(
-                                                          crossAxisCount: 2,
-                                                          mainAxisSpacing: 10,
-                                                          crossAxisSpacing: 10,
-                                                          childAspectRatio: 0.8,
-                                                        ),
-                                                        itemCount:
+                                                    ),
+                                                    GridView.builder(
+                                                      shrinkWrap: true,
+                                                      physics:
+                                                          NeverScrollableScrollPhysics(),
+                                                      gridDelegate:
+                                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                                        crossAxisCount: 2,
+                                                        mainAxisSpacing: 10,
+                                                        crossAxisSpacing: 10,
+                                                        childAspectRatio: 0.8,
+                                                      ),
+                                                      itemCount:
+                                                          produitsLocaux.length,
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        if (index <
                                                             produitsLocaux
-                                                                .length,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          if (index <
-                                                              produitsLocaux
-                                                                  .length) {
-                                                            return GestureDetector(
-                                                              onTap: () {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                    builder: (context) => ProductsByStoresScreen(
-                                                                        id: produitsLocaux[index]
-                                                                            .idMagasin,
-                                                                        nom: produitsLocaux[index]
-                                                                            .nomMagasin),
-                                                                  ),
-                                                                );
-                                                              },
-                                                              child: Card(
-                                                                margin:
-                                                                    EdgeInsets
-                                                                        .all(8),
-                                                                child: Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .stretch,
-                                                                  children: [
-                                                                    ClipRRect(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                      child:
-                                                                          Container(
-                                                                        height:
-                                                                            72,
-                                                                        child: produitsLocaux[index].photo == null ||
-                                                                                produitsLocaux[index].photo!.isEmpty
-                                                                            ? Image.asset(
-                                                                                "assets/images/default_image.png",
-                                                                                fit: BoxFit.cover,
-                                                                              )
-                                                                            : CachedNetworkImage(
-                                                                                imageUrl: "https://koumi.ml/api-koumi/Magasin/${produitsLocaux[index].idMagasin}/image",
-                                                                                fit: BoxFit.cover,
-                                                                                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                                                                                errorWidget: (context, url, error) => Image.asset(
-                                                                                  'assets/images/default_image.png',
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              ),
-                                                                      ),
-                                                                    ),
-                                                                    // SizedBox(height: 8),
-                                                                    ListTile(
-                                                                      title:
-                                                                          Text(
-                                                                        produitsLocaux[index]
-                                                                            .nomMagasin!,
-                                                                        maxLines:
-                                                                            2,
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              17,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                          color:
-                                                                              Colors.black87,
-                                                                        ),
-                                                                        overflow:
-                                                                            TextOverflow.ellipsis,
-                                                                      ),
-                                                                      subtitle:
-                                                                          Text(
-                                                                        overflow:
-                                                                            TextOverflow.ellipsis,
-                                                                        produitsLocaux[index]
-                                                                            .localiteMagasin!,
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              15,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                          color:
-                                                                              Colors.black87,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-
-                                                                    _buildItem(produitsLocaux[
-                                                                            index]
-                                                                        .contactMagasin!)
-                                                                  ],
+                                                                .length) {
+                                                          return GestureDetector(
+                                                            onTap: () {
+                                                              Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder: (context) => ProductsByStoresScreen(
+                                                                      id: produitsLocaux[
+                                                                              index]
+                                                                          .idMagasin,
+                                                                      nom: produitsLocaux[
+                                                                              index]
+                                                                          .nomMagasin),
                                                                 ),
-                                                              ),
-                                                            );
-                                                          } else {
-                                                            return isLoading ==
-                                                                    true
-                                                                ? Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .symmetric(
-                                                                        vertical:
-                                                                            32),
-                                                                    child: Center(
-                                                                        child: const Center(
-                                                                      child:
-                                                                          CircularProgressIndicator(
-                                                                        color: Colors
-                                                                            .orange,
-                                                                      ),
-                                                                    )),
-                                                                  )
-                                                                : Container();
-                                                          }
-                                                        },
-                                                      ),
-                                                    ],
-                                                    if (produitsEtrangers
-                                                        .isNotEmpty) ...[
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: Text(
-                                                          "Magasins etrangère",
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 18),
-                                                        ),
-                                                      ),
-                                                      GridView.builder(
-                                                        shrinkWrap: true,
-                                                        physics:
-                                                            NeverScrollableScrollPhysics(),
-                                                        gridDelegate:
-                                                            SliverGridDelegateWithFixedCrossAxisCount(
-                                                          crossAxisCount: 2,
-                                                          mainAxisSpacing: 10,
-                                                          crossAxisSpacing: 10,
-                                                          childAspectRatio: 0.8,
-                                                        ),
-                                                        itemCount:
-                                                            produitsEtrangers
-                                                                .length,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          if (index <
-                                                              produitsEtrangers
-                                                                  .length) {
-                                                            return GestureDetector(
-                                                              onTap: () {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                    builder: (context) => ProductsByStoresScreen(
-                                                                        id: produitsEtrangers[index]
-                                                                            .idMagasin,
-                                                                        nom: produitsEtrangers[index]
-                                                                            .nomMagasin),
-                                                                  ),
-                                                                );
-                                                              },
-                                                              child: Card(
-                                                                margin:
-                                                                    EdgeInsets
-                                                                        .all(8),
-                                                                child: Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .stretch,
-                                                                  children: [
-                                                                    ClipRRect(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                      child:
-                                                                          Container(
-                                                                        height:
-                                                                            72,
-                                                                        child: produitsEtrangers[index].photo == null ||
-                                                                                produitsEtrangers[index].photo!.isEmpty
-                                                                            ? Image.asset(
-                                                                                "assets/images/default_image.png",
+                                                              );
+                                                            },
+                                                            child: Card(
+                                                              margin: EdgeInsets
+                                                                  .all(8),
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .stretch,
+                                                                children: [
+                                                                  ClipRRect(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                    child:
+                                                                        Container(
+                                                                      height:
+                                                                          72,
+                                                                      child: produitsLocaux[index].photo == null ||
+                                                                              produitsLocaux[index].photo!.isEmpty
+                                                                          ? Image.asset(
+                                                                              "assets/images/default_image.png",
+                                                                              fit: BoxFit.cover,
+                                                                            )
+                                                                          : CachedNetworkImage(
+                                                                              imageUrl: "https://koumi.ml/api-koumi/Magasin/${produitsLocaux[index].idMagasin}/image",
+                                                                              fit: BoxFit.cover,
+                                                                              placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                                                                              errorWidget: (context, url, error) => Image.asset(
+                                                                                'assets/images/default_image.png',
                                                                                 fit: BoxFit.cover,
-                                                                              )
-                                                                            : CachedNetworkImage(
-                                                                                imageUrl: "https://koumi.ml/api-koumi/Magasin/${produitsEtrangers[index].idMagasin}/image",
-                                                                                fit: BoxFit.cover,
-                                                                                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                                                                                errorWidget: (context, url, error) => Image.asset(
-                                                                                  'assets/images/default_image.png',
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
                                                                               ),
-                                                                      ),
+                                                                            ),
                                                                     ),
-                                                                    // SizedBox(height: 8),
-                                                                    ListTile(
-                                                                      title:
-                                                                          Text(
-                                                                        produitsEtrangers[index]
-                                                                            .nomMagasin!,
-                                                                        maxLines:
-                                                                            2,
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              17,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                          color:
-                                                                              Colors.black87,
-                                                                        ),
-                                                                        overflow:
-                                                                            TextOverflow.ellipsis,
-                                                                      ),
-                                                                      subtitle:
-                                                                          Text(
-                                                                        overflow:
-                                                                            TextOverflow.ellipsis,
-                                                                        produitsEtrangers[index]
-                                                                            .localiteMagasin!,
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              15,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                          color:
-                                                                              Colors.black87,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-
-                                                                    _buildItem(produitsEtrangers[
-                                                                            index]
-                                                                        .contactMagasin!)
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            );
-                                                          } else {
-                                                            return isLoading ==
-                                                                    true
-                                                                ? Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .symmetric(
-                                                                        vertical:
-                                                                            32),
-                                                                    child: Center(
-                                                                        child: const Center(
-                                                                      child:
-                                                                          CircularProgressIndicator(
+                                                                  ),
+                                                                  // SizedBox(height: 8),
+                                                                  ListTile(
+                                                                    title: Text(
+                                                                      produitsLocaux[
+                                                                              index]
+                                                                          .nomMagasin!,
+                                                                      maxLines:
+                                                                          2,
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            17,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
                                                                         color: Colors
-                                                                            .orange,
+                                                                            .black87,
                                                                       ),
-                                                                    )),
-                                                                  )
-                                                                : Container();
-                                                          }
-                                                        },
-                                                      ),
-                                                    ],
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                    ),
+                                                                    subtitle:
+                                                                        Text(
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      produitsLocaux[
+                                                                              index]
+                                                                          .localiteMagasin!,
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        color: Colors
+                                                                            .black87,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+
+                                                                  _buildItem(produitsLocaux[
+                                                                          index]
+                                                                      .contactMagasin!)
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          );
+                                                        } else {
+                                                          return isLoading ==
+                                                                  true
+                                                              ? Padding(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          32),
+                                                                  child: Center(
+                                                                      child:
+                                                                          const Center(
+                                                                    child:
+                                                                        CircularProgressIndicator(
+                                                                      color: Colors
+                                                                          .orange,
+                                                                    ),
+                                                                  )),
+                                                                )
+                                                              : Container();
+                                                        }
+                                                      },
+                                                    ),
                                                   ],
-                                                );
-                                    }
-                                  });
-                            }),
-                          )))));
+                                                  if (produitsEtrangers
+                                                      .isNotEmpty) ...[
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Text(
+                                                        "Magasins etrangère",
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 18),
+                                                      ),
+                                                    ),
+                                                    GridView.builder(
+                                                      shrinkWrap: true,
+                                                      physics:
+                                                          NeverScrollableScrollPhysics(),
+                                                      gridDelegate:
+                                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                                        crossAxisCount: 2,
+                                                        mainAxisSpacing: 10,
+                                                        crossAxisSpacing: 10,
+                                                        childAspectRatio: 0.8,
+                                                      ),
+                                                      itemCount:
+                                                          produitsEtrangers
+                                                              .length,
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        if (index <
+                                                            produitsEtrangers
+                                                                .length) {
+                                                          return GestureDetector(
+                                                            onTap: () {
+                                                              Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder: (context) => ProductsByStoresScreen(
+                                                                      id: produitsEtrangers[
+                                                                              index]
+                                                                          .idMagasin,
+                                                                      nom: produitsEtrangers[
+                                                                              index]
+                                                                          .nomMagasin),
+                                                                ),
+                                                              );
+                                                            },
+                                                            child: Card(
+                                                              margin: EdgeInsets
+                                                                  .all(8),
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .stretch,
+                                                                children: [
+                                                                  ClipRRect(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                    child:
+                                                                        Container(
+                                                                      height:
+                                                                          72,
+                                                                      child: produitsEtrangers[index].photo == null ||
+                                                                              produitsEtrangers[index].photo!.isEmpty
+                                                                          ? Image.asset(
+                                                                              "assets/images/default_image.png",
+                                                                              fit: BoxFit.cover,
+                                                                            )
+                                                                          : CachedNetworkImage(
+                                                                              imageUrl: "https://koumi.ml/api-koumi/Magasin/${produitsEtrangers[index].idMagasin}/image",
+                                                                              fit: BoxFit.cover,
+                                                                              placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                                                                              errorWidget: (context, url, error) => Image.asset(
+                                                                                'assets/images/default_image.png',
+                                                                                fit: BoxFit.cover,
+                                                                              ),
+                                                                            ),
+                                                                    ),
+                                                                  ),
+                                                                  // SizedBox(height: 8),
+                                                                  ListTile(
+                                                                    title: Text(
+                                                                      produitsEtrangers[
+                                                                              index]
+                                                                          .nomMagasin!,
+                                                                      maxLines:
+                                                                          2,
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            17,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        color: Colors
+                                                                            .black87,
+                                                                      ),
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                    ),
+                                                                    subtitle:
+                                                                        Text(
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      produitsEtrangers[
+                                                                              index]
+                                                                          .localiteMagasin!,
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        color: Colors
+                                                                            .black87,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+
+                                                                  _buildItem(produitsEtrangers[
+                                                                          index]
+                                                                      .contactMagasin!)
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          );
+                                                        } else {
+                                                          return isLoading ==
+                                                                  true
+                                                              ? Padding(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          32),
+                                                                  child: Center(
+                                                                      child:
+                                                                          const Center(
+                                                                    child:
+                                                                        CircularProgressIndicator(
+                                                                      color: Colors
+                                                                          .orange,
+                                                                    ),
+                                                                  )),
+                                                                )
+                                                              : Container();
+                                                        }
+                                                      },
+                                                    ),
+                                                  ],
+                                                ],
+                                              );
+                                      }
+                                    });
+                              }),
+                            )
+                          : SingleChildScrollView(
+                              controller: scrollableController1,
+                              child: Consumer<MagasinService>(
+                                  builder: (context, magasinService, child) {
+                                return FutureBuilder<List<Magasin>>(
+                                    future: magasinListeFuture1,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return _buildShimmerEffect();
+                                      }
+
+                                      if (!snapshot.hasData) {
+                                        return SingleChildScrollView(
+                                          child: Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: Center(
+                                              child: Column(
+                                                children: [
+                                                  Image.asset(
+                                                      'assets/images/notif.jpg'),
+                                                  SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Text(
+                                                    'Aucun magasin trouvé',
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 17,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      } else {
+                                        magasinListe = snapshot.data!;
+                                        String searchText = "";
+                                        List<Magasin> produitsLocaux =
+                                            magasinListe
+                                                .where(
+                                          (element) =>
+                                              element
+                                                  .acteur!.niveau3PaysActeur! ==
+                                              detectedCountry!,
+                                        )
+                                                .where((cate) {
+                                          String nomCat =
+                                              cate.nomMagasin!.toLowerCase();
+                                          searchText = _searchController.text
+                                              .toLowerCase();
+                                          return nomCat.contains(searchText);
+                                        }).toList();
+
+                                        List<Magasin> produitsEtrangers =
+                                            magasinListe
+                                                .where(
+                                          (element) =>
+                                              element
+                                                  .acteur!.niveau3PaysActeur! !=
+                                              detectedCountry,
+                                        )
+                                                .where((cate) {
+                                          String nomCat =
+                                              cate.nomMagasin!.toLowerCase();
+                                          searchText = _searchController.text
+                                              .toLowerCase();
+                                          return nomCat.contains(searchText);
+                                        }).toList();
+
+                                        List<Magasin> filteredSearch =
+                                            magasinListe.where((cate) {
+                                          String nomCat =
+                                              cate.nomMagasin!.toLowerCase();
+                                          searchText = _searchController.text
+                                              .toLowerCase();
+                                          return nomCat.contains(searchText);
+                                        }).toList();
+                                        return filteredSearch
+                                                    // .where((element) => element.statutMagasin == true)
+                                                    .isEmpty &&
+                                                isLoading == false
+                                            ? SingleChildScrollView(
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(10),
+                                                  child: Center(
+                                                    child: Column(
+                                                      children: [
+                                                        Image.asset(
+                                                            'assets/images/notif.jpg'),
+                                                        SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        Text(
+                                                          'Aucun magasin trouvé',
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 17,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            : filteredSearch.isEmpty &&
+                                                    isLoading == true
+                                                ? _buildShimmerEffect()
+                                                : Column(
+                                                    children: [
+                                                      if (produitsLocaux
+                                                          .isNotEmpty) ...[
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                          child: Text(
+                                                            "Magasins locaux",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 18),
+                                                          ),
+                                                        ),
+                                                        GridView.builder(
+                                                          shrinkWrap: true,
+                                                          physics:
+                                                              NeverScrollableScrollPhysics(),
+                                                          gridDelegate:
+                                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                                            crossAxisCount: 2,
+                                                            mainAxisSpacing: 10,
+                                                            crossAxisSpacing:
+                                                                10,
+                                                            childAspectRatio:
+                                                                0.8,
+                                                          ),
+                                                          itemCount:
+                                                              produitsLocaux
+                                                                  .length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            if (index <
+                                                                produitsLocaux
+                                                                    .length) {
+                                                              return GestureDetector(
+                                                                onTap: () {
+                                                                  Navigator
+                                                                      .push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                      builder: (context) => ProductsByStoresScreen(
+                                                                          id: produitsLocaux[index]
+                                                                              .idMagasin,
+                                                                          nom: produitsLocaux[index]
+                                                                              .nomMagasin),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                                child: Card(
+                                                                  margin:
+                                                                      EdgeInsets
+                                                                          .all(
+                                                                              8),
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .stretch,
+                                                                    children: [
+                                                                      ClipRRect(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(8.0),
+                                                                        child:
+                                                                            Container(
+                                                                          height:
+                                                                              72,
+                                                                          child: produitsLocaux[index].photo == null || produitsLocaux[index].photo!.isEmpty
+                                                                              ? Image.asset(
+                                                                                  "assets/images/default_image.png",
+                                                                                  fit: BoxFit.cover,
+                                                                                )
+                                                                              : CachedNetworkImage(
+                                                                                  imageUrl: "https://koumi.ml/api-koumi/Magasin/${produitsLocaux[index].idMagasin}/image",
+                                                                                  fit: BoxFit.cover,
+                                                                                  placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                                                                                  errorWidget: (context, url, error) => Image.asset(
+                                                                                    'assets/images/default_image.png',
+                                                                                    fit: BoxFit.cover,
+                                                                                  ),
+                                                                                ),
+                                                                        ),
+                                                                      ),
+                                                                      // SizedBox(height: 8),
+                                                                      ListTile(
+                                                                        title:
+                                                                            Text(
+                                                                          produitsLocaux[index]
+                                                                              .nomMagasin!,
+                                                                          maxLines:
+                                                                              2,
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                17,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            color:
+                                                                                Colors.black87,
+                                                                          ),
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                        ),
+                                                                        subtitle:
+                                                                            Text(
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                          produitsLocaux[index]
+                                                                              .localiteMagasin!,
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                15,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            color:
+                                                                                Colors.black87,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+
+                                                                      _buildItem(
+                                                                          produitsLocaux[index]
+                                                                              .contactMagasin!)
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            } else {
+                                                              return isLoading ==
+                                                                      true
+                                                                  ? Padding(
+                                                                      padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                          vertical:
+                                                                              32),
+                                                                      child: Center(
+                                                                          child: const Center(
+                                                                        child:
+                                                                            CircularProgressIndicator(
+                                                                          color:
+                                                                              Colors.orange,
+                                                                        ),
+                                                                      )),
+                                                                    )
+                                                                  : Container();
+                                                            }
+                                                          },
+                                                        ),
+                                                      ],
+                                                      if (produitsEtrangers
+                                                          .isNotEmpty) ...[
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                          child: Text(
+                                                            "Magasins etrangère",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 18),
+                                                          ),
+                                                        ),
+                                                        GridView.builder(
+                                                          shrinkWrap: true,
+                                                          physics:
+                                                              NeverScrollableScrollPhysics(),
+                                                          gridDelegate:
+                                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                                            crossAxisCount: 2,
+                                                            mainAxisSpacing: 10,
+                                                            crossAxisSpacing:
+                                                                10,
+                                                            childAspectRatio:
+                                                                0.8,
+                                                          ),
+                                                          itemCount:
+                                                              produitsEtrangers
+                                                                  .length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            if (index <
+                                                                produitsEtrangers
+                                                                    .length) {
+                                                              return GestureDetector(
+                                                                onTap: () {
+                                                                  Navigator
+                                                                      .push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                      builder: (context) => ProductsByStoresScreen(
+                                                                          id: produitsEtrangers[index]
+                                                                              .idMagasin,
+                                                                          nom: produitsEtrangers[index]
+                                                                              .nomMagasin),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                                child: Card(
+                                                                  margin:
+                                                                      EdgeInsets
+                                                                          .all(
+                                                                              8),
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .stretch,
+                                                                    children: [
+                                                                      ClipRRect(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(8.0),
+                                                                        child:
+                                                                            Container(
+                                                                          height:
+                                                                              72,
+                                                                          child: produitsEtrangers[index].photo == null || produitsEtrangers[index].photo!.isEmpty
+                                                                              ? Image.asset(
+                                                                                  "assets/images/default_image.png",
+                                                                                  fit: BoxFit.cover,
+                                                                                )
+                                                                              : CachedNetworkImage(
+                                                                                  imageUrl: "https://koumi.ml/api-koumi/Magasin/${produitsEtrangers[index].idMagasin}/image",
+                                                                                  fit: BoxFit.cover,
+                                                                                  placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                                                                                  errorWidget: (context, url, error) => Image.asset(
+                                                                                    'assets/images/default_image.png',
+                                                                                    fit: BoxFit.cover,
+                                                                                  ),
+                                                                                ),
+                                                                        ),
+                                                                      ),
+                                                                      // SizedBox(height: 8),
+                                                                      ListTile(
+                                                                        title:
+                                                                            Text(
+                                                                          produitsEtrangers[index]
+                                                                              .nomMagasin!,
+                                                                          maxLines:
+                                                                              2,
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                17,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            color:
+                                                                                Colors.black87,
+                                                                          ),
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                        ),
+                                                                        subtitle:
+                                                                            Text(
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                          produitsEtrangers[index]
+                                                                              .localiteMagasin!,
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                15,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            color:
+                                                                                Colors.black87,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+
+                                                                      _buildItem(
+                                                                          produitsEtrangers[index]
+                                                                              .contactMagasin!)
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            } else {
+                                                              return isLoading ==
+                                                                      true
+                                                                  ? Padding(
+                                                                      padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                          vertical:
+                                                                              32),
+                                                                      child: Center(
+                                                                          child: const Center(
+                                                                        child:
+                                                                            CircularProgressIndicator(
+                                                                          color:
+                                                                              Colors.orange,
+                                                                        ),
+                                                                      )),
+                                                                    )
+                                                                  : Container();
+                                                            }
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ],
+                                                  );
+                                      }
+                                    });
+                              }),
+                            )))),
+        ));
   }
 
   Widget _buildShimmerEffect() {

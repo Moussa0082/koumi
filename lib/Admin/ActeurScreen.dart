@@ -143,6 +143,7 @@ class _ActeurScreenState extends State<ActeurScreen> {
                       onPressed: () {
                         setState(() {
                           isSearchMode = !isSearchMode;
+                          _searchController.clear();
                         });
                       },
                       icon: Icon(

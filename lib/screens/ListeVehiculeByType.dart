@@ -167,11 +167,11 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
 
   @override
   void dispose() {
-    if (isSearchMode) {
-      _searchController = TextEditingController();
-    } else {
+    // if (isSearchMode) {
+    //   _searchController = TextEditingController();
+    // } else {
+    // }
       _searchController.dispose();
-    }
     scrollableController.dispose();
     super.dispose();
   }
@@ -236,53 +236,44 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
               ],
             )
           ]),
-      body: Container(
-        child: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverToBoxAdapter(
-                    child: Column(children: [
-                  if (!isSearchMode)
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton.icon(
-                        onPressed: () {
+      body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+        child: Container(
+          child: NestedScrollView(
+              headerSliverBuilder:
+                  (BuildContext context, bool innerBoxIsScrolled) {
+                return <Widget>[
+                  SliverToBoxAdapter(
+                      child: Column(children: [
+                     Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        if (mounted) {
                           setState(() {
-                            isSearchMode = true;
+                            isSearchMode = !isSearchMode;
+                            _searchController.clear();
+                            _searchController = TextEditingController();
                           });
-                        },
-                        icon: Icon(
-                          Icons.search,
-                          color: d_colorGreen,
-                        ),
-                        label: Text(
-                          'Rechercher',
-                          style: TextStyle(color: d_colorGreen, fontSize: 17),
-                        ),
+                          debugPrint("Rechercher mode désactivé : $isSearchMode");
+                        }
+                      },
+                      icon: Icon(
+                        isSearchMode ? Icons.close : Icons.search,
+                        color: isSearchMode ? Colors.red : Colors.green,
+                      ),
+                      label: Text(
+                        isSearchMode ? 'Fermer' : 'Rechercher...',
+                        style: TextStyle(
+                            color: isSearchMode ? Colors.red : Colors.green,
+                            fontSize: 17),
                       ),
                     ),
+                  ),
                   if (isSearchMode)
-                    Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              isSearchMode = false;
-                            });
-                          },
-                          icon: Icon(
-                            Icons.close,
-                            color: Colors.red,
-                          ),
-                          label: Text(
-                            'Fermer',
-                            style: TextStyle(color: Colors.red, fontSize: 17),
-                          ),
-                        )),
-                  Visibility(
-                    visible: isSearchMode,
-                    child: Padding(
+                    Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: SearchFieldAutoComplete<String>(
                         controller: _searchController,
@@ -311,416 +302,416 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                         },
                       ),
                     ),
-                  ),
-                  // const SizedBox(height: 10),
-                  //  Padding(
-                  //   padding: const EdgeInsets.all(10.0),
-                  //   child: Container(
-                  //     padding: EdgeInsets.symmetric(horizontal: 10),
-                  //     decoration: BoxDecoration(
-                  //       color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                  //       borderRadius: BorderRadius.circular(25),
-                  //     ),
-                  //     child: Row(
-                  //       children: [
-                  //         Icon(Icons.search,
-                  //             color: Colors.blueGrey[400],
-                  //             size:
-                  //                 28), // Utiliser une icône de recherche plus grande
-                  //         SizedBox(width: 10),
-                  //         Expanded(
-                  //           child: TextField(
-                  //             controller: _searchController,
-                  //             onChanged: (value) {
-                  //               setState(() {});
-                  //             },
-                  //             decoration: InputDecoration(
-                  //               hintText: 'Rechercher...',
-                  //               border: InputBorder.none,
-                  //               hintStyle:
-                  //                   TextStyle(color: Colors.blueGrey[400]),
-                  //             ),
-                  //           ),
-                  //         ),
-                  //         // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
-                  //         IconButton(
-                  //           icon: Icon(Icons.clear),
-                  //           onPressed: () {
-                  //             _searchController.clear();
-                  //             setState(() {});
-                  //           },
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-                  // const SizedBox(height: 10),
-                ])),
-              ];
-            },
-            body: RefreshIndicator(
-              onRefresh: () async {
-                setState(() {
-                  page = 0;
-                  // Rafraîchir les données ici
-                  futureListe = VehiculeService()
-                      .fetchVehiculeByTypeVoitureWithPagination(
-                          typeVoiture.idTypeVoiture!,
-                          detectedCountry != null ? detectedCountry! : "mali");
-                });
+                    // const SizedBox(height: 10),
+                    //  Padding(
+                    //   padding: const EdgeInsets.all(10.0),
+                    //   child: Container(
+                    //     padding: EdgeInsets.symmetric(horizontal: 10),
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                    //       borderRadius: BorderRadius.circular(25),
+                    //     ),
+                    //     child: Row(
+                    //       children: [
+                    //         Icon(Icons.search,
+                    //             color: Colors.blueGrey[400],
+                    //             size:
+                    //                 28), // Utiliser une icône de recherche plus grande
+                    //         SizedBox(width: 10),
+                    //         Expanded(
+                    //           child: TextField(
+                    //             controller: _searchController,
+                    //             onChanged: (value) {
+                    //               setState(() {});
+                    //             },
+                    //             decoration: InputDecoration(
+                    //               hintText: 'Rechercher...',
+                    //               border: InputBorder.none,
+                    //               hintStyle:
+                    //                   TextStyle(color: Colors.blueGrey[400]),
+                    //             ),
+                    //           ),
+                    //         ),
+                    //         // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                    //         IconButton(
+                    //           icon: Icon(Icons.clear),
+                    //           onPressed: () {
+                    //             _searchController.clear();
+                    //             setState(() {});
+                    //           },
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 10),
+                  ])),
+                ];
               },
-              child: SingleChildScrollView(
-                controller: scrollableController,
-                child: Consumer<VehiculeService>(
-                    builder: (context, vehiculeService, child) {
-                  return FutureBuilder(
-                      // future: vehiculeService
-                      //     .fetchVehiculeByTypeVehicule(typeVoiture.idTypeVoiture!),
-                      future: futureListe,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return _buildShimmerEffect();
-                        }
-
-                        if (!snapshot.hasData) {
-                          return SingleChildScrollView(
-                            child: Padding(
-                              padding: EdgeInsets.all(10),
-                              child: Center(
-                                child: Column(
-                                  children: [
-                                    Image.asset('assets/images/notif.jpg'),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      'Aucune vehiucle trouvé',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 17,
-                                        overflow: TextOverflow.ellipsis,
+              body: RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {
+                    page = 0;
+                    // Rafraîchir les données ici
+                    futureListe = VehiculeService()
+                        .fetchVehiculeByTypeVoitureWithPagination(
+                            typeVoiture.idTypeVoiture!,
+                            detectedCountry != null ? detectedCountry! : "mali");
+                  });
+                },
+                child: SingleChildScrollView(
+                  controller: scrollableController,
+                  child: Consumer<VehiculeService>(
+                      builder: (context, vehiculeService, child) {
+                    return FutureBuilder(
+                        // future: vehiculeService
+                        //     .fetchVehiculeByTypeVehicule(typeVoiture.idTypeVoiture!),
+                        future: futureListe,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return _buildShimmerEffect();
+                          }
+        
+                          if (!snapshot.hasData) {
+                            return SingleChildScrollView(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Center(
+                                  child: Column(
+                                    children: [
+                                      Image.asset('assets/images/notif.jpg'),
+                                      SizedBox(
+                                        height: 10,
                                       ),
-                                    ),
-                                  ],
+                                      Text(
+                                        'Aucune vehiucle trouvé',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 17,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        } else {
-                          vehiculeListe = snapshot.data!;
-                          String searchText = "";
-                          List<Vehicule> filtereSearch =
-                              vehiculeListe.where((search) {
-                            String libelle = search.nomVehicule.toLowerCase();
-                            searchText = _searchController.text.toLowerCase();
-                            return libelle.contains(searchText);
-                          }).toList();
-                          return GridView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 10,
-                              crossAxisSpacing: 10,
-                              childAspectRatio: 0.8,
-                            ),
-                            itemCount: filtereSearch.length + 1,
-                            itemBuilder: (context, index) {
-                              if (index < filtereSearch.length) {
-                                var e = filtereSearch
-                                    .where((element) =>
-                                        element.statutVehicule == true)
-                                    .elementAt(index);
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                DetailTransport(vehicule: e)));
-                                  },
-                                  child: Card(
-                                    margin: EdgeInsets.all(8),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          child: SizedBox(
-                                            height: 72,
-                                            child: e.photoVehicule == null ||
-                                                    e.photoVehicule!.isEmpty
-                                                ? Image.asset(
-                                                    "assets/images/default_image.png",
-                                                    fit: BoxFit.cover,
-                                                  )
-                                                : CachedNetworkImage(
-                                                    imageUrl:
-                                                        "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
-                                                    fit: BoxFit.cover,
-                                                    placeholder: (context,
-                                                            url) =>
-                                                        const Center(
-                                                            child:
-                                                                CircularProgressIndicator()),
-                                                    errorWidget:
-                                                        (context, url, error) =>
-                                                            Image.asset(
-                                                      'assets/images/default_image.png',
+                            );
+                          } else {
+                            vehiculeListe = snapshot.data!;
+                            String searchText = "";
+                            List<Vehicule> filtereSearch =
+                                vehiculeListe.where((search) {
+                              String libelle = search.nomVehicule.toLowerCase();
+                              searchText = _searchController.text.toLowerCase();
+                              return libelle.contains(searchText);
+                            }).toList();
+                            return GridView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 10,
+                                crossAxisSpacing: 10,
+                                childAspectRatio: 0.8,
+                              ),
+                              itemCount: filtereSearch.length + 1,
+                              itemBuilder: (context, index) {
+                                if (index < filtereSearch.length) {
+                                  var e = filtereSearch
+                                      .where((element) =>
+                                          element.statutVehicule == true)
+                                      .elementAt(index);
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DetailTransport(vehicule: e)));
+                                    },
+                                    child: Card(
+                                      margin: EdgeInsets.all(8),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            child: SizedBox(
+                                              height: 72,
+                                              child: e.photoVehicule == null ||
+                                                      e.photoVehicule!.isEmpty
+                                                  ? Image.asset(
+                                                      "assets/images/default_image.png",
                                                       fit: BoxFit.cover,
+                                                    )
+                                                  : CachedNetworkImage(
+                                                      imageUrl:
+                                                          "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
+                                                      fit: BoxFit.cover,
+                                                      placeholder: (context,
+                                                              url) =>
+                                                          const Center(
+                                                              child:
+                                                                  CircularProgressIndicator()),
+                                                      errorWidget:
+                                                          (context, url, error) =>
+                                                              Image.asset(
+                                                        'assets/images/default_image.png',
+                                                        fit: BoxFit.cover,
+                                                      ),
                                                     ),
-                                                  ),
-                                          ),
-                                        ),
-                                        // SizedBox(height: 8),
-                                        ListTile(
-                                          title: Text(
-                                            e.nomVehicule,
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black87,
-                                            ),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          subtitle: Text(
-                                            e.localisation,
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.black87,
                                             ),
                                           ),
-                                        ),
-                                        Container(
-                                          alignment: Alignment.bottomRight,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              _buildEtat(e.statutVehicule),
-                                              PopupMenuButton<String>(
-                                                padding: EdgeInsets.zero,
-                                                itemBuilder: (context) =>
-                                                    <PopupMenuEntry<String>>[
-                                                  PopupMenuItem<String>(
-                                                    child: ListTile(
-                                                      leading:
+                                          // SizedBox(height: 8),
+                                          ListTile(
+                                            title: Text(
+                                              e.nomVehicule,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black87,
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            subtitle: Text(
+                                              e.localisation,
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            alignment: Alignment.bottomRight,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                _buildEtat(e.statutVehicule),
+                                                PopupMenuButton<String>(
+                                                  padding: EdgeInsets.zero,
+                                                  itemBuilder: (context) =>
+                                                      <PopupMenuEntry<String>>[
+                                                    PopupMenuItem<String>(
+                                                      child: ListTile(
+                                                        leading:
+                                                            e.statutVehicule ==
+                                                                    false
+                                                                ? Icon(
+                                                                    Icons.check,
+                                                                    color: Colors
+                                                                        .green,
+                                                                  )
+                                                                : Icon(
+                                                                    Icons
+                                                                        .disabled_visible,
+                                                                    color: Colors
+                                                                            .orange[
+                                                                        400],
+                                                                  ),
+                                                        title: Text(
                                                           e.statutVehicule ==
                                                                   false
-                                                              ? Icon(
-                                                                  Icons.check,
-                                                                  color: Colors
-                                                                      .green,
-                                                                )
-                                                              : Icon(
-                                                                  Icons
-                                                                      .disabled_visible,
-                                                                  color: Colors
-                                                                          .orange[
-                                                                      400],
-                                                                ),
-                                                      title: Text(
-                                                        e.statutVehicule ==
-                                                                false
-                                                            ? "Activer"
-                                                            : "Desactiver",
-                                                        style: TextStyle(
-                                                          color:
-                                                              e.statutVehicule ==
-                                                                      false
-                                                                  ? Colors.green
-                                                                  : Colors.orange[
-                                                                      400],
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                      onTap: () async {
-                                                        e.statutVehicule ==
-                                                                false
-                                                            ? await VehiculeService()
-                                                                .activerVehicules(e
-                                                                    .idVehicule)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<VehiculeService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          setState(
-                                                                              () {
-                                                                            futureListe =
-                                                                                getListe(typeVoiture.idTypeVoiture!);
-                                                                          }),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Activer avec succèss "),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 2),
-                                                                            ),
-                                                                          )
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        })
-                                                            : await VehiculeService()
-                                                                .desactiverVehicules(e
-                                                                    .idVehicule)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<VehiculeService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          setState(
-                                                                              () {
-                                                                            futureListe =
-                                                                                getListe(typeVoiture.idTypeVoiture!);
-                                                                          }),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        });
-
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          const SnackBar(
-                                                            content: Row(
-                                                              children: [
-                                                                Text(
-                                                                    "Désactiver avec succèss "),
-                                                              ],
-                                                            ),
-                                                            duration: Duration(
-                                                                seconds: 2),
+                                                              ? "Activer"
+                                                              : "Desactiver",
+                                                          style: TextStyle(
+                                                            color:
+                                                                e.statutVehicule ==
+                                                                        false
+                                                                    ? Colors.green
+                                                                    : Colors.orange[
+                                                                        400],
+                                                            fontWeight:
+                                                                FontWeight.bold,
                                                           ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-                                                  PopupMenuItem<String>(
-                                                    child: ListTile(
-                                                      leading: const Icon(
-                                                        Icons.delete,
-                                                        color: Colors.red,
-                                                      ),
-                                                      title: const Text(
-                                                        "Supprimer",
-                                                        style: TextStyle(
-                                                          color: Colors.red,
-                                                          fontWeight:
-                                                              FontWeight.bold,
                                                         ),
+                                                        onTap: () async {
+                                                          e.statutVehicule ==
+                                                                  false
+                                                              ? await VehiculeService()
+                                                                  .activerVehicules(e
+                                                                      .idVehicule)
+                                                                  .then(
+                                                                      (value) => {
+                                                                            Provider.of<VehiculeService>(context, listen: false)
+                                                                                .applyChange(),
+                                                                            setState(
+                                                                                () {
+                                                                              futureListe =
+                                                                                  getListe(typeVoiture.idTypeVoiture!);
+                                                                            }),
+                                                                            Navigator.of(context)
+                                                                                .pop(),
+                                                                            ScaffoldMessenger.of(context)
+                                                                                .showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Activer avec succèss "),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 2),
+                                                                              ),
+                                                                            )
+                                                                          })
+                                                                  .catchError(
+                                                                      (onError) =>
+                                                                          {
+                                                                            ScaffoldMessenger.of(context)
+                                                                                .showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Une erreur s'est produit"),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 5),
+                                                                              ),
+                                                                            ),
+                                                                            Navigator.of(context)
+                                                                                .pop(),
+                                                                          })
+                                                              : await VehiculeService()
+                                                                  .desactiverVehicules(e
+                                                                      .idVehicule)
+                                                                  .then(
+                                                                      (value) => {
+                                                                            Provider.of<VehiculeService>(context, listen: false)
+                                                                                .applyChange(),
+                                                                            setState(
+                                                                                () {
+                                                                              futureListe =
+                                                                                  getListe(typeVoiture.idTypeVoiture!);
+                                                                            }),
+                                                                            Navigator.of(context)
+                                                                                .pop(),
+                                                                          })
+                                                                  .catchError(
+                                                                      (onError) =>
+                                                                          {
+                                                                            ScaffoldMessenger.of(context)
+                                                                                .showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Une erreur s'est produit"),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 5),
+                                                                              ),
+                                                                            ),
+                                                                            Navigator.of(context)
+                                                                                .pop(),
+                                                                          });
+        
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            const SnackBar(
+                                                              content: Row(
+                                                                children: [
+                                                                  Text(
+                                                                      "Désactiver avec succèss "),
+                                                                ],
+                                                              ),
+                                                              duration: Duration(
+                                                                  seconds: 2),
+                                                            ),
+                                                          );
+                                                        },
                                                       ),
-                                                      onTap: () async {
-                                                        await VehiculeService()
-                                                            .deleteVehicule(
-                                                                e.idVehicule)
-                                                            .then((value) => {
-                                                                  Provider.of<VehiculeService>(
-                                                                          context,
-                                                                          listen:
-                                                                              false)
-                                                                      .applyChange(),
-                                                                  setState(() {
-                                                                    futureListe =
-                                                                        getListe(
-                                                                            typeVoiture.idTypeVoiture!);
-                                                                  }),
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop(),
-                                                                })
-                                                            .catchError(
-                                                                (onError) => {
-                                                                      ScaffoldMessenger.of(
-                                                                              context)
-                                                                          .showSnackBar(
-                                                                        const SnackBar(
-                                                                          content:
-                                                                              Row(
-                                                                            children: [
-                                                                              Text("Impossible de supprimer"),
-                                                                            ],
-                                                                          ),
-                                                                          duration:
-                                                                              Duration(seconds: 2),
-                                                                        ),
-                                                                      )
-                                                                    });
-                                                      },
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      ],
+                                                    PopupMenuItem<String>(
+                                                      child: ListTile(
+                                                        leading: const Icon(
+                                                          Icons.delete,
+                                                          color: Colors.red,
+                                                        ),
+                                                        title: const Text(
+                                                          "Supprimer",
+                                                          style: TextStyle(
+                                                            color: Colors.red,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        onTap: () async {
+                                                          await VehiculeService()
+                                                              .deleteVehicule(
+                                                                  e.idVehicule)
+                                                              .then((value) => {
+                                                                    Provider.of<VehiculeService>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .applyChange(),
+                                                                    setState(() {
+                                                                      futureListe =
+                                                                          getListe(
+                                                                              typeVoiture.idTypeVoiture!);
+                                                                    }),
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(),
+                                                                  })
+                                                              .catchError(
+                                                                  (onError) => {
+                                                                        ScaffoldMessenger.of(
+                                                                                context)
+                                                                            .showSnackBar(
+                                                                          const SnackBar(
+                                                                            content:
+                                                                                Row(
+                                                                              children: [
+                                                                                Text("Impossible de supprimer"),
+                                                                              ],
+                                                                            ),
+                                                                            duration:
+                                                                                Duration(seconds: 2),
+                                                                          ),
+                                                                        )
+                                                                      });
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                );
-                              } else {
-                                return isLoading == true
-                                    ? Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 32),
-                                        child: Center(
-                                            child: const Center(
-                                          child: CircularProgressIndicator(
-                                            color: Colors.orange,
-                                          ),
-                                        )),
-                                      )
-                                    : Container();
-                              }
-                            },
-                          );
-                        }
-                      });
-                }),
-              ),
-            )),
+                                  );
+                                } else {
+                                  return isLoading == true
+                                      ? Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 32),
+                                          child: Center(
+                                              child: const Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.orange,
+                                            ),
+                                          )),
+                                        )
+                                      : Container();
+                                }
+                              },
+                            );
+                          }
+                        });
+                  }),
+                ),
+              )),
+        ),
       ),
     );
   }

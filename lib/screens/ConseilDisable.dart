@@ -41,7 +41,6 @@ class _ConseilDisableState extends State<ConseilDisable> {
       }
     });
   }
-
   late ScrollController _scrollController;
   @override
   void initState() {
@@ -91,6 +90,7 @@ class _ConseilDisableState extends State<ConseilDisable> {
                         onPressed: () {
                           setState(() {
                             isSearchMode = !isSearchMode;
+                            _searchController.clear();
                           });
                         },
                         icon: Icon(
